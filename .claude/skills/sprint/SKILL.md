@@ -1,6 +1,6 @@
 ---
 name: sprint
-description: Orquestra a squad (produto, dev, qa) executando UMA etapa por vez e parando em cada aprovação do Renato.
+description: Orquestra a squad (produto, ux, dev, qa) executando UMA etapa por vez e parando em cada aprovação do Renato.
 argument-hint: [ideia: <texto> | status]
 disable-model-invocation: true
 allowed-tools: Bash(git status *) Bash(git log *) Bash(git diff *) Bash(git add *) Bash(git -c * commit *) Bash(npm *) Bash(npx *) Read Write Edit Glob Grep
@@ -16,9 +16,9 @@ cat docs/status.md
 
 ## Regras inegociáveis
 
-1. Execute no máximo UMA etapa de trabalho (Produto, Dev ou QA) por chamada deste comando.
+1. Execute no máximo UMA etapa de trabalho (Produto, UX, Dev ou QA) por chamada deste comando.
 2. Nunca inicie uma etapa de trabalho cujo portão anterior não esteja "aprovada". Isso vale mesmo que o Renato pareça ter pressa.
-3. Delegue o trabalho aos subagentes `produto`, `dev` e `qa`. Você não escreve código nem backlog.
+3. Delegue o trabalho aos subagentes `produto`, `ux`, `dev` e `qa`. Você não escreve código, backlog nem design.
 4. Depois de cada etapa: confira os arquivos entregues, atualize `docs/status.md` (estado e observação), faça commit do status e pare no portão seguinte, pedindo a decisão ao Renato com AskUserQuestion.
 
 ## O que fazer
@@ -34,9 +34,17 @@ cat docs/status.md
 
 | Portão | Aprovado libera | Agente | Depois abre |
 | --- | --- | --- | --- |
-| G1 backlog | D1 implementar | `dev` | G2 |
+| G1 backlog | U1 planejar design | `ux` | GD |
+| GD design | D1 implementar | `dev` | G2 |
 | G2 código | Q1 testar (também retestar) | `qa` | G3 |
 | G3 relatório de QA | D2 corrigir bugs ou E entrega | `dev` ou fechamento | G2 (após correção) ou fim |
+
+## Etapa U1 e portão GD (design)
+
+- Ao chamar `ux`, passe `docs/backlog.md`, `docs/design-direcao.md` (se existir) e os ajustes pedidos pelo Renato. Numa sprint nova sem `docs/design-direcao.md`, pergunte ao Renato a direção visual (estilo e cores) junto com a decisão de G1 e grave a resposta nesse arquivo antes de chamar o UX.
+- Confira se `docs/design.md` tem tokens, componentes e uma seção por história, e se `docs/design-preview.html` existe. Faça o commit com `git -c user.name="Agente UX" -c user.email="ux@squad.local" commit -m "docs(design): ..."`.
+- Em GD, mostre a paleta principal (hex), a tipografia, as telas desenhadas e as "Decisões de UX", e indique `docs/design-preview.html` para ele abrir no navegador. Opções: **Aprovar e iniciar D1 implementar**, **Pedir ajustes ao design**, **Ainda estou revisando**. Ajustes rodam de novo só o `ux`.
+- O Dev implementa seguindo `docs/design.md`. Se o Renato pedir mudança de design depois de GD aprovado, ela passa por U1 e GD de novo antes de chegar ao Dev.
 
 ## Portão G3 (relatório de QA)
 
