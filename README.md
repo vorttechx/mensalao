@@ -1,6 +1,6 @@
-# Squad Assina Aí
+# Squad Mensalão
 
-Projeto do Claude Code com uma squad de três agentes (Produto, Dev, QA) que constrói o Assina Aí, um PWA de controle de assinaturas, com aprovação do Renato antes de cada etapa.
+Projeto do Claude Code com uma squad de três agentes (Produto, Dev, QA) que constrói o Mensalão, um PWA de controle de assinaturas, com aprovação do Renato antes de cada etapa.
 
 ## Estrutura
 

@@ -1,4 +1,4 @@
-# Status da sprint 1 — Assina Aí
+# Status da sprint 1 — Mensalão
 
 Atualizado a cada etapa pelo orquestrador. Estados: pendente, andamento, concluída, aguardando você, aprovada, rejeitada, falhou.
 

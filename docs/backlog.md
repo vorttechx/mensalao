@@ -1,8 +1,8 @@
-# Assina Aí — Backlog do MVP (Sprint 1)
+# Mensalão — Backlog do MVP (Sprint 1)
 
 ## 1. Visão do produto
 
-O **Assina Aí** é um PWA instalável no celular que ajuda brasileiros a retomar o controle das assinaturas e cobranças recorrentes (streaming, música, academia, internet, apps e autorizações de Pix Automático) **sem conectar ao banco**. Todos os dados ficam no próprio aparelho. O app mostra o que vai ser cobrado e quando, quanto isso pesa por mês e por ano, avisa quando um preço subiu e explica onde cancelar — num cenário em que as recorrências estão espalhadas por vários bancos, cartões e, desde jul/2026, também pela conta-salário.
+O **Mensalão** é um PWA instalável no celular que ajuda brasileiros a retomar o controle das assinaturas e cobranças recorrentes (streaming, música, academia, internet, apps e autorizações de Pix Automático) **sem conectar ao banco**. Todos os dados ficam no próprio aparelho. O app mostra o que vai ser cobrado e quando, quanto isso pesa por mês e por ano, avisa quando um preço subiu e explica onde cancelar — num cenário em que as recorrências estão espalhadas por vários bancos, cartões e, desde jul/2026, também pela conta-salário.
 
 ### Fora de escopo (MVP)
 
@@ -24,7 +24,7 @@ Restrições fixadas pelo tech lead — obrigatórias para todas as histórias:
 | Item | Definição |
 |---|---|
 | Stack | Vite + TypeScript, **sem framework de UI** (DOM nativo). |
-| Persistência | `localStorage` (chave versionada, ex.: `assina-ai:v1`). Nada sai do aparelho. |
+| Persistência | `localStorage` (chave versionada, ex.: `mensalao:v1`). Nada sai do aparelho. |
 | PWA | `manifest.webmanifest` + service worker: app instalável e funcional **offline** após o primeiro acesso. |
 | Domínio | Lógica de domínio em **módulos puros e testáveis** (sem acesso a DOM nem a `localStorage`): cálculo de totais, lista de próximas cobranças, cálculo de reajuste, avanço da data de cobrança para o próximo ciclo. Data "hoje" recebida por parâmetro para permitir teste. |
 | Build | `base: './'` (caminhos relativos) no Vite, para funcionar em qualquer subdiretório. |
@@ -160,7 +160,7 @@ Personas:
 
 **Critérios de aceite**
 
-- **US-07.CA1** — Dado que tenho dados, quando toco em "Exportar backup" (`data-testid="btn-exportar"`), então é baixado um arquivo `assina-ai-backup-aaaa-mm-dd.json` com versão do formato, data de exportação, configurações (N dias) e todas as assinaturas (incluindo pausadas, canceladas e histórico de preços).
+- **US-07.CA1** — Dado que tenho dados, quando toco em "Exportar backup" (`data-testid="btn-exportar"`), então é baixado um arquivo `mensalao-backup-aaaa-mm-dd.json` com versão do formato, data de exportação, configurações (N dias) e todas as assinaturas (incluindo pausadas, canceladas e histórico de preços).
 - **US-07.CA2** — Dado um backup válido, quando escolho "Importar backup" (`data-testid="btn-importar"`) e seleciono o arquivo, então vejo confirmação com a quantidade de assinaturas e o aviso de que os dados atuais serão **substituídos**; ao confirmar, os dados são carregados e todas as telas atualizam.
 - **US-07.CA3** — Dado um arquivo inválido (não é JSON, JSON sem o formato esperado, versão desconhecida, valores negativos ou datas inválidas), quando tento importar, então vejo mensagem de erro clara e **os dados atuais permanecem intactos**.
 - **US-07.CA4** — Dado que exporto e em seguida importo o mesmo arquivo, então os dados resultantes são idênticos aos originais (ida e volta sem perdas, incluindo centavos e histórico).
@@ -172,13 +172,13 @@ Personas:
 
 ### US-08 — Instalar e usar offline (P1)
 
-**Como** Marina, **quero** instalar o Assina Aí na tela inicial do celular e usá-lo sem internet, **para** consultar minhas cobranças a qualquer momento, como um app comum.
+**Como** Marina, **quero** instalar o Mensalão na tela inicial do celular e usá-lo sem internet, **para** consultar minhas cobranças a qualquer momento, como um app comum.
 
 **Critérios de aceite**
 
-- **US-08.CA1** — Dado que acesso o app num navegador compatível, então o manifest (nome "Assina Aí", ícones 192 e 512 px, `display: standalone`, cores de tema) permite a instalação.
+- **US-08.CA1** — Dado que acesso o app num navegador compatível, então o manifest (nome "Mensalão", ícones 192 e 512 px, `display: standalone`, cores de tema) permite a instalação.
 - **US-08.CA2** — Dado que o app já foi aberto uma vez com internet, quando fico offline e reabro, então todas as telas carregam e os dados locais aparecem.
-- **US-08.CA3** — Dado que o build é servido de um subdiretório (ex.: `/apps/assina-ai/`), então todos os recursos carregam (base relativa `./`).
+- **US-08.CA3** — Dado que o build é servido de um subdiretório (ex.: `/apps/mensalao/`), então todos os recursos carregam (base relativa `./`).
 - **US-08.CA4** — Dado que o `localStorage` contém dados corrompidos, quando abro o app, então ele não trava: mostra aviso, oferece começar do zero ou importar backup, e não sobrescreve os dados corrompidos sem confirmação.
 - **US-08.CA5** — A interface funciona em 360 px de largura sem rolagem horizontal, com áreas de toque de pelo menos 44×44 px.
 

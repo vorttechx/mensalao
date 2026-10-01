@@ -1,4 +1,4 @@
-# Squad de desenvolvimento — Assina Aí
+# Squad de desenvolvimento — Mensalão
 
 Squad simulada de três agentes que constrói apps pequenos a partir de uma ideia. Idioma: português do Brasil (conversa, docs, commits e comentários).
 
