@@ -37,6 +37,11 @@ export function valorSimples(a: Assinatura): string {
   return formatarBRL(a.valorCentavos);
 }
 
+/** Selos de reajuste do item (implementados na US-03). */
+export function selosReajuste(_a: Assinatura): HTMLElement[] {
+  return [];
+}
+
 /** Texto do reajuste para o banner de edição (implementado na US-03). */
 export function textoReajusteBanner(_a: Assinatura): string {
   return '';

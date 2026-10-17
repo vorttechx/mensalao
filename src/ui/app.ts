@@ -5,6 +5,7 @@ import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
 import { consumirBanner, fecharBanner, navegar, registrarTroca, rotaAtual } from './navegacao';
 import type { Aba, Tela } from './tela';
+import { telaAjustes } from './telas/ajustes';
 import { telaCatalogo } from './telas/catalogo';
 import { telaFormulario } from './telas/formulario';
 import { telaInicio } from './telas/inicio';
@@ -25,6 +26,7 @@ function resolverTela(rota: string): Tela {
   const [p0, p1, p2] = partes;
   if (p0 === 'nova' && p1 === 'form') return telaFormulario({ modo: 'nova', catalogoId: p2 ?? null });
   if (p0 === 'nova') return telaCatalogo();
+  if (p0 === 'ajustes') return telaAjustes();
   return telaInicio();
 }
 
