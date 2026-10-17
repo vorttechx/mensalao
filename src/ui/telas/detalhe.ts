@@ -2,11 +2,13 @@
 import { formatarDataBR } from '../../domain/datas';
 import { formatarBRL } from '../../domain/dinheiro';
 import { rotuloCiclo, rotuloPagamento, sufixoCiclo, type Assinatura } from '../../domain/tipos';
+import { montarGuia } from '../../domain/guia';
 import { excluirAssinatura, marcarCancelada, pausar, reativar, substituirAssinatura } from '../../domain/operacoes';
 import { definirEstado, hoje, obterEstado } from '../../loja';
 import { renderizar } from '../app';
 import { botao, confirmar, estadoVazio, selo } from '../componentes';
 import { h } from '../dom';
+import { icone } from '../icones';
 import { avisar, navegar, substituir, voltar } from '../navegacao';
 import type { Tela } from '../tela';
 import { hrefDetalhe, selosReajuste } from './comum';
@@ -69,6 +71,28 @@ async function acaoExcluir(a: Assinatura): Promise<void> {
   substituir('#/');
 }
 
+/** Guia "Como cancelar" (US-06): botão disclosure + painel com os textos. */
+function guiaCancelamento(a: Assinatura): { botao: HTMLButtonElement; painel: HTMLElement } {
+  const g = montarGuia(a);
+  const painel = h(
+    'div',
+    { class: 'guia', id: 'guia', testid: 'cancel-guide', hidden: true, role: 'region', 'aria-label': 'Como cancelar' },
+    g.servico ? h('p', { testid: 'guia-servico' }, g.servico) : null,
+    g.lojaApps ? h('p', { testid: 'guia-loja' }, g.lojaApps) : null,
+    g.pix ? h('div', { testid: 'guia-pix' }, h('h3', {}, 'Pix Automático'), h('p', {}, g.pix)) : null,
+    h('p', { class: 'aviso-guia' }, icone('info'), h('span', {}, g.avisoFinal)),
+    a.status !== 'cancelada'
+      ? botao('Marcar como cancelada', 'secundario', () => acaoMarcarCancelada(a), { testid: 'btn-guia-marcar-cancelada', larga: true })
+      : null,
+  );
+  const b = botao('Como cancelar', 'secundario', () => {
+    const abrir = painel.hidden;
+    painel.hidden = !abrir;
+    b.setAttribute('aria-expanded', String(abrir));
+  }, { testid: 'btn-como-cancelar', attrs: { 'aria-expanded': 'false', 'aria-controls': 'guia' } });
+  return { botao: b, painel };
+}
+
 function situacao(a: Assinatura): Node {
   if (a.status === 'pausada') return selo('neutro', 'Pausada', 'badge-pausada');
   if (a.status === 'cancelada') return selo('cancelada', 'Cancelada', 'badge-cancelada');
@@ -97,6 +121,7 @@ export function telaDetalhe(id: string): Tela {
     };
   }
   const selos = selosReajuste(a);
+  const guia = guiaCancelamento(a);
 
   return {
     titulo: a.nome,
@@ -124,7 +149,9 @@ export function telaDetalhe(id: string): Tela {
         'div',
         { class: 'duas acoes-detalhe' },
         botao('Editar', 'secundario', () => navegar(`${hrefDetalhe(a)}/editar`), { testid: 'btn-editar' }),
+        guia.botao,
       ),
+      guia.painel,
       secaoHistorico(a),
       ...acoesSituacao(a),
     ],
