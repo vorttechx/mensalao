@@ -1,7 +1,9 @@
 // Peças compartilhadas pelas telas de lista e detalhe.
 import { formatarDataBR } from '../../domain/datas';
 import { formatarBRL } from '../../domain/dinheiro';
+import { textoReajuste, ultimoReajuste } from '../../domain/reajuste';
 import { rotuloPagamento, type Assinatura } from '../../domain/tipos';
+import { selo } from '../componentes';
 import { h, type Filho } from '../dom';
 
 export function hrefDetalhe(a: Assinatura): string {
@@ -37,12 +39,14 @@ export function valorSimples(a: Assinatura): string {
   return formatarBRL(a.valorCentavos);
 }
 
-/** Selos de reajuste do item (implementados na US-03). */
-export function selosReajuste(_a: Assinatura): HTMLElement[] {
-  return [];
+/** Selo de reajuste (US-03): vermelho quando subiu, menta quando caiu. */
+export function selosReajuste(a: Assinatura): HTMLElement[] {
+  const r = ultimoReajuste(a);
+  return r ? [selo(r.tipo === 'subiu' ? 'subiu' : 'caiu', textoReajuste(r), 'badge-reajuste')] : [];
 }
 
-/** Texto do reajuste para o banner de edição (implementado na US-03). */
-export function textoReajusteBanner(_a: Assinatura): string {
-  return '';
+/** "Valor subiu 12,5% (R$ 5,00)." para o banner após editar. */
+export function textoReajusteBanner(a: Assinatura): string {
+  const r = ultimoReajuste(a);
+  return r ? `Valor ${textoReajuste(r)}.` : '';
 }

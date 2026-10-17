@@ -7,6 +7,7 @@ import { consumirBanner, fecharBanner, navegar, registrarTroca, rotaAtual } from
 import type { Aba, Tela } from './tela';
 import { telaAjustes } from './telas/ajustes';
 import { telaCatalogo } from './telas/catalogo';
+import { telaDetalhe } from './telas/detalhe';
 import { telaFormulario } from './telas/formulario';
 import { telaInicio } from './telas/inicio';
 
@@ -27,6 +28,8 @@ function resolverTela(rota: string): Tela {
   if (p0 === 'nova' && p1 === 'form') return telaFormulario({ modo: 'nova', catalogoId: p2 ?? null });
   if (p0 === 'nova') return telaCatalogo();
   if (p0 === 'ajustes') return telaAjustes();
+  if (p0 === 'assinatura' && p1 && p2 === 'editar') return telaFormulario({ modo: 'editar', id: p1 });
+  if (p0 === 'assinatura' && p1) return telaDetalhe(p1);
   return telaInicio();
 }
 

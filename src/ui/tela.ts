@@ -14,5 +14,5 @@ export interface Tela {
   subtitulo?: string;
   /** Mostra o botão flutuante "Adicionar". */
   fab?: boolean;
-  conteudo: Node[];
+  conteudo: (Node | null | false | undefined)[];
 }
