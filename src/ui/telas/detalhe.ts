@@ -2,10 +2,12 @@
 import { formatarDataBR } from '../../domain/datas';
 import { formatarBRL } from '../../domain/dinheiro';
 import { rotuloCiclo, rotuloPagamento, sufixoCiclo, type Assinatura } from '../../domain/tipos';
-import { obterEstado } from '../../loja';
-import { botao, estadoVazio } from '../componentes';
+import { excluirAssinatura, marcarCancelada, pausar, reativar, substituirAssinatura } from '../../domain/operacoes';
+import { definirEstado, hoje, obterEstado } from '../../loja';
+import { renderizar } from '../app';
+import { botao, confirmar, estadoVazio, selo } from '../componentes';
 import { h } from '../dom';
-import { navegar, voltar } from '../navegacao';
+import { avisar, navegar, substituir, voltar } from '../navegacao';
 import type { Tela } from '../tela';
 import { hrefDetalhe, selosReajuste } from './comum';
 
@@ -39,6 +41,52 @@ function secaoHistorico(a: Assinatura): HTMLElement {
   );
 }
 
+function aplicar(nova: Assinatura, mensagem: string): void {
+  definirEstado(substituirAssinatura(obterEstado(), nova));
+  avisar({ tipo: 'ok', linhas: [mensagem] });
+  renderizar();
+}
+
+/** Marca como cancelada (US-05.CA3). Também usada pelo guia "Como cancelar". */
+export function acaoMarcarCancelada(a: Assinatura): void {
+  aplicar(marcarCancelada(a, hoje()), `${a.nome} marcada como cancelada.`);
+}
+
+function acaoPausar(a: Assinatura): void {
+  aplicar(pausar(a), `${a.nome} pausada. Ela não entra nos totais nem nas próximas cobranças.`);
+}
+
+function acaoReativar(a: Assinatura): void {
+  const r = reativar(a, hoje());
+  aplicar(r, `${a.nome} reativada. Próxima cobrança: ${formatarDataBR(r.proxima)}.`);
+}
+
+async function acaoExcluir(a: Assinatura): Promise<void> {
+  const ok = await confirmar({ titulo: `Excluir ${a.nome}?`, texto: 'Esta ação não pode ser desfeita.', rotuloConfirmar: 'Excluir' });
+  if (!ok) return;
+  definirEstado(excluirAssinatura(obterEstado(), a.id));
+  avisar({ tipo: 'ok', linhas: [`${a.nome} excluída.`] });
+  substituir('#/');
+}
+
+function situacao(a: Assinatura): Node {
+  if (a.status === 'pausada') return selo('neutro', 'Pausada', 'badge-pausada');
+  if (a.status === 'cancelada') return selo('cancelada', 'Cancelada', 'badge-cancelada');
+  return document.createTextNode('Ativa');
+}
+
+/** Ações de mudança de situação e exclusão, conforme o status (design.md 4.4). */
+function acoesSituacao(a: Assinatura): HTMLElement[] {
+  const pilha = h('div', { class: 'pilha acoes-detalhe' });
+  if (a.status === 'ativa') pilha.append(botao('Pausar', 'secundario', () => acaoPausar(a), { testid: 'btn-pausar', larga: true }));
+  else pilha.append(botao('Reativar', 'primario', () => acaoReativar(a), { testid: 'btn-reativar', larga: true }));
+  if (a.status !== 'cancelada') {
+    pilha.append(botao('Marcar como cancelada', 'secundario', () => acaoMarcarCancelada(a), { testid: 'btn-cancelar', larga: true }));
+  }
+  const perigo = h('div', { class: 'zona-perigo' }, botao('Excluir assinatura', 'perigo', () => void acaoExcluir(a), { testid: 'btn-excluir', larga: true }));
+  return [pilha, perigo];
+}
+
 export function telaDetalhe(id: string): Tela {
   const a = obterEstado().assinaturas.find((x) => x.id === id);
   if (!a) {
@@ -68,6 +116,8 @@ export function telaDetalhe(id: string): Tela {
           a.banco ? linha('Banco ou cartão', a.banco) : null,
           linha('Categoria', a.categoria),
           a.emTeste && a.fimTeste ? linha('Fim do teste grátis', formatarDataBR(a.fimTeste)) : null,
+          linha('Situação', situacao(a), 'detalhe-situacao'),
+          a.status === 'cancelada' && a.canceladaEm ? linha('Cancelada em', formatarDataBR(a.canceladaEm), 'detalhe-cancelada-em') : null,
         ),
       ),
       h(
@@ -76,6 +126,7 @@ export function telaDetalhe(id: string): Tela {
         botao('Editar', 'secundario', () => navegar(`${hrefDetalhe(a)}/editar`), { testid: 'btn-editar' }),
       ),
       secaoHistorico(a),
+      ...acoesSituacao(a),
     ],
   };
 }

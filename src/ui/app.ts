@@ -6,6 +6,7 @@ import { icone, type NomeIcone } from './icones';
 import { consumirBanner, fecharBanner, navegar, registrarTroca, rotaAtual } from './navegacao';
 import type { Aba, Tela } from './tela';
 import { telaAjustes } from './telas/ajustes';
+import { telaAssinaturas } from './telas/assinaturas';
 import { telaCatalogo } from './telas/catalogo';
 import { telaDetalhe } from './telas/detalhe';
 import { telaFormulario } from './telas/formulario';
@@ -30,6 +31,7 @@ function resolverTela(rota: string): Tela {
   if (p0 === 'nova') return telaCatalogo();
   if (p0 === 'ajustes') return telaAjustes();
   if (p0 === 'totais') return telaTotais();
+  if (p0 === 'assinaturas') return telaAssinaturas();
   if (p0 === 'assinatura' && p1 && p2 === 'editar') return telaFormulario({ modo: 'editar', id: p1 });
   if (p0 === 'assinatura' && p1) return telaDetalhe(p1);
   return telaInicio();
