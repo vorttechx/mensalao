@@ -4,6 +4,7 @@ import { alterarDiasAviso } from '../../domain/operacoes';
 import { lerDiasAviso } from '../../domain/validacao';
 import { definirEstado, obterEstado } from '../../loja';
 import { renderizar } from '../app';
+import { exportarBackup, importarArquivo, seletorDeArquivo } from '../backup';
 import { botao } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
@@ -62,12 +63,34 @@ function secaoAvisos(): HTMLElement {
   );
 }
 
+function secaoBackup(): HTMLElement {
+  const seletor = seletorDeArquivo((f) => void importarArquivo(f, () => renderizar()));
+  return h(
+    'section',
+    { 'aria-labelledby': 'titulo-backup' },
+    h('h2', { class: 'secao', id: 'titulo-backup' }, 'Backup'),
+    h('p', { class: 'nota' }, 'Seus dados ficam só neste celular. Guarde uma cópia em arquivo para não perder tudo ao trocar de aparelho.'),
+    h(
+      'div',
+      { class: 'pilha' },
+      botao('Exportar backup', 'primario', () => {
+        const nome = exportarBackup();
+        avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
+        renderizar();
+      }, { testid: 'btn-exportar', larga: true }),
+      botao('Importar backup', 'secundario', seletor.abrir, { testid: 'btn-importar', larga: true }),
+      seletor.input,
+    ),
+  );
+}
+
 export function telaAjustes(): Tela {
   return {
     titulo: 'Ajustes',
     aba: 'ajustes',
     conteudo: [
       secaoAvisos(),
+      secaoBackup(),
       h(
         'section',
         { 'aria-labelledby': 'titulo-sobre' },
