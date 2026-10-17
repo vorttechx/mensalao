@@ -10,6 +10,7 @@ import { telaCatalogo } from './telas/catalogo';
 import { telaDetalhe } from './telas/detalhe';
 import { telaFormulario } from './telas/formulario';
 import { telaInicio } from './telas/inicio';
+import { telaTotais } from './telas/totais';
 
 const ABAS: { aba: Aba; rotulo: string; hash: string; icone: NomeIcone }[] = [
   { aba: 'inicio', rotulo: 'Início', hash: '#/', icone: 'inicio' },
@@ -28,6 +29,7 @@ function resolverTela(rota: string): Tela {
   if (p0 === 'nova' && p1 === 'form') return telaFormulario({ modo: 'nova', catalogoId: p2 ?? null });
   if (p0 === 'nova') return telaCatalogo();
   if (p0 === 'ajustes') return telaAjustes();
+  if (p0 === 'totais') return telaTotais();
   if (p0 === 'assinatura' && p1 && p2 === 'editar') return telaFormulario({ modo: 'editar', id: p1 });
   if (p0 === 'assinatura' && p1) return telaDetalhe(p1);
   return telaInicio();
