@@ -1,0 +1,38 @@
+// Estado em memória da aplicação + persistência. A UI lê e grava por aqui.
+import { salvar } from './armazenamento';
+import { isoDeDate } from './domain/datas';
+import { normalizarDatas } from './domain/operacoes';
+import { estadoVazio, type Estado } from './domain/tipos';
+
+let estado: Estado = estadoVazio();
+
+/** "Hoje" no fuso do aparelho, em ISO. Único ponto que consulta o relógio. */
+export function hoje(): string {
+  return isoDeDate(new Date());
+}
+
+export function obterEstado(): Estado {
+  return estado;
+}
+
+/** Substitui o estado e grava no localStorage. */
+export function definirEstado(novo: Estado): void {
+  estado = novo;
+  salvar(novo);
+}
+
+/** Troca o estado em memória sem gravar (usado na carga inicial). */
+export function iniciarEstado(inicial: Estado): void {
+  estado = inicial;
+}
+
+/** Avança datas vencidas (US-02.CA4) e persiste se algo mudou. */
+export function normalizarAgora(): void {
+  const r = normalizarDatas(estado, hoje());
+  if (r.mudou) definirEstado(r.estado);
+}
+
+export function gerarId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
