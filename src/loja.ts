@@ -5,6 +5,18 @@ import { normalizarDatas } from './domain/operacoes';
 import { estadoVazio, type Estado } from './domain/tipos';
 
 let estado: Estado = estadoVazio();
+let recuperacao = false;
+
+/** Modo de recuperação: dados salvos ilegíveis; nada é gravado até o usuário decidir. */
+export function emRecuperacao(): boolean {
+  return recuperacao;
+}
+export function entrarEmRecuperacao(): void {
+  recuperacao = true;
+}
+export function sairDaRecuperacao(): void {
+  recuperacao = false;
+}
 
 /** "Hoje" no fuso do aparelho, em ISO. Único ponto que consulta o relógio. */
 export function hoje(): string {
@@ -28,6 +40,7 @@ export function iniciarEstado(inicial: Estado): void {
 
 /** Avança datas vencidas (US-02.CA4) e persiste se algo mudou. */
 export function normalizarAgora(): void {
+  if (recuperacao) return;
   const r = normalizarDatas(estado, hoje());
   if (r.mudou) definirEstado(r.estado);
 }

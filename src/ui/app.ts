@@ -1,5 +1,5 @@
 // Moldura da aplicação e roteador: decide a tela pela rota e monta topo, banner, conteúdo e navegação.
-import { normalizarAgora } from '../loja';
+import { emRecuperacao, normalizarAgora } from '../loja';
 import { botao, criarBanner } from './componentes';
 import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
@@ -11,6 +11,7 @@ import { telaCatalogo } from './telas/catalogo';
 import { telaDetalhe } from './telas/detalhe';
 import { telaFormulario } from './telas/formulario';
 import { telaInicio } from './telas/inicio';
+import { telaRecuperacao } from './telas/recuperacao';
 import { telaTotais } from './telas/totais';
 
 const ABAS: { aba: Aba; rotulo: string; hash: string; icone: NomeIcone }[] = [
@@ -25,6 +26,7 @@ let ultimaRota = '';
 
 /** Escolhe a tela pela rota. */
 function resolverTela(rota: string): Tela {
+  if (emRecuperacao()) return telaRecuperacao();
   const partes = rota.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   const [p0, p1, p2] = partes;
   if (p0 === 'nova' && p1 === 'form') return telaFormulario({ modo: 'nova', catalogoId: p2 ?? null });
