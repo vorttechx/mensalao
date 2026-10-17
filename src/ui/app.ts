@@ -107,6 +107,9 @@ export function renderizar(): void {
   else if (trocou) {
     h1.focus({ preventScroll: true });
     window.scrollTo(0, 0);
+  } else if (!document.activeElement || document.activeElement === document.body) {
+    // O elemento focado saiu do DOM na nova montagem: devolve o foco ao título.
+    h1.focus({ preventScroll: true });
   }
 }
 

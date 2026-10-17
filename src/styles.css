@@ -128,7 +128,8 @@ svg.ic24 { width: 24px; height: 24px; flex: none; }
 /* ---------- Estrutura ---------- */
 .app { max-width: var(--largura-max); margin: 0 auto; min-height: 100vh; }
 .topo {
-  height: var(--altura-barra-topo);
+  min-height: var(--altura-barra-topo);
+  padding-block: var(--espaco-1);
   display: flex; align-items: center; gap: var(--espaco-1);
   padding: 0 var(--espaco-4);
   background: var(--cor-fundo);
@@ -221,6 +222,7 @@ select.controle {
 .campo-curto .controle { width: 120px; }
 .msg-erro { display: flex; gap: 6px; align-items: flex-start; color: var(--cor-perigo); font-size: var(--texto-sm); margin-top: var(--espaco-1); }
 .msg-erro svg { margin-top: 3px; }
+.campo > label.check { display: flex; font-size: var(--texto-base); font-weight: var(--peso-normal); margin-bottom: 0; }
 .check { display: flex; align-items: center; gap: var(--espaco-3); min-height: var(--toque-min); cursor: pointer; font-size: var(--texto-base); }
 .check input { width: 24px; height: 24px; margin: 0; accent-color: var(--cor-primaria); flex: none; cursor: pointer; }
 
@@ -336,7 +338,8 @@ dialog.dialogo::backdrop { background: rgba(19, 34, 27, 0.5); }
 /* ---------- Detalhe ---------- */
 .valor-detalhe { font-size: var(--texto-xl); font-weight: var(--peso-numero); line-height: var(--altura-linha-numero); margin: var(--espaco-2) 0 0; font-variant-numeric: tabular-nums; }
 .valor-detalhe small { font-size: var(--texto-base); font-weight: var(--peso-normal); color: var(--cor-texto-2); }
-dl.dados { margin: var(--espaco-4) 0 0; }
+dl.dados { margin: 0; }
+.cartao-dados { margin-top: var(--espaco-4); }
 dl.dados div { display: flex; justify-content: space-between; gap: var(--espaco-3); padding: var(--espaco-2) 0; border-bottom: 1px solid var(--cor-divisor); }
 dl.dados div:last-child { border-bottom: 0; }
 dl.dados dt { color: var(--cor-texto-2); }

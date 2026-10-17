@@ -131,7 +131,7 @@ export function telaDetalhe(id: string): Tela {
       selos.length ? h('div', { class: 'selos' }, selos) : null,
       h(
         'div',
-        { class: 'cartao' },
+        { class: 'cartao cartao-dados' },
         h(
           'dl',
           { class: 'dados', testid: 'detalhe-dados' },
