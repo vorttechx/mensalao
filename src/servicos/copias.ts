@@ -30,14 +30,18 @@ function registrarInicioPro(): void {
   if (ehPro() && !obterPrefs().backup.inicioPro) alterarPrefs((p) => ({ ...p, backup: { ...p.backup, inicioPro: hoje() } }));
 }
 
-/** Cria a cópia automática quando cabe (Pro, ligado, algo mudou, uma por dia). Revogado: para (CA11). */
-export function processarCopias(): void {
+/**
+ * Cria a cópia automática quando cabe (Pro, ligado, algo mudou, uma por dia). Revogado: para (CA11).
+ * Retorna true quando a lista de cópias mudou (para a tela que a exibe se atualizar, BUG-02).
+ */
+export function processarCopias(): boolean {
   registrarInicioPro();
-  if (!ehPro() || !obterPrefs().backup.ativo || emRecuperacao()) return;
+  if (!ehPro() || !obterPrefs().backup.ativo || emRecuperacao()) return false;
   const nova = decidirCopia(listarCopias(), obterEstado(), agoraLocal(), gerarId());
-  if (!nova) return;
+  if (!nova) return false;
   // Cota excedida: não trava e não mexe nos dados principais (CA7).
   erroEspaco = !gravarCopias(nova);
+  return !erroEspaco;
 }
 
 export function haErroEspaco(): boolean {

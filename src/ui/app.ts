@@ -179,11 +179,13 @@ export function iniciarApp(el: HTMLElement): void {
   aoMudarEstado(() => processarCopias());
   aoMudarPlano((m) => {
     aplicarTema(); // revogado: volta ao padrão sem apagar a escolha (US-17.CA6)
-    processarCopias();
+    const criouCopia = processarCopias();
     void processarLembretes();
     setTimeout(() => {
       const naTelaPro = rotaAtual() === '#/pro';
-      if ((m.planoMudou || naTelaPro || haAvisoRevogacao() || haErroEspaco()) && !telaComFormulario()) renderizar();
+      // Ajustes lista as cópias: a criada após a primeira montagem precisa aparecer (BUG-02).
+      const listaCopiasMudou = criouCopia && rotaAtual() === '#/ajustes';
+      if ((m.planoMudou || naTelaPro || listaCopiasMudou || haAvisoRevogacao() || haErroEspaco()) && !telaComFormulario()) renderizar();
     }, 0);
   });
   const aoMudarRede = (): void => {
