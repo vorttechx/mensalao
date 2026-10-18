@@ -55,6 +55,7 @@ async function ligarLembrete(): Promise<void> {
       testidSaida: 'lembrete-btn-voltar',
       icone: 'sino',
     });
+    if (continuar === null) return; // fechado pela troca de rota: nada a fazer (BUG-01)
     if (!continuar) {
       renderizar(); // "Voltar" deixa o lembrete desligado
       return;

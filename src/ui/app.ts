@@ -3,7 +3,7 @@ import { aoMudarEstado, emRecuperacao, normalizarAgora } from '../loja';
 import { fecharErroEspaco, haErroEspaco, processarCopias } from '../servicos/copias';
 import { processarLembretes } from '../servicos/lembretes';
 import { aoMudarPlano, ehPro, fecharAvisoRevogacao, haAvisoRevogacao, verificarAoAbrir } from '../servicos/pro';
-import { botao, criarBanner, seloPro } from './componentes';
+import { botao, criarBanner, fecharDialogosAbertos, seloPro } from './componentes';
 import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
 import { adicionar } from './limite';
@@ -170,6 +170,8 @@ function telaComFormulario(): boolean {
 export function iniciarApp(el: HTMLElement): void {
   raiz = el;
   window.addEventListener('hashchange', () => {
+    // Diálogo modal aberto não sobrevive à troca de tela (BUG-01).
+    fecharDialogosAbertos();
     registrarTroca();
     renderizar();
   });

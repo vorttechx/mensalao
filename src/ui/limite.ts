@@ -36,6 +36,8 @@ export async function avisarLimite(op: { reativarNome?: string; sobreTela?: bool
     icone: 'moeda',
   });
   dialogoAberto = false;
+  // Fechado pela troca de rota: a pessoa já está em outra tela, nada a fazer (BUG-01).
+  if (irPro === null) return;
   if (irPro) {
     if (op.sobreTela) substituir('#/pro');
     else navegar('#/pro');

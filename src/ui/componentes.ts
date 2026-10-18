@@ -182,6 +182,17 @@ export function estadoVazio(op: {
 
 /* ---------- Diálogo de confirmação ---------- */
 
+/** Valor de retorno que marca o diálogo fechado pela troca de rota (não é escolha da pessoa). */
+const FECHADO_POR_ROTA = 'rota';
+
+/**
+ * Fecha todos os diálogos modais abertos sem executar a ação (BUG-01). Chamado pelo roteador
+ * a cada troca de rota (hash, link, Voltar do Android/navegador).
+ */
+export function fecharDialogosAbertos(): void {
+  document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach((d) => d.close(FECHADO_POR_ROTA));
+}
+
 /**
  * Abre um <dialog> modal. Resolve true ao confirmar e false ao voltar/Esc.
  * O foco abre no botão seguro ("Voltar") e retorna ao elemento que abriu.
@@ -207,6 +218,7 @@ export function confirmar(op: { titulo: string; texto: string; rotuloConfirmar: 
     ]);
     dlg.addEventListener('close', () => {
       dlg.remove();
+      if (dlg.returnValue === FECHADO_POR_ROTA) return resolver(false);
       if (anterior && anterior.isConnected) anterior.focus();
       resolver(confirmado);
     });
@@ -224,7 +236,8 @@ export function paragrafos(textos: Filho[]): HTMLElement[] {
 
 /**
  * Diálogo que não destrói nada (limite, permissão de notificação). Ação principal primária à direita,
- * saída secundária à esquerda com o foco inicial. Resolve true na ação principal; false em sair/Esc.
+ * saída secundária à esquerda com o foco inicial. Resolve true na ação principal; false em sair/Esc;
+ * null quando fechado pela troca de rota (nenhuma das ações deve ser executada).
  */
 export function dialogoInfo(op: {
   titulo: string;
@@ -236,7 +249,7 @@ export function dialogoInfo(op: {
   testidSaida: string;
   alerta?: boolean;
   icone?: NomeIcone;
-}): Promise<boolean> {
+}): Promise<boolean | null> {
   return new Promise((resolver) => {
     const anterior = document.activeElement as HTMLElement | null;
     const idTitulo = novoId('dlg-titulo');
@@ -262,6 +275,7 @@ export function dialogoInfo(op: {
     ]);
     dlg.addEventListener('close', () => {
       dlg.remove();
+      if (dlg.returnValue === FECHADO_POR_ROTA) return resolver(null);
       resolver(principal);
       if (anterior && anterior.isConnected) anterior.focus();
     });
