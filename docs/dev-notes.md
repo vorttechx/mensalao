@@ -93,6 +93,10 @@ O provedor é **sempre** o falso no build de teste (US-12.CA16). Ele lê o contr
 13. **Acknowledge da compra:** chama `service.acknowledge(token, 'onetime')` se existir (API 1.0) e `PaymentResponse.complete('success')` (API 2.0). Precisa ser confirmado na compra real (R-07).
 14. **Página de privacidade** é uma segunda entrada do Vite (`privacidade.html`), com a mesma folha de estilos; entra no cache offline. O service worker passou a ser gerado no `writeBundle` (com a lista final de arquivos) e, offline, serve a própria página navegada antes de cair no `index.html`.
 
+## Ajuste pedido no portão G2: máscara de data
+
+Os campos `field-proxima` e `field-fim-teste` (os únicos de data dd/mm/aaaa do app) continuam com `inputmode="numeric"`, mas agora inserem as barras sozinhos no evento `input` ("30092026" → "30/09/2026", "3009" → "30/09"), limitados a 10 caracteres. A lógica é pura: `mascararDataBR(texto)` e `posicaoCursorMascara(mascarado, digitosAntes)` em `src/domain/datas.ts`; o ligamento na UI é `aplicarMascaraData(input)` em `src/ui/componentes.ts`. Regras: descarta o que não é dígito nem barra; aceita texto colado com barras (inclusive "1/2/2026"); nunca acrescenta barra final por conta própria (o backspace não trava), só mantém a que a própria pessoa digitou; dígitos além do ano são ignorados; o cursor é preservado pela contagem de dígitos. A validação (`lerDataBR`) não mudou. Isto resolve o desvio aceito na sprint 1 "o campo de data não tem máscara". Nenhum teste do QA quebrou (82 unitários e 64 E2E passando).
+
 ## Desvios do design
 
 - **Banner de revogação e de "sem espaço"** ficam no topo do conteúdo de qualquer tela (até serem fechados), não só da primeira; a resposta da loja pode chegar depois de a pessoa trocar de tela.

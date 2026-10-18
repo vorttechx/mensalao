@@ -1,6 +1,7 @@
 // Componentes de interface reutilizáveis (design.md seção 3).
 import { anexar, h, novoId, type Filho } from './dom';
 import { icone, ilustracaoCarteira, type NomeIcone } from './icones';
+import { mascararDataBR, posicaoCursorMascara } from '../domain/datas';
 
 /* ---------- Banner ---------- */
 
@@ -101,6 +102,27 @@ export function campoTexto(
   });
   controle.value = op.valor ?? '';
   return montarCampo(op, controle, op.prefixo ? (c) => h('div', { class: 'prefixo' }, h('span', { 'aria-hidden': 'true' }, op.prefixo!), c) : undefined);
+}
+
+/**
+ * Aplica a máscara dd/mm/aaaa num campo de data: mantém o teclado numérico
+ * (inputmode="numeric") e insere as barras enquanto a pessoa digita.
+ */
+export function aplicarMascaraData(controle: HTMLInputElement): void {
+  controle.addEventListener('input', () => {
+    const bruto = controle.value;
+    const mascarado = mascararDataBR(bruto);
+    if (mascarado === bruto) return;
+    const cursor = controle.selectionStart ?? bruto.length;
+    const digitosAntes = bruto.slice(0, cursor).replace(/\D/g, '').length;
+    controle.value = mascarado;
+    const pos = cursor >= bruto.length ? mascarado.length : posicaoCursorMascara(mascarado, digitosAntes);
+    try {
+      controle.setSelectionRange(pos, pos);
+    } catch {
+      // Alguns navegadores não permitem seleção fora de foco; ignora.
+    }
+  });
 }
 
 export function campoSelecao(op: OpcoesCampo & { opcoes: { valor: string; rotulo: string }[]; valor?: string }): Campo<HTMLSelectElement> {

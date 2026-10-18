@@ -6,7 +6,7 @@ import { adicionarAssinatura, criarAssinatura, editarAssinatura, substituirAssin
 import { CATEGORIAS, CICLOS, FORMAS_PAGAMENTO, type Assinatura } from '../../domain/tipos';
 import { ORDEM_CAMPOS, validarFormulario, type CampoFormulario, type EntradaFormulario } from '../../domain/validacao';
 import { definirEstado, gerarId, hoje, obterEstado } from '../../loja';
-import { botao, campoSelecao, campoTexto, estadoVazio, type Banner, type Campo } from '../componentes';
+import { aplicarMascaraData, botao, campoSelecao, campoTexto, estadoVazio, type Banner, type Campo } from '../componentes';
 import { h } from '../dom';
 import { avisarLimite, guardarTelaDeCadastro, podeAdicionar } from '../limite';
 import { avisar, voltar, voltarAte } from '../navegacao';
@@ -90,6 +90,9 @@ export function telaFormulario(m: ModoFormulario): Tela {
       placeholder: 'dd/mm/aaaa',
     }),
   };
+  // Campos de data: barras automáticas, pois o teclado numérico do celular não tem "/".
+  aplicarMascaraData(campos.proxima.controle as HTMLInputElement);
+  aplicarMascaraData(campos.fimTeste.controle as HTMLInputElement);
   const banco = campoTexto({
     rotulo: 'Banco ou cartão (opcional)',
     testid: 'field-banco',

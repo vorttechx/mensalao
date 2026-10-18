@@ -117,3 +117,46 @@ export function avancarAteHoje(iso: string, ciclo: Ciclo, hoje: string, diaRef?:
   while (atual < hoje) atual = proximoCiclo(atual, ciclo, diaRef);
   return atual;
 }
+
+/**
+ * Máscara de digitação para "dd/mm/aaaa": insere as barras automaticamente
+ * (o teclado numérico do celular não tem "/"). "30092026" → "30/09/2026",
+ * "3009" → "30/09". Aceita texto já com barras (colado ou digitado, inclusive
+ * "1/2/2026") e descarta o que não for dígito ou barra. Nunca acrescenta barra
+ * no fim por conta própria, para o backspace não "travar" sobre ela; só mantém
+ * a barra final quando a própria pessoa a digitou. Resultado limitado a 10 caracteres.
+ */
+export function mascararDataBR(texto: string): string {
+  const limites = [2, 2, 4];
+  const grupos = ['', '', ''];
+  let g = 0;
+  for (const c of texto) {
+    if (c >= '0' && c <= '9') {
+      if (grupos[g].length >= limites[g]) {
+        if (g === 2) break; // ano completo: ignora o excesso
+        g++;
+      }
+      grupos[g] += c;
+    } else if (c === '/') {
+      // Barra explícita fecha o grupo atual (se houver algo nele).
+      if (g < 2 && grupos[g].length > 0) {
+        g++;
+      }
+    }
+  }
+  // Só há grupo seguinte vazio quando a pessoa digitou a barra: aí ela é mantida.
+  let saida = grupos[0];
+  if (g >= 1) saida += '/' + grupos[1];
+  if (g >= 2) saida += '/' + grupos[2];
+  return saida.slice(0, 10);
+}
+
+/** Posição do cursor no texto mascarado que preserva a quantidade de dígitos antes dele. */
+export function posicaoCursorMascara(mascarado: string, digitosAntes: number): number {
+  if (digitosAntes <= 0) return 0;
+  let n = 0;
+  for (let i = 0; i < mascarado.length; i++) {
+    if (mascarado[i] >= '0' && mascarado[i] <= '9' && ++n === digitosAntes) return i + 1;
+  }
+  return mascarado.length;
+}
