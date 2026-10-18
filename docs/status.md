@@ -12,8 +12,8 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 | D1 Implementar histórias | Dev | concluída | US-09, US-11 a US-17 e empacotamento; notas em `docs/dev-notes.md` |
 | G2 Aprovar código antes do QA | Renato | aprovada | Aprovado pelo Renato em 18/10/2026, após a correção da máscara de data |
 | Q1 Testar e abrir bugs | QA | concluída | 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos |
-| G3 Revisar relatório de QA | Renato | aguardando você | |
-| D2 Corrigir bugs (máx. 3 rodadas) | Dev | pendente | |
+| G3 Revisar relatório de QA | Renato | aprovada | Renato escolheu corrigir os 2 bugs antes de entregar |
+| D2 Corrigir bugs (máx. 3 rodadas) | Dev | andamento | Rodada 1: BUG-01 e BUG-02 |
 | E Entrega | Renato | pendente | |
 
 ## Registro
@@ -32,3 +32,4 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 - 18/10/2026: Renato pediu a barra automática no campo de data (teclado numérico no celular); Dev corrigiu com máscara.
 - 18/10/2026: Renato aprovou o código (G2). Etapa Q1 (QA) iniciada.
 - 18/10/2026: QA entregou o relatório (Q1): 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos. Portão G3 aguardando o Renato.
+- 18/10/2026: Renato revisou o relatório de QA (G3) e escolheu corrigir. Etapa D2 (Dev, rodada 1) iniciada.
