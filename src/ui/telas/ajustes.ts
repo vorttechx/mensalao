@@ -130,6 +130,7 @@ export function telaAjustes(): Tela {
         { 'aria-labelledby': 'titulo-sobre' },
         h('h2', { class: 'secao', id: 'titulo-sobre' }, 'Sobre'),
         h('p', { class: 'nota' }, 'Mensalão não se conecta a bancos e não envia seus dados para a internet.'),
+        h('a', { class: 'link-privacidade', href: './privacidade.html', testid: 'link-privacidade' }, 'Política de privacidade'),
       ),
     ],
   };

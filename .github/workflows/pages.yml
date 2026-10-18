@@ -28,6 +28,9 @@ jobs:
       - run: npm test
       # Gera os builds de produção e de teste e falha se o provedor falso estiver na produção (US-12.CA14).
       - run: npm run verificar:bundle
+        env:
+          # Domínio próprio (D-05): defina a variável MENSALAO_DOMINIO no repositório para gravar o CNAME.
+          MENSALAO_DOMINIO: ${{ vars.MENSALAO_DOMINIO }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

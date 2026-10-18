@@ -631,3 +631,8 @@ fieldset.temas legend { font-size: var(--texto-sm); font-weight: var(--peso-medi
 .em-uso { font-size: var(--texto-sm); color: var(--cor-texto-2); }
 .previa-temas { display: flex; gap: var(--espaco-3); }
 .previa-temas .bolinhas i { width: 20px; height: 20px; }
+
+/* ---------- Sobre e política de privacidade (E-05) ---------- */
+.link-privacidade { display: inline-flex; align-items: center; min-height: var(--toque-min); color: var(--cor-primaria); font-weight: var(--peso-medio); }
+.privacidade p { margin: 0 0 var(--espaco-3); }
+.topo .btn-texto { margin-left: calc(-1 * var(--espaco-2)); text-decoration: none; }
