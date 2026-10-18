@@ -11,7 +11,7 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 | GD Aprovar design antes do Dev | Renato | aprovada | Aprovado pelo Renato em 18/10/2026 |
 | D1 Implementar histórias | Dev | concluída | US-09, US-11 a US-17 e empacotamento; notas em `docs/dev-notes.md` |
 | G2 Aprovar código antes do QA | Renato | aprovada | Aprovado pelo Renato em 18/10/2026, após a correção da máscara de data |
-| Q1 Testar e abrir bugs | QA | concluída | 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos |
+| Q1 Testar e abrir bugs | QA | reteste em andamento | 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos |
 | G3 Revisar relatório de QA | Renato | aprovada | Renato escolheu corrigir os 2 bugs antes de entregar |
 | D2 Corrigir bugs (máx. 3 rodadas) | Dev | concluída | Rodada 1: BUG-01 e BUG-02 corrigidos (aguardando QA); aprovação do Renato antes do reteste |
 | E Entrega | Renato | pendente | |
@@ -34,3 +34,4 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 - 18/10/2026: QA entregou o relatório (Q1): 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos. Portão G3 aguardando o Renato.
 - 18/10/2026: Renato revisou o relatório de QA (G3) e escolheu corrigir. Etapa D2 (Dev, rodada 1) iniciada.
 - 18/10/2026: Dev corrigiu BUG-01 e BUG-02 (rodada 1): 178 unitários e 193 E2E passando. Aguardando a aprovação do Renato para o reteste do QA.
+- 18/10/2026: Renato aprovou as correções da rodada 1. Reteste do QA iniciado.
