@@ -15,4 +15,6 @@ export interface Tela {
   /** Mostra o botão flutuante "Adicionar". */
   fab?: boolean;
   conteudo: (Node | null | false | undefined)[];
+  /** Chamado depois de montar; se devolver um elemento, ele recebe o foco no lugar do título. */
+  aoMontar?: () => HTMLElement | null | void;
 }

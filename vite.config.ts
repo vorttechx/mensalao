@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { join, relative, resolve } from 'node:path';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 
 /** Lista os arquivos de public/ (copiados como estão para o build). */
 function arquivosPublicos(dir: string, raiz = dir): string[] {
@@ -60,8 +60,23 @@ self.addEventListener('fetch', (ev) => {
 }
 
 // base relativa: o build funciona em qualquer subdiretório (ex.: /apps/mensalao/).
-export default defineConfig({
-  base: './',
-  build: { target: 'es2022' },
-  plugins: [serviceWorker()],
+// Build de teste (US-12.CA14 a CA16): `vite build --mode teste` (VITE_MODO=teste em .env.teste) troca o
+// alias "@ambiente" para o ambiente de teste, com o provedor falso, e grava em dist-teste/. O build de
+// produção usa ambiente.producao.ts, que não importa o provedor falso: ele não chega ao bundle.
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
+  const teste = (process.env.VITE_MODO ?? env.VITE_MODO) === 'teste';
+  return {
+    base: './',
+    resolve: {
+      alias: {
+        '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'producao'}.ts`),
+      },
+    },
+    build: {
+      target: 'es2022',
+      outDir: teste ? 'dist-teste' : 'dist',
+    },
+    plugins: [serviceWorker()],
+  };
 });

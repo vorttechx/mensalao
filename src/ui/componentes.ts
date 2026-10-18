@@ -1,11 +1,12 @@
 // Componentes de interface reutilizáveis (design.md seção 3).
-import { h, novoId, type Filho } from './dom';
+import { anexar, h, novoId, type Filho } from './dom';
 import { icone, ilustracaoCarteira, type NomeIcone } from './icones';
 
 /* ---------- Banner ---------- */
 
 export interface Banner {
-  tipo: 'ok' | 'erro';
+  /** 'info' = banner informativo neutro (design 8.11), mesmo visual do 'ok' com ícone "i". */
+  tipo: 'ok' | 'erro' | 'info';
   linhas: string[];
   testid?: string;
 }
@@ -161,8 +162,9 @@ export function estadoVazio(op: {
 /**
  * Abre um <dialog> modal. Resolve true ao confirmar e false ao voltar/Esc.
  * O foco abre no botão seguro ("Voltar") e retorna ao elemento que abriu.
+ * `extra`: parágrafo adicional com ícone "i" entre o texto e os botões (ex.: aviso de limite na importação).
  */
-export function confirmar(op: { titulo: string; texto: string; rotuloConfirmar: string }): Promise<boolean> {
+export function confirmar(op: { titulo: string; texto: string; rotuloConfirmar: string; extra?: { texto: string; testid: string } }): Promise<boolean> {
   return new Promise((resolver) => {
     const anterior = document.activeElement as HTMLElement | null;
     const idTitulo = novoId('dlg-titulo');
@@ -174,7 +176,12 @@ export function confirmar(op: { titulo: string; texto: string; rotuloConfirmar: 
       confirmado = true;
       dlg.close();
     }, { testid: 'btn-confirmar' });
-    dlg.append(h('h2', { id: idTitulo }, op.titulo), h('p', { id: idTexto }, op.texto), h('div', { class: 'acoes' }, voltar, ok));
+    anexar(dlg, [
+      h('h2', { id: idTitulo }, op.titulo),
+      h('p', { id: idTexto }, op.texto),
+      op.extra ? h('p', { class: 'dialogo-extra', testid: op.extra.testid }, icone('info'), h('span', {}, op.extra.texto)) : null,
+      h('div', { class: 'acoes' }, voltar, ok),
+    ]);
     dlg.addEventListener('close', () => {
       dlg.remove();
       if (anterior && anterior.isConnected) anterior.focus();
@@ -188,4 +195,85 @@ export function confirmar(op: { titulo: string; texto: string; rotuloConfirmar: 
 
 export function paragrafos(textos: Filho[]): HTMLElement[] {
   return textos.filter(Boolean).map((t) => h('p', {}, t));
+}
+
+/* ---------- Diálogo informativo (design 8.10) ---------- */
+
+/**
+ * Diálogo que não destrói nada (limite, permissão de notificação). Ação principal primária à direita,
+ * saída secundária à esquerda com o foco inicial. Resolve true na ação principal; false em sair/Esc.
+ */
+export function dialogoInfo(op: {
+  titulo: string;
+  textos: string[];
+  rotuloPrincipal: string;
+  rotuloSaida: string;
+  testid: string;
+  testidPrincipal: string;
+  testidSaida: string;
+  alerta?: boolean;
+  icone?: NomeIcone;
+}): Promise<boolean> {
+  return new Promise((resolver) => {
+    const anterior = document.activeElement as HTMLElement | null;
+    const idTitulo = novoId('dlg-titulo');
+    const idTexto = novoId('dlg-texto');
+    let principal = false;
+    const dlg = h('dialog', {
+      class: 'dialogo',
+      testid: op.testid,
+      role: op.alerta ? 'alertdialog' : null,
+      'aria-labelledby': idTitulo,
+      'aria-describedby': idTexto,
+    });
+    const sair = botao(op.rotuloSaida, 'secundario', () => dlg.close(), { testid: op.testidSaida });
+    const ok = botao(op.rotuloPrincipal, 'primario', () => {
+      principal = true;
+      dlg.close();
+    }, { testid: op.testidPrincipal });
+    anexar(dlg, [
+      op.icone ? h('div', { class: 'dialogo-icone' }, icone(op.icone, 'ic24')) : null,
+      h('h2', { id: idTitulo }, op.titulo),
+      h('div', { id: idTexto }, op.textos.map((t) => h('p', {}, t))),
+      h('div', { class: 'acoes' }, sair, ok),
+    ]);
+    dlg.addEventListener('close', () => {
+      dlg.remove();
+      resolver(principal);
+      if (anterior && anterior.isConnected) anterior.focus();
+    });
+    document.body.append(dlg);
+    dlg.showModal();
+    sair.focus();
+  });
+}
+
+/* ---------- Selo Pro (design 8.1) ---------- */
+
+export function seloPro(attrs: Record<string, string> = {}): HTMLElement {
+  return h('span', { class: 'selo selo-pro', ...attrs }, icone('moeda'), 'Pro');
+}
+
+/* ---------- Cartão de recurso Pro (design 8.3) ---------- */
+
+export function cartaoRecursoPro(op: {
+  testid: string;
+  titulo: string;
+  descricao: string[];
+  /** Nome do recurso no rótulo acessível do botão ("Conhecer o Pro para <recurso>"). */
+  recurso: string;
+  previa?: Node | null;
+  extra?: Node | null;
+  aoConhecer: () => void;
+}): HTMLElement {
+  const idTitulo = novoId('lock-titulo');
+  return h(
+    'section',
+    { class: 'cartao-pro', testid: op.testid, 'aria-labelledby': idTitulo },
+    h('div', { class: 'cartao-pro-topo' }, h('h3', { id: idTitulo }, op.titulo), seloPro()),
+    op.descricao.map((d) => h('p', { class: 'cartao-pro-desc' }, d)),
+    op.previa ?? null,
+    op.extra ?? null,
+    botao('Conhecer o Pro', 'secundario', op.aoConhecer, { testid: 'lock-btn-pro', attrs: { 'aria-label': `Conhecer o Pro para ${op.recurso}` } }),
+  );
 }

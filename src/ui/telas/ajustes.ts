@@ -8,7 +8,10 @@ import { exportarBackup, importarArquivo, seletorDeArquivo } from '../backup';
 import { botao } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
-import { avisar } from '../navegacao';
+import { avisar, navegar } from '../navegacao';
+import { ehPro } from '../../servicos/pro';
+import { contarAtivas, LIMITE_GRATIS } from '../../domain/plano';
+import { seloPro } from '../componentes';
 import type { Tela } from '../tela';
 
 function secaoAvisos(): HTMLElement {
@@ -84,11 +87,33 @@ function secaoBackup(): HTMLElement {
   );
 }
 
+/** Plano (design 9.8): grátis com acesso à tela Pro, ou Pro com "Ver detalhes". */
+function secaoPlano(): HTMLElement {
+  const pro = ehPro();
+  const cartao = pro
+    ? h(
+        'div',
+        { class: 'cartao plano-cartao', testid: 'plano-cartao' },
+        h('p', { class: 'plano-nome' }, icone('moeda', 'ic24'), 'Mensalão Pro'),
+        h('p', { class: 'nota' }, 'Compra ativa. Obrigado!'),
+        botao('Ver detalhes', 'texto', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
+      )
+    : h(
+        'div',
+        { class: 'cartao plano-cartao', testid: 'plano-cartao' },
+        h('p', { class: 'plano-nome' }, 'Plano grátis'),
+        h('p', { class: 'nota' }, `${contarAtivas(obterEstado())} de ${LIMITE_GRATIS} assinaturas ativas`),
+        botao('Conhecer o Pro', 'secundario', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
+      );
+  return h('section', { 'aria-labelledby': 'titulo-plano' }, h('h2', { class: 'secao', id: 'titulo-plano' }, 'Plano', pro ? ' ' : null, pro ? seloPro() : null), cartao);
+}
+
 export function telaAjustes(): Tela {
   return {
     titulo: 'Ajustes',
     aba: 'ajustes',
     conteudo: [
+      secaoPlano(),
       secaoAvisos(),
       secaoBackup(),
       h(
