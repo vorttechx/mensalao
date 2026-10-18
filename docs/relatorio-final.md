@@ -1,57 +1,64 @@
-# Mensalão — Relatório final da sprint 1
+# Mensalão — Relatório final da sprint 2
 
-Entrega aprovada pelo Renato em 17/10/2026 (portão G3).
+Entrega aprovada pelo Renato em 18/10/2026 (portão G3). O relatório da sprint 1 está em `docs/sprint1/relatorio-final.md`.
 
 ## O que foi construído
 
-App web instalável (PWA) para controlar assinaturas e cobranças recorrentes, sem conectar ao banco. Os dados ficam só no aparelho (localStorage). Stack: Vite + TypeScript sem framework, domínio puro em `src/domain/` e interface em `src/ui/`, seguindo o `docs/design.md` aprovado (verde-cédula, mobile-first a partir de 360 px, tema escuro automático).
+Modelo freemium com compra única "Mensalão Pro" e o app preparado para a Google Play (TWA). O grátis permite até 5 assinaturas ativas; o Pro libera assinaturas ilimitadas e os recursos abaixo. A compra é feita pela Google Play (Digital Goods API + Payment Request); fora do app instalado, a tela Pro informa que a compra só existe pela Play. O build de produção não contém o provedor de compra falso (`npm run verificar:bundle`); o build de teste (`npm run build:teste`) tem o provedor falso para simular compra, restauração e reembolso.
 
 | História | Entregue |
 | --- | --- |
-| US-01 Cadastrar pelo catálogo ou livremente | catálogo de 18 serviços com busca sem acentos, formulário validado |
-| US-02 Próximas cobranças e testes grátis | lista por data com selos "hoje / amanhã / em X dias", aviso de fim de teste, estado vazio, N dias configurável |
-| US-03 Alerta de reajuste | histórico de preços e selos "subiu" / "caiu" |
-| US-04 Totais mensal e anual | totais por forma de pagamento e por categoria, testes grátis à parte |
-| US-05 Editar, pausar, cancelar, excluir | ações no detalhe, canceladas em seção recolhível, exclusão com confirmação |
-| US-06 Guia "onde cancelar" | guia por serviço, por loja de apps e por Pix |
-| US-07 Backup JSON | exportação versionada e importação validada com confirmação |
-| US-08 Instalar e usar offline | manifest, ícones 192/512, service worker, tela de recuperação de dados corrompidos |
+| US-09 Limite de 5 ativas no grátis | contador, diálogo de limite acessível, pausar/cancelar/excluir sempre livres, importação acima do limite preservada |
+| US-11 Tela Pro e compra única | oferta, preço vindo da loja, estados de carregando/erro/cancelada/offline, proteção contra toque duplo |
+| US-12 Restaurar e estado Pro persistido | verificação ao abrir sem bloquear a tela, restaurar compra, reinstalação, reembolso com aviso único |
+| US-13 Lembrete antes da cobrança | 0 a 7 dias de antecedência, explicação antes de pedir permissão, notificação uma vez por cobrança |
+| US-14 Backup automático local | até 3 cópias diárias no aparelho, restaurar com confirmação, lembrete de exportar a cada 7 dias |
+| US-15 Exportar CSV | arquivo compatível com Excel e Planilhas (BOM, `;`, proteção contra fórmula) |
+| US-16 Gráfico por categoria | rosca em SVG com legenda e "Outras categorias", acessível |
+| US-17 Temas de cor | 4 temas com prévia, aplicação imediata, contraste AA |
+| Ajuste do G2 | máscara de data: a barra entra sozinha com o teclado numérico do celular |
+| Empacotamento (5.1) | projeto TWA em `twa/`, `assetlinks.json`, manifest com id e ícones maskable, política de privacidade, ficha, capturas e guia de publicação em `docs/loja/`, CNAME por variável no CI |
+
+US-10 e US-18 saíram do backlog a pedido do Renato.
 
 ## Como rodar
 
 ```bash
 npm install
-npm run dev        # desenvolvimento
-npm run build      # build de produção em dist/
-npm run preview    # serve dist/ em http://localhost:4173/ (com service worker)
-npm test           # testes unitários (Vitest)
-npm run test:e2e   # testes de interface (Playwright)
+npm run dev               # desenvolvimento
+npm run build             # produção em dist/
+npm run build:teste       # build de teste (provedor falso) em dist-teste/
+npm run verificar:bundle  # confere que a produção não tem o provedor falso
+npm test                  # unitários (Vitest)
+npm run test:e2e          # interface (Playwright), builds de teste e de produção
 ```
 
-Para instalar no celular, `dist/` precisa ser hospedado num endereço HTTPS (por exemplo, GitHub Pages); no Chrome do Android, "Instalar app". Uma versão de teste, sem instalação nem modo offline, foi publicada num link privado do Claude.
+Na versão de teste, para começar já com o Pro, gravar `mensalao:teste:provedor` com `{"compras":["mensalao_pro"]}` no `localStorage` e recarregar.
 
 ## Resultados de teste
 
-- Build sem erros de TypeScript.
-- 82 testes unitários e 64 testes de interface (360×780) passando, conferidos de novo pelo orquestrador em 17/10/2026. Cada teste cita o critério de aceite que cobre.
-- Bugs: nenhum aberto (alta 0, média 0, baixa 0). Nenhuma rodada de correção foi necessária.
+- Build sem erros; verificação do bundle OK.
+- 178 testes unitários e 196 de interface (360×780) passando, após uma rodada de correções.
+- Bugs: BUG-01 (média, diálogo sobre a nova tela ao mudar a rota) e BUG-02 (baixa, lista de cópias desatualizada) corrigidos e retestados. Nenhum aberto.
 
 ## Limitações
 
-- Não testados automaticamente: o prompt real de instalação, o build servido em subdiretório, a medição de contraste no app (os pares de cor foram conferidos no design), o tema escuro e o uso por leitor de tela.
-- Modo offline só no build e a partir do segundo carregamento.
-- Com o app aberto na virada do dia, as datas só se atualizam na próxima ação.
-- O aviso "Teste terminou…" não tem prazo definido pelo Produto.
-- O banner "Backup exportado" não confirma que o navegador salvou o arquivo.
-- Em 360 px, valores a partir de R$ 1.000,00 quebram em duas linhas no histórico de preços.
-- Desvios do design aceitos: o detalhe esconde a navegação inferior; na recuperação, o título fica fora da caixa vermelha; o campo de data não tem máscara.
+- Compra real, acknowledge, restauração após reinstalar e reembolso pela Play não foram exercitados (dependem da conta e do app na Play).
+- Lembretes só disparam ao abrir ou voltar ao app; não há aviso com o app fechado.
+- Notificação real do sistema, leitor de tela real, abertura do CSV no Excel e arte maskable na zona segura não foram verificados.
+- Dentro da TWA, quem adulterar o `localStorage` fica Pro até a loja responder (risco aceito na D-06).
+- Capturas da loja em 1080×1920, porque 360×780 passa da proporção máxima da Play.
+- Desvios do design aceitos: banner de revogação em qualquer tela, selo "Danificada" com ícone de alerta, selo Pro ao lado de "Plano" em Ajustes, vãos do gráfico feitos encurtando os arcos.
 
 ## Bugs conhecidos
 
 Nenhum.
 
-## Próximos passos
+## Próximos passos (dependem do Renato)
 
-- Hospedar o app (precisa de `git push`, ainda não autorizado) e conferir a instalação no celular.
-- Sprint 2: monetização freemium com compra única Pro e publicação nas lojas (`docs/sprint2-direcao.md`).
-- Decidir o destino da branch `dev/rascunho-sem-aprovacao`.
+Lista com caixas de marcar: https://claude.ai/artifact/KaS3458HW36sX2pHHvGkYm
+
+- Publicar o código da sprint 2 na main (PR) para atualizar o GitHub Pages.
+- Confirmar preço do Pro (proposto R$ 16,90) e id do pacote `br.com.mensalao.app`.
+- Registrar o domínio, apontar o DNS e definir `MENSALAO_DOMINIO`.
+- Conta na Play, chave de assinatura (fingerprint SHA-256), `.aab`, produto `mensalao_pro`, ficha, testadores de licença, teste de compra real, link da ficha (`URL_FICHA_PLAY`) e envio para revisão.

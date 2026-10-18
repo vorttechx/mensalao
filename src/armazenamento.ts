@@ -25,3 +25,22 @@ export function carregar(): Carga {
 export function salvar(estado: Estado): void {
   localStorage.setItem(CHAVE, JSON.stringify(estado));
 }
+
+/** Lê uma chave qualquer do localStorage (null se não existir ou se o acesso falhar). */
+export function lerChave(chave: string): string | null {
+  try {
+    return localStorage.getItem(chave);
+  } catch {
+    return null;
+  }
+}
+
+/** Grava uma chave; devolve false se não deu (ex.: cota excedida), sem lançar erro. */
+export function gravarChave(chave: string, valor: string): boolean {
+  try {
+    localStorage.setItem(chave, valor);
+    return true;
+  } catch {
+    return false;
+  }
+}

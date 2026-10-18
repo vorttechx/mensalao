@@ -1,113 +1,160 @@
-# Mensalão — Notas do Dev (Sprint 1, etapa D1)
+# Mensalão — Notas do Dev (Sprint 2, etapa D1)
 
-Autor: Agente Dev. Entrada: `docs/backlog.md` (G1 aprovado) e `docs/design.md` (GD aprovado, com as Decisões de UX), em 17/10/2026.
+Autor: Agente Dev. Entrada: `docs/backlog.md` (G1 aprovado, histórias US-09 e US-11 a US-17) e `docs/design.md` Parte 2 (GD aprovado). Notas da sprint 1: `docs/sprint1/dev-notes.md` (continuam valendo para o que não mudou).
 
-## Arquitetura
+## Arquitetura (o que é novo)
 
-- **Vite + TypeScript estrito, sem framework.** DOM nativo com um auxiliar `h()` (`src/ui/dom.ts`).
-- **Domínio puro** em `src/domain/` (sem DOM nem `localStorage`). Toda função que depende do dia recebe `hoje` (ISO `aaaa-mm-dd`) por parâmetro.
-- **Persistência:** só `src/armazenamento.ts` toca o `localStorage` (chave `mensalao:v1`). `src/loja.ts` guarda o estado em memória, grava a cada mudança e é o único ponto que lê o relógio (`hoje()`).
-- **UI:** `src/ui/app.ts` é o roteador por hash e a moldura (topo, banner, conteúdo, botão flutuante, navegação). Cada tela em `src/ui/telas/*.ts` devolve um objeto `Tela`. A tela é remontada a cada troca de rota ou ação.
-- **PWA:** `public/manifest.webmanifest`, ícones em `public/icons/`. O `sw.js` é gerado no build por um plugin em `vite.config.ts`, com a lista de todos os arquivos (cache para uso offline). `base: './'`.
-- **Formato dos dados:** datas em ISO `aaaa-mm-dd` (sem fuso), valores em centavos inteiros, histórico `{ data, deCentavos, paraCentavos }` em ordem cronológica.
+- **Domínio puro** (sem DOM nem `localStorage`) em `src/domain/`: `plano.ts`, `pro.ts`, `preferencias.ts`, `lembretes.ts`, `copias.ts`, `csv.ts`, `grafico.ts`. "Hoje/agora" sempre por parâmetro.
+- **Plataforma** em `src/plataforma/`: interface `ProvedorCompra` e `Notificador` (`provedor.ts`), implementações `play.ts` (Digital Goods API + Payment Request, `https://play.google.com/billing`, SKU `mensalao_pro`, acknowledge), `indisponivel.ts`, `falso.ts`, `notificador.ts` (Notification API + service worker), `notificador-falso.ts`.
+- **Escolha do ambiente em tempo de build:** o código importa `@ambiente`. O `vite.config.ts` resolve esse alias para `ambiente.producao.ts` (Play ou Indisponível, notificador real, sem controles) ou, com `VITE_MODO=teste` (`.env.teste`, `vite build --mode teste`), para `ambiente.teste.ts` (provedor e notificador falsos + `window.__mensalaoTeste`). O arquivo de produção não importa nada de teste, então o provedor falso não entra no bundle de produção. O `tsconfig.json` aponta `@ambiente` para o de produção; o `vitest.config.ts`, para o de teste.
+- **Serviços** em `src/servicos/` (fazem E/S, a UI usa só eles): `pro.ts` (plano efetivo, verificação ao abrir, comprar, restaurar, aviso de revogação), `preferencias.ts`, `lembretes.ts`, `copias.ts`. `armazenamento.ts` ganhou `lerChave`/`gravarChave` (não lançam erro; gravar devolve false em cota excedida). `loja.ts` ganhou `aoMudarEstado` (gatilho das cópias) e `agoraLocal()`.
+- **UI:** tela nova `#/pro` (`ui/telas/pro.ts`); `ui/limite.ts` (contador e diálogo de limite); seções novas em `ui/telas/lembretes.ts`, `copias.ts`, `planilha.ts`, `grafico.ts`, `temas.ts`; `ui/temas.ts` aplica `data-tema` no `<html>` e as metas `theme-color`. A moldura (`ui/app.ts`) escuta o plano e remonta a tela quando a loja responde (exceto no formulário, para não perder o que foi digitado).
+- **Chaves do `localStorage`:** `mensalao:v1` (estado, igual à sprint 1), `mensalao:pro:v1` (`{ pro, sku, verificadoEm }`), `mensalao:prefs:v1` (tema, lembrete, avisados, backup), `mensalao:copias:v1` (cópias). O backup JSON continua na versão 1 e não inclui nem lê nada disso.
 
 ## Como rodar
 
 ```bash
 npm install
-npm run dev        # desenvolvimento (sem service worker)
-npm run build      # tsc (src + configs) e vite build em dist/
-npm run preview    # serve dist/ em http://localhost:4173/
-npm test           # vitest: tests/**/*.test.ts (fora de tests/e2e)
-npm run test:e2e   # playwright: tests/e2e/**/*.spec.ts; sobe build + preview na porta 4173
+npm run build            # tsc + build de PRODUÇÃO em dist/
+npm run build:teste      # tsc + build de TESTE (provedor falso) em dist-teste/
+npm run preview          # serve dist/ em http://localhost:4173/
+npm run preview:teste    # serve dist-teste/ em http://localhost:4173/
+npm run verificar:bundle # gera os dois builds e roda scripts/verificar-provedor-falso.mjs (US-12.CA14)
+npm test                 # vitest (tests/**/*.test.ts)
+npm run test:e2e         # playwright (sobe os dois builds, ver abaixo)
+npm run capturas         # capturas da loja (precisa do preview:teste rodando na 4173)
 ```
 
-- Playwright configurado em `playwright.config.ts`: viewport 360×780, `locale pt-BR`, `timezoneId America/Sao_Paulo`, `@playwright/test` 1.56.1, que usa o Chromium já instalado em `/opt/pw-browsers` (não precisa de `playwright install`).
-- O "hoje" vem de `new Date()`, então nos E2E dá para fixar a data com `page.clock.setFixedTime(...)` antes do `goto`.
-- Para injetar dados nos E2E: gravar o JSON do estado em `localStorage['mensalao:v1']` (formato abaixo) e recarregar a página.
+**Playwright (`playwright.config.ts`)** sobe dois servidores:
+- projeto `mobile-360`: build de **teste** na porta **4173** — todos os `*.spec.ts`, exceto `*.prod.spec.ts`. Os 64 E2E da sprint 1 rodam aqui sem mudança (o provedor falso padrão responde "sem compra", então o app está no plano grátis).
+- projeto `producao-360`: build de **produção** na porta **4174** — só arquivos `*.prod.spec.ts` (ex.: tentar ativar o Pro por URL, console ou `localStorage`, US-12.CA15). Hoje não há nenhum; o QA cria.
 
-```json
-{ "versao": 1, "config": { "diasAviso": 3 }, "assinaturas": [ {
-  "id": "x", "nome": "Netflix", "valorCentavos": 4490, "ciclo": "mensal", "proxima": "2026-10-20", "diaRef": 20,
-  "pagamento": "cartao", "banco": "", "categoria": "Streaming de vídeo", "emTeste": false, "fimTeste": null,
-  "status": "ativa", "canceladaEm": null, "catalogoId": "netflix", "historico": [], "criadaEm": "2026-10-01" } ] }
-```
-Valores aceitos: `ciclo` mensal|anual|semanal; `pagamento` cartao|pix|boleto|debito; `status` ativa|pausada|cancelada. `fimTeste` é obrigatório se `emTeste` e `null` caso contrário; `canceladaEm` é obrigatório só para `cancelada`. Estado fora desse formato é tratado como corrompido (US-08.CA4).
+**Verificação do bundle (US-12.CA14):** `scripts/verificar-provedor-falso.mjs [dist] [dist-teste]` procura `provedor-falso-mensalao`, `mensalao:teste:provedor`, `mensalao:teste:notificacao` e `__mensalaoTeste`. Falha (código 1) se algum estiver em `dist/` ou se faltar algum em `dist-teste/`. O CI (`.github/workflows/pages.yml`) agora roda `npm run verificar:bundle` no lugar de `npm run build`.
 
-## Funções de domínio (para os testes unitários)
+## Como o teste controla o provedor falso (build de teste)
 
-| Módulo | Funções principais |
+O provedor é **sempre** o falso no build de teste (US-12.CA16). Ele lê o controle **a cada chamada**, então dá para configurar antes de abrir o app (para a verificação ao abrir) ou durante o teste.
+
+**1. Pelo `localStorage`** (antes do `goto`/`reload`, ou com `page.addInitScript`), chave `mensalao:teste:provedor`, JSON parcial (o que faltar usa o padrão):
+
+| Campo | Padrão | Efeito |
+| --- | --- | --- |
+| `disponivel` | `true` | `false` simula o navegador comum: tela Pro com `pro-indisponivel`, restaurar desabilitado, cache Pro não honrado. |
+| `preco` | `"R$ 16,90"` | Texto do botão "Comprar Pro por …". `null` = loja não devolveu o produto (mostra o erro de preço). |
+| `detalhes` | `"ok"` | `"erro"` faz a consulta de preço falhar (`pro-erro-preco`, `pro-btn-recarregar`). |
+| `compra` | `"ok"` | Resultado de comprar: `"ok"`, `"cancelado"` ou `"erro"`. Com `"ok"`, o falso acrescenta `mensalao_pro` em `compras` (a "conta da Play" passa a ter a compra). |
+| `compras` | `[]` | SKUs da conta. `["mensalao_pro"]` = já comprou (verificação ao abrir ativa o Pro; restaurar encontra). |
+| `listar` | `"ok"` | `"erro"` faz a listagem falhar (erro/timeout da loja): verificação mantém o estado local; restaurar mostra erro. |
+| `offline` | `false` | `true` simula sem rede (também vale quando `navigator.onLine` é false, ex.: `context.setOffline(true)`): detalhes/listar falham e comprar devolve `"erro"`. |
+| `atrasoMs` | `0` | Atraso de cada resposta (para ver "Carregando preço…", "Abrindo a Google Play…", "Verificando…" e testar toque duplo). |
+
+**2. Pelo console/Playwright** (só existe no build de teste): `window.__mensalaoTeste.provedor.configurar({...})` (grava a mesma chave), `.ler()`, `.padrao`, `.chamadas()` → `{ disponivel, detalhes, comprar, listarCompras }` (contagem acumulada em `mensalao:teste:provedor-chamadas`; apague a chave para zerar). Útil para "toques repetidos não abrem duas compras" e "verificação no máximo uma vez por abertura" (cada abertura chama `disponivel` e `listarCompras` uma vez).
+
+**Receitas:**
+- *Compra ok:* plano grátis, abrir `#/pro`, clicar `pro-btn-comprar` → `pro-ativo`.
+- *Cancelada / erro:* `configurar({ compra: 'cancelado' | 'erro' })` → `pro-cancelada` / `pro-erro`.
+- *Offline:* `context.setOffline(true)` (ou `offline: true`) e abrir `#/pro` → `pro-offline`, botão desabilitado.
+- *Restaurar:* `compras: ['mensalao_pro']` com `mensalao:pro:v1` ausente; ou, para testar o botão sem a verificação ao abrir ativar antes, abrir com `compras: []` e configurar `compras: ['mensalao_pro']` antes de clicar `pro-btn-restaurar`.
+- *Reinstalação (US-12.CA5):* limpar o `localStorage` do app mas manter `compras: ['mensalao_pro']` → ao abrir, vira Pro sozinho.
+- *Reembolso (US-12.CA6):* ser Pro (`mensalao:pro:v1` = `{"pro":true,"sku":"mensalao_pro","verificadoEm":"…"}` ou comprar), depois `configurar({ compras: [] })` e recarregar → `pro-revogado-aviso`.
+- *Pro mantido em falha (CA7):* Pro + `listar: 'erro'` (ou offline) e recarregar → continua Pro, sem aviso.
+- *Começar já Pro num teste:* gravar `mensalao:teste:provedor` com `{"compras":["mensalao_pro"]}` antes do `reload`. Só o `mensalao:pro:v1` não basta: o falso responde "sem compra" e revoga.
+
+**Notificações (US-13)**, chave `mensalao:teste:notificacao` (ou `window.__mensalaoTeste.notificacao.configurar`): `suporte` (padrão `true`; `false` → `lembrete-sem-suporte`), `permissao` (`'default'` | `'granted'` | `'denied'`, padrão `'default'`), `resposta` ao pedido (padrão `'granted'`). As notificações "exibidas" ficam em `mensalao:teste:notificacoes` (lista `{ titulo, corpo }`) e em `window.__mensalaoTeste.notificacao.enviadas()`.
+
+**Datas:** como na sprint 1, `page.clock.setFixedTime(...)` antes do `goto`. As cópias usam data e hora locais do relógio do navegador.
+
+## Funções de domínio novas (para os unitários)
+
+| Módulo | Funções |
 | --- | --- |
-| `domain/datas.ts` | `lerDataBR`, `formatarDataBR`, `somarMeses(iso, n, diaRef?)`, `proximoCiclo`, `avancarAteHoje(iso, ciclo, hoje, diaRef?)`, `diferencaDias` |
-| `domain/dinheiro.ts` | `lerValor(texto)` → `{ok, centavos}` ou `{ok:false, erro:'invalido'|'casas'}`, `formatarBRL(centavos)`, `formatarPercentual` |
-| `domain/validacao.ts` | `validarFormulario(entrada, hoje)` (erros por campo + data avançada), `lerDiasAviso(texto)` |
-| `domain/operacoes.ts` | `criarAssinatura`, `editarAssinatura`, `pausar`, `marcarCancelada`, `reativar`, `excluirAssinatura`, `normalizarDatas` |
-| `domain/proximas.ts` | `listarProximas(assinaturas, hoje, n)`, `testeVigente`, `testeEncerrado`, `textoVenceLogo`, `textoFimTeste` |
-| `domain/reajuste.ts` | `calcularReajuste(anterior, atual)`, `ultimoReajuste`, `textoReajuste` |
-| `domain/totais.ts` | `calcularTotais(assinaturas, hoje)`, `equivalenteMensal`, `equivalenteAnual` |
-| `domain/catalogo.ts` | `CATALOGO`, `buscarCatalogo(termo)`, `normalizarBusca` |
-| `domain/guia.ts` | `montarGuia(assinatura)`, `textoPix(banco)` |
-| `domain/backup.ts` | `gerarBackup(estado, exportadoEm)`, `lerBackup(texto, hoje)`, `nomeArquivoBackup(hoje)` |
-| `domain/esquema.ts` | `validarEstado`, `validarConteudo` (estrutura do estado e do backup) |
+| `domain/plano.ts` | `LIMITE_GRATIS`, `contarAtivas`, `podeAtivarMais(estado, pro)`, `vagasRestantes`, `acimaDoLimite`, `textoContador(ativas)`, `recursosDoPlano(pro)` |
+| `domain/pro.ts` | `CHAVE_PRO`, `SKU_PRO`, `lerEstadoPro(bruto)`, `proEfetivo({ disponibilidade, confirmacao, cache })`, `aplicarVerificacao(cache, resposta, agora)` |
+| `domain/preferencias.ts` | `lerPreferencias(bruto)`, `preferenciasPadrao`, `temaEfetivo(prefs, pro)`, `ehTema` |
+| `domain/lembretes.ts` | `lembretesDevidos(estado, hoje, dias, jaAvisados)` → `{ itens, novos }`, `registrarAvisados`, `lerDiasLembrete`, `textoAntecedencia`, `prefixoDias` |
+| `domain/copias.ts` | `lerCopias`, `decidirCopia(copias, estado, agora, id)`, `adicionarCopia`, `copiaAntesDeRestaurar`, `lerConteudoCopia`, `marcarInutilizavel`, `diasParaLembrarExportar(info, hoje, temAssinaturas)`, `adiarLembreteExportar`, `formatarDataHora` |
+| `domain/csv.ts` | `gerarCsv(estado, hoje)`, `nomeArquivoCsv(hoje)`, `valorCsv`, `escaparCampo`, `protegerFormula`, `CABECALHO_CSV` |
+| `domain/grafico.ts` | `agregarCategorias(porCategoria)`, `dadosGrafico(assinaturas, hoje)`, `percentuaisMaiorResto(pesos)`, `formatarDecimos` |
 
 ## Decisões (ambiguidades resolvidas pelo mais simples)
 
-1. **Decisões de UX aprovadas, seguidas como estão:** 4 abas + botão flutuante; ações no detalhe; canceladas em `<details>` recolhível; datas como texto `dd/mm/aaaa`; selos "hoje / amanhã / em X dias"; selects começam em "Selecione…" e dão erro se ficarem sem escolha; "Marcar como cancelada" sem confirmação; diálogo com "Voltar".
-2. **Catálogo pré-preenche só nome, valor, ciclo e categoria** (US-01.CA2). A forma de pagamento continua em "Selecione…" e é obrigatória, como em qualquer cadastro (Decisão de UX 6). Nos E2E, escolha `field-pagamento` e informe `field-proxima` antes de salvar.
-3. **Categorias:** as 11 do MVP mais as duas compostas do catálogo ("Streaming / Compras" e "Streaming de vídeo / Música"), para o pré-preenchimento ficar válido.
-4. **Valor:** aceita vírgula ou ponto decimal, prefixo "R$" e milhar com ponto (`1.234,56`). Mais de 2 casas dá erro específico ("Use no máximo 2 casas decimais…"); vazio, zero, negativo e letras dão "Informe um valor maior que zero, como 39,90".
-5. **BRL:** `Intl.NumberFormat('pt-BR', BRL)` com o espaço não separável trocado por espaço comum, para o texto ser exatamente `R$ 39,90`.
-6. **Vence logo:** destaca quando `0 ≤ dias até a cobrança ≤ N` (com N = 3, hoje 30/09: 30/09 e 03/10 sim, 04/10 não). O teste grátis é vigente quando `fimTeste ≥ hoje` ("termina hoje" ainda é teste); encerrado quando `fimTeste < hoje`.
-7. **Dia de referência (`diaRef`):** guarda o dia digitado na próxima cobrança para manter o "31" ao avançar meses (31/01 → 28/02 → 31/03). Na edição, só muda se o usuário alterar a data.
-8. **Avanço de datas vencidas:** feito ao abrir o app e a cada montagem de tela, para **todas** as assinaturas (inclusive pausadas/canceladas, o que não muda nada para o usuário), além de na reativação e na importação.
-9. **Totais exatos:** soma em inteiros (mensal × 12, anual × 1, semanal × 52). Total anual = essa soma; mensal = soma ÷ 12, arredondado só na exibição. Formas de pagamento na ordem fixa Cartão, Pix Automático, Boleto, Débito; categorias do maior para o menor (empate: nome).
-10. **Histórico de preços:** cada entrada é "valor anterior → novo valor" com a data da alteração; abaixo vem "Valor atual". O selo compara o valor atual com o `deCentavos` da última entrada.
-11. **Guia Pix com banco:** "Abra o app do banco de onde sai o pagamento (no app do Itaú), procure Pix > …", com o restante do texto exatamente como no US-06.CA2. Cadastro livre pago por Pix mostra só o bloco do Pix (o genérico do US-06.CA3 vale só "sem Pix Automático").
-12. **Backup:** `{ formato: "mensalao-backup", versao: 1, exportadoEm, config, assinaturas }`. A importação valida tudo (JSON, formato, versão, valores positivos, datas reais, ids únicos) antes de pedir confirmação; nada muda em caso de erro.
-13. **Retorno após salvar:** volta no histórico até a tela de origem (Início/Assinaturas/detalhe), então o "Voltar" do navegador funciona igual ao da barra de topo.
-14. **Navegação inferior** fica oculta no catálogo, no formulário e também no **detalhe** (telas internas com "Voltar"); o design só falava dos formulários. Ver desvios.
+1. **Plano efetivo (US-12.CA15):** provedor indisponível → grátis sempre; loja confirmou → Pro; loja respondeu sem a compra → grátis; sem resposta ainda, erro ou offline → vale o cache `mensalao:pro:v1`. Na produção num navegador comum o provedor é "Indisponível" desde o início, então o cache nunca é honrado.
+2. **Verificação ao abrir:** `disponivel()` + `listarCompras()` com prazo de 10 s; uma vez por abertura; a primeira tela já aparece com o estado local.
+3. **Restaurar sem compra** não revoga um Pro em cache (o botão só aparece no grátis); revogação só acontece na verificação ao abrir.
+4. **Limite:** o diálogo abre em todo "Adicionar" (flutuante, estados vazios de Início, Assinaturas e Totais), no catálogo e no formulário abertos por URL (diálogo por cima; "Agora não" volta), no "Salvar" de nova assinatura e no "Reativar". O contador aparece também no estado vazio de Assinaturas e no cartão "Plano" de Ajustes (só texto).
+5. **Importar com exatamente 5 ativas:** o aviso diz "Este backup tem 5 assinaturas ativas, o limite do plano grátis. Todas serão importadas…" (o texto do design fala "acima das 5", que só vale para 6 ou mais).
+6. **Lembretes:** padrão desligado (ligar passa pela explicação + permissão), 1 dia. O par é registrado como avisado na primeira vez que entra na janela, mesmo sem permissão (não notifica depois retroativamente). Com teste grátis vigente, só o aviso de fim do teste (a cobrança volta a contar quando o teste acaba). A lista de avisados descarta datas passadas.
+7. **Verificação em segundo plano (D-07):** não há Periodic Background Sync (o service worker não lê `localStorage`). O "melhor esforço" é: ao abrir, quando a loja confirma o Pro, ao ligar o lembrete e ao voltar ao app (`visibilitychange`). O texto de limitação está na tela.
+8. **Cópias:** a regra de "uma por dia" mantém a primeira cópia do dia (a que tem o estado antes dos erros do dia). A cópia de segurança antes de restaurar ignora a regra do dia, mas não duplica se for igual à mais recente. Cópia danificada é detectada ao tocar em "Restaurar" (antes da confirmação), marcada e mantida na lista.
+9. **Lembrete de exportar:** conta a partir da última exportação de arquivo (botão dos Ajustes ou "Exportar agora", em qualquer plano) ou, se nunca exportou, da primeira abertura como Pro. "Lembrar depois" esconde por 7 dias.
+10. **CSV:** linhas terminam em `\r\n` inclusive a última; o apóstrofo anti-fórmula vale para nome, banco e categoria.
+11. **Gráfico:** percentuais em décimos pelo maior resto sobre o equivalente anual (inteiro). "Outras categorias" só existe com 7 ou mais categorias. Com a tela de Totais vazia no Pro, o cartão do gráfico mostra "Sem dados para o gráfico" acima do estado vazio; no grátis aparece o cartão `lock-grafico`.
+12. **Preço da Play:** formatado com `Intl.NumberFormat(navigator.language, { currency })` a partir do valor e moeda devolvidos; nada fixo no código.
+13. **Acknowledge da compra:** chama `service.acknowledge(token, 'onetime')` se existir (API 1.0) e `PaymentResponse.complete('success')` (API 2.0). Precisa ser confirmado na compra real (R-07).
+14. **Página de privacidade** é uma segunda entrada do Vite (`privacidade.html`), com a mesma folha de estilos; entra no cache offline. O service worker passou a ser gerado no `writeBundle` (com a lista final de arquivos) e, offline, serve a própria página navegada antes de cair no `index.html`.
 
-## Desvios do design (o mais próximo do desenhado)
+## Ajuste pedido no portão G2: máscara de data
 
-- **Detalhe sem navegação inferior:** o wireframe 4.4 não mostra a navegação e a tela tem "Voltar"; ocultei para dar espaço às ações.
-- **Recuperação de dados (4.8):** o título "Não conseguimos ler seus dados salvos" é o `h1` da tela, logo acima da caixa vermelha (`corrupt-warning`), que traz o texto explicativo. No wireframe o título fica dentro da caixa.
-- **Máscara de data** (opcional no design) não foi feita: o campo aceita `dd/mm/aaaa` digitado (o placeholder orienta).
-- **Ícone PNG** gerado a partir do SVG próprio (`public/icons/icone.svg`) renderizado no Chromium; o mesmo arquivo serve como favicon. Manifest declara entradas `any` e `maskable` separadas.
+Os campos `field-proxima` e `field-fim-teste` (os únicos de data dd/mm/aaaa do app) continuam com `inputmode="numeric"`, mas agora inserem as barras sozinhos no evento `input` ("30092026" → "30/09/2026", "3009" → "30/09"), limitados a 10 caracteres. A lógica é pura: `mascararDataBR(texto)` e `posicaoCursorMascara(mascarado, digitosAntes)` em `src/domain/datas.ts`; o ligamento na UI é `aplicarMascaraData(input)` em `src/ui/componentes.ts`. Regras: descarta o que não é dígito nem barra; aceita texto colado com barras (inclusive "1/2/2026"); nunca acrescenta barra final por conta própria (o backspace não trava), só mantém a que a própria pessoa digitou; dígitos além do ano são ignorados; o cursor é preservado pela contagem de dígitos. A validação (`lerDataBR`) não mudou. Isto resolve o desvio aceito na sprint 1 "o campo de data não tem máscara". Nenhum teste do QA quebrou (82 unitários e 64 E2E passando).
+
+## Desvios do design
+
+- **Banner de revogação e de "sem espaço"** ficam no topo do conteúdo de qualquer tela (até serem fechados), não só da primeira; a resposta da loja pode chegar depois de a pessoa trocar de tela.
+- **Selo "Danificada"** usa o ícone de alerta (o design pede "!"; é o mesmo ícone dos erros de campo).
+- **Rótulo do Ajustes > Plano no Pro:** o título "Plano" ganha o selo Pro ao lado; "Ver detalhes" leva à tela Pro.
+- **Gráfico:** os vãos de 2 px entre fatias são feitos encurtando cada arco (não com borda da cor da superfície); visualmente equivalente.
 
 ## Mapa história → arquivos
 
 | História | Arquivos |
 | --- | --- |
-| US-01 | `domain/tipos.ts`, `domain/datas.ts`, `domain/dinheiro.ts`, `domain/catalogo.ts`, `domain/validacao.ts`, `domain/operacoes.ts`, `domain/esquema.ts`, `armazenamento.ts`, `loja.ts`, `ui/telas/catalogo.ts`, `ui/telas/formulario.ts`, `ui/componentes.ts`, `ui/app.ts`, `styles.css` |
-| US-02 | `domain/proximas.ts`, `ui/telas/inicio.ts`, `ui/telas/ajustes.ts` (N dias) |
-| US-03 | `domain/reajuste.ts`, `ui/telas/detalhe.ts` (histórico), `ui/telas/comum.ts` (selo), `ui/telas/formulario.ts` (edição) |
-| US-04 | `domain/totais.ts`, `ui/telas/totais.ts` |
-| US-05 | `domain/operacoes.ts`, `ui/telas/assinaturas.ts`, `ui/telas/detalhe.ts` (ações), `ui/componentes.ts` (diálogo) |
-| US-06 | `domain/guia.ts`, `ui/telas/detalhe.ts` (painel "Como cancelar") |
-| US-07 | `domain/backup.ts`, `ui/backup.ts`, `ui/telas/ajustes.ts` (seção Backup) |
-| US-08 | `public/manifest.webmanifest`, `public/icons/*`, `vite.config.ts` (sw.js), `main.ts`, `ui/telas/recuperacao.ts`, `index.html` |
+| US-09 | `domain/plano.ts`, `ui/limite.ts`, `ui/telas/inicio.ts`, `assinaturas.ts`, `totais.ts`, `catalogo.ts`, `formulario.ts`, `detalhe.ts`, `ui/backup.ts` (aviso na importação), `ui/componentes.ts` (`dialogoInfo`, `confirmar` com `extra`) |
+| US-11 | `plataforma/*` (provedores, ambientes), `servicos/pro.ts`, `ui/telas/pro.ts`, `ui/telas/ajustes.ts` (Plano), `ui/app.ts` (rota, selo Pro), `vite.config.ts`, `.env.teste`, `playwright.config.ts` |
+| US-12 | `domain/pro.ts`, `servicos/pro.ts` (verificação, restaurar, revogação), `ui/app.ts` (aviso), `scripts/verificar-provedor-falso.mjs`, `.github/workflows/pages.yml` |
+| US-13 | `domain/lembretes.ts`, `domain/preferencias.ts`, `plataforma/notificador*.ts`, `servicos/lembretes.ts`, `servicos/preferencias.ts`, `ui/telas/lembretes.ts`, `vite.config.ts` (clique na notificação) |
+| US-14 | `domain/copias.ts`, `servicos/copias.ts`, `ui/telas/copias.ts`, `loja.ts` (`aoMudarEstado`) |
+| US-15 | `domain/csv.ts`, `ui/telas/planilha.ts` |
+| US-16 | `domain/grafico.ts`, `ui/telas/grafico.ts` |
+| US-17 | `ui/temas.ts`, `ui/telas/temas.ts`, `styles.css` (temas e tokens do cartão de total) |
+| 5.1 (E-01 a E-08) | `twa/`, `public/.well-known/assetlinks.json`, `public/manifest.webmanifest` (`id`), `vite.config.ts` (CNAME), `privacidade.html`, `docs/loja/*`, `scripts/capturas.mjs` |
 
-## `data-testid`
+## `data-testid` novos
 
-**Formulário e catálogo:** `catalog-search`, `catalog-list`, `catalog-item` (com `data-catalogo-id`), `catalog-contagem` (anúncio aria-live), `catalog-vazio`, `btn-cadastrar-livre`, `form-assinatura`, `field-nome`, `field-valor`, `field-ciclo`, `field-proxima`, `field-pagamento`, `field-banco`, `field-categoria`, `field-teste`, `field-fim-teste`, `btn-salvar`, `error-nome`, `error-valor`, `error-ciclo`, `error-proxima`, `error-pagamento`, `error-categoria`, `error-fim-teste` (as mensagens de erro ficam ocultas com `hidden` quando não há erro).
+**Limite:** `limite-contador` (só o texto), `limite-link-pro`, `limite-aviso` (diálogo, `role="alertdialog"`), `limite-btn-pro`, `limite-btn-agora-nao`, `import-aviso-limite`.
 
-**Início:** `upcoming-list`, `upcoming-item` (com `data-id`), `badge-vence-logo`, `badge-teste-fim`, `badge-reajuste`, `aviso-teste-terminou`, `empty-state`, `btn-adicionar-vazio`, `btn-adicionar` (flutuante), `subtitulo`. Dentro de cada item: `item-nome`, `item-valor`, `item-meta`.
+**Pro:** `pro-tela`, `pro-recursos`, `pro-btn-comprar`, `pro-carregando`, `pro-erro-preco`, `pro-btn-recarregar`, `pro-cancelada`, `pro-erro`, `pro-offline`, `pro-indisponivel`, `pro-btn-play` (oculto até haver `URL_FICHA_PLAY`), `pro-btn-restaurar`, `pro-restaurar-msg`, `pro-ativo`, `pro-btn-voltar-app`, `pro-nota-gratis`, `pro-revogado-aviso`, `selo-pro`, `plano-cartao`, `plano-btn-pro`.
 
-**Assinaturas:** `sub-list`, `sub-item`, `badge-pausada`, `badge-cancelada`, `filtro-canceladas` (`<details>`), `canceladas-list`, `empty-state-assinaturas`.
+**Recursos bloqueados:** `lock-lembrete`, `lock-backup`, `lock-csv`, `lock-grafico`, `lock-temas` (cada um com botão `lock-btn-pro`).
 
-**Detalhe:** `detalhe-valor`, `detalhe-dados`, `detalhe-proxima`, `detalhe-situacao`, `detalhe-cancelada-em`, `btn-editar`, `btn-como-cancelar` (`aria-expanded`), `cancel-guide`, `guia-servico`, `guia-loja`, `guia-pix`, `btn-guia-marcar-cancelada`, `price-history` (`<ol>`), `price-history-item`, `price-history-vazio`, `btn-pausar`, `btn-reativar`, `btn-cancelar` (Marcar como cancelada), `btn-excluir`, `nao-encontrada`.
+**Lembretes:** `lembrete-ativar` (switch), `lembrete-dias`, `error-lembrete-dias`, `lembrete-btn-salvar`, `form-lembrete`, `lembrete-salvo` (banner), `lembrete-limite-texto` (Ajustes e Início), `lembrete-sem-permissao`, `lembrete-sem-suporte`, `lembrete-dialogo`, `lembrete-btn-continuar`, `lembrete-btn-voltar`, `lembrete-aviso`, `lembrete-item`.
 
-**Totais:** `cartao-total`, `total-mensal`, `total-anual`, `total-quantidade`, `total-em-teste`, `total-por-pagamento` (+ `total-por-pagamento-item`), `total-por-categoria` (+ `total-por-categoria-item`), `empty-state-totais`.
+**Backup automático:** `backup-ativar`, `backup-aviso-limite`, `copias-lista`, `copia-item`, `copia-restaurar`, `copia-inutilizavel`, `badge-danificada`, `copias-vazia`, `copia-restaurada` (banner), `copia-erro` (banner), `backup-erro-espaco`, `backup-lembrete`, `backup-btn-exportar`, `backup-btn-depois`. A confirmação de restaurar usa `confirm-dialog`/`btn-confirmar`/`btn-dialogo-voltar`.
 
-**Ajustes e backup:** `form-config`, `config-dias-aviso`, `error-config-dias`, `btn-salvar-config` (Enter no campo também salva), `aviso-config-salva`, `btn-exportar`, `btn-importar`, `input-importar` (`<input type=file>` oculto; usar `setInputFiles`), `export-ok`, `import-ok`, `import-error`.
+**CSV:** `btn-exportar-csv`, `csv-ok`, `csv-vazio`.
 
-**Diálogo, banners, navegação e recuperação:** `confirm-dialog`, `btn-confirmar`, `btn-dialogo-voltar`, `banner` (sucesso genérico), `aviso-data-avancada` (banner após salvar com data ajustada), `btn-voltar`, `titulo-tela` (h1), `nav-inicio`, `nav-assinaturas`, `nav-totais`, `nav-ajustes`, `corrupt-warning`, `btn-comecar-zero`.
+**Gráfico:** `grafico-categorias`, `grafico-item`, `grafico-pct`, `grafico-vazio`; o SVG tem `role="img"` com `<title id="grafico-titulo">`.
+
+**Temas:** `temas-lista` (fieldset), `tema-verde-cedula`, `tema-azul-noite`, `tema-grafite`, `tema-ameixa` (inputs radio), `tema-aplicado` (banner). Tema aplicado = atributo `data-tema` no `<html>` (ausente no verde-cédula).
+
+**Sobre:** `link-privacidade`; na página `privacidade.html`: `privacidade`, `privacidade-voltar`.
+
+## Testes existentes da sprint 1
+
+Os 82 unitários e os 64 E2E passam sem alteração (os E2E agora rodam contra o build de teste na mesma porta 4173). Nenhum teste do QA quebrou.
+
+## Empacotamento: o que ficou pendente do Renato
+
+- **Domínio (R-02):** `twa/twa-manifest.json` usa `DOMINIO-A-DEFINIR.com.br`. O `CNAME` só é gerado com a variável `MENSALAO_DOMINIO` (no CI, variável do repositório); sem ela o Pages atual segue igual.
+- **Fingerprint SHA-256 (R-03):** marcador `SHA256_DA_CHAVE_DE_ASSINATURA_A_PREENCHER` em `twa/twa-manifest.json` e `public/.well-known/assetlinks.json`.
+- **Id do pacote (R-10):** `br.com.mensalao.app` usado nos dois arquivos, a confirmar.
+- **Ficha publicada:** `URL_FICHA_PLAY` em `src/ui/telas/pro.ts` está vazio; com ele preenchido aparece "Abrir na Google Play".
+- **E-mail de contato** da política de privacidade; revisão dos textos de `docs/loja/`.
+- Gerar o `.aab` (Bubblewrap, JDK e Android SDK) e o gráfico de destaque 1024×500 não foram feitos aqui.
 
 ## Limitações conhecidas
 
-- Não há testes automatizados escritos pelo Dev (trabalho do QA); a verificação foi manual com scripts Playwright fora do repositório.
-- O service worker só existe no build (`npm run preview`), não no `npm run dev`. Na primeira visita a página ainda não é controlada; o modo offline vale a partir do segundo carregamento (ou após o SW ativar, com `clients.claim`).
-- O aviso "Teste terminou em …" fica no item enquanto "Está em teste grátis" estiver marcado (Decisão de UX 7; o Produto ainda não definiu um prazo).
-- Se o app ficar aberto na virada do dia, as datas são recalculadas na próxima montagem de tela (troca de rota ou ação), não automaticamente à meia-noite.
-- O banner "Backup exportado" aparece logo após o clique, sem confirmação de que o navegador salvou o arquivo.
-- O histórico de preços quebra a data e os valores em duas linhas quando os valores são grandes (≥ R$ 1.000,00) em 360 px.
+- A integração Google Play não foi exercitada de verdade (só revisão de código); compra real, acknowledge, restauração após reinstalar e reembolso ficam para o checklist R-07.
+- Lembretes com o app fechado não existem de fato (sem push nem sincronização periódica); só ao abrir/voltar ao app.
+- Se o `localStorage` estiver cheio a ponto de não caber nem o estado principal, o comportamento é o da sprint 1 (a gravação principal não trata cota).
+- Dentro da TWA, quem adulterar `mensalao:pro:v1` fica Pro enquanto a loja não responder (risco aceito em D-06).
+- As capturas da loja estão em 1080×1920 (9:16); o backlog cita 360×780, mas 780/360 passa da proporção máxima de 2:1 aceita pela Play.

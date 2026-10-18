@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
-import { readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { readdirSync, statSync, writeFileSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 
 /** Lista os arquivos de public/ (copiados como estão para o build). */
 function arquivosPublicos(dir: string, raiz = dir): string[] {
@@ -19,9 +19,11 @@ function serviceWorker(): Plugin {
   return {
     name: 'mensalao-service-worker',
     apply: 'build',
-    generateBundle(_opcoes, bundle) {
+    // writeBundle: o bundle já está completo (inclui as páginas HTML e sem os chunks vazios removidos pelo Vite).
+    writeBundle(opcoes, bundle) {
+      // .well-known/assetlinks.json e CNAME são para a TWA e o Pages, não para o cache offline.
       const arquivos = ['./', 'index.html', ...Object.keys(bundle), ...arquivosPublicos('public')]
-        .filter((f) => f !== 'sw.js')
+        .filter((f) => f !== 'sw.js' && f !== 'CNAME' && !f.startsWith('.well-known/'))
         .filter((f, i, todos) => todos.indexOf(f) === i);
       const versao = createHash('sha256').update(arquivos.join('|')).digest('hex').slice(0, 12);
       const codigo = `// Gerado no build (vite.config.ts). Cache do app para uso offline.
@@ -44,24 +46,71 @@ self.addEventListener('fetch', (ev) => {
   const req = ev.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   if (req.mode === 'navigate') {
-    // Navegação: tenta a rede (versão nova) e cai para o index.html do cache offline.
+    // Navegação: tenta a rede (versão nova); offline, a própria página do cache (ex.: privacidade.html) ou o index.html.
     ev.respondWith(
-      fetch(req).catch(() => caches.match('index.html', { ignoreSearch: true }).then((r) => r || caches.match('./'))),
+      fetch(req).catch(() =>
+        caches.match(req, { ignoreSearch: true })
+          .then((r) => r || caches.match('index.html', { ignoreSearch: true }))
+          .then((r) => r || caches.match('./')),
+      ),
     );
     return;
   }
   // Demais arquivos: cache primeiro, rede como reserva.
   ev.respondWith(caches.match(req, { ignoreSearch: true }).then((r) => r || fetch(req)));
 });
+
+// Toque numa notificação de lembrete (US-13): abre o app no Início.
+self.addEventListener('notificationclick', (ev) => {
+  ev.notification.close();
+  ev.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((janelas) => {
+      for (const j of janelas) if ('focus' in j) return j.focus();
+      return self.clients.openWindow('./');
+    }),
+  );
+});
 `;
-      this.emitFile({ type: 'asset', fileName: 'sw.js', source: codigo });
+      writeFileSync(join(opcoes.dir ?? 'dist', 'sw.js'), codigo);
+    },
+  };
+}
+
+/**
+ * Domínio próprio no GitHub Pages (D-05, E-02): com MENSALAO_DOMINIO definido (ex.: mensalao.com.br),
+ * o build grava o arquivo CNAME. Sem a variável, nada muda (o Pages atual continua funcionando).
+ */
+function cname(): Plugin {
+  return {
+    name: 'mensalao-cname',
+    apply: 'build',
+    generateBundle() {
+      const dominio = process.env.MENSALAO_DOMINIO?.trim();
+      if (dominio) this.emitFile({ type: 'asset', fileName: 'CNAME', source: `${dominio}\n` });
     },
   };
 }
 
 // base relativa: o build funciona em qualquer subdiretório (ex.: /apps/mensalao/).
-export default defineConfig({
-  base: './',
-  build: { target: 'es2022' },
-  plugins: [serviceWorker()],
+// Build de teste (US-12.CA14 a CA16): `vite build --mode teste` (VITE_MODO=teste em .env.teste) troca o
+// alias "@ambiente" para o ambiente de teste, com o provedor falso, e grava em dist-teste/. O build de
+// produção usa ambiente.producao.ts, que não importa o provedor falso: ele não chega ao bundle.
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
+  const teste = (process.env.VITE_MODO ?? env.VITE_MODO) === 'teste';
+  return {
+    base: './',
+    resolve: {
+      alias: {
+        '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'producao'}.ts`),
+      },
+    },
+    build: {
+      target: 'es2022',
+      outDir: teste ? 'dist-teste' : 'dist',
+      // Duas páginas: o app e a política de privacidade (E-05), ambas no cache offline.
+      rollupOptions: { input: { main: resolve(__dirname, 'index.html'), privacidade: resolve(__dirname, 'privacidade.html') } },
+    },
+    plugins: [serviceWorker(), cname()],
+  };
 });

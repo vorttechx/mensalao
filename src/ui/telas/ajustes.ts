@@ -8,7 +8,14 @@ import { exportarBackup, importarArquivo, seletorDeArquivo } from '../backup';
 import { botao } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
-import { avisar } from '../navegacao';
+import { avisar, navegar } from '../navegacao';
+import { ehPro } from '../../servicos/pro';
+import { contarAtivas, textoContador } from '../../domain/plano';
+import { seloPro } from '../componentes';
+import { secaoBackupAutomatico } from './copias';
+import { secaoLembretes } from './lembretes';
+import { secaoPlanilha } from './planilha';
+import { secaoTemas } from './temas';
 import type { Tela } from '../tela';
 
 function secaoAvisos(): HTMLElement {
@@ -68,7 +75,8 @@ function secaoBackup(): HTMLElement {
   return h(
     'section',
     { 'aria-labelledby': 'titulo-backup' },
-    h('h2', { class: 'secao', id: 'titulo-backup' }, 'Backup'),
+    h('h2', { class: 'secao', id: 'titulo-backup' }, 'Backup e exportação'),
+    h('h3', { class: 'subsecao' }, 'Backup em arquivo'),
     h('p', { class: 'nota' }, 'Seus dados ficam só neste celular. Guarde uma cópia em arquivo para não perder tudo ao trocar de aparelho.'),
     h(
       'div',
@@ -81,7 +89,30 @@ function secaoBackup(): HTMLElement {
       botao('Importar backup', 'secundario', seletor.abrir, { testid: 'btn-importar', larga: true }),
       seletor.input,
     ),
+    secaoPlanilha(),
+    secaoBackupAutomatico(),
   );
+}
+
+/** Plano (design 9.8): grátis com acesso à tela Pro, ou Pro com "Ver detalhes". */
+function secaoPlano(): HTMLElement {
+  const pro = ehPro();
+  const cartao = pro
+    ? h(
+        'div',
+        { class: 'cartao plano-cartao', testid: 'plano-cartao' },
+        h('p', { class: 'plano-nome' }, icone('moeda', 'ic24'), 'Mensalão Pro'),
+        h('p', { class: 'nota' }, 'Compra ativa. Obrigado!'),
+        botao('Ver detalhes', 'texto', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
+      )
+    : h(
+        'div',
+        { class: 'cartao plano-cartao', testid: 'plano-cartao' },
+        h('p', { class: 'plano-nome' }, 'Plano grátis'),
+        h('p', { class: 'nota' }, textoContador(contarAtivas(obterEstado()))),
+        botao('Conhecer o Pro', 'secundario', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
+      );
+  return h('section', { 'aria-labelledby': 'titulo-plano' }, h('h2', { class: 'secao', id: 'titulo-plano' }, 'Plano', pro ? ' ' : null, pro ? seloPro() : null), cartao);
 }
 
 export function telaAjustes(): Tela {
@@ -89,13 +120,17 @@ export function telaAjustes(): Tela {
     titulo: 'Ajustes',
     aba: 'ajustes',
     conteudo: [
+      secaoPlano(),
       secaoAvisos(),
+      secaoLembretes(),
       secaoBackup(),
+      secaoTemas(),
       h(
         'section',
         { 'aria-labelledby': 'titulo-sobre' },
         h('h2', { class: 'secao', id: 'titulo-sobre' }, 'Sobre'),
         h('p', { class: 'nota' }, 'Mensalão não se conecta a bancos e não envia seus dados para a internet.'),
+        h('a', { class: 'link-privacidade', href: './privacidade.html', testid: 'link-privacidade' }, 'Política de privacidade'),
       ),
     ],
   };

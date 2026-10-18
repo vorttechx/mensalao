@@ -5,8 +5,10 @@ import { hoje, obterEstado } from '../../loja';
 import { botao, estadoVazio, selo } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
-import { navegar } from '../navegacao';
+import { adicionar, contadorLimite } from '../limite';
 import type { Tela } from '../tela';
+import { lembreteExportar } from './copias';
+import { avisoLembretes } from './lembretes';
 import { itemAssinatura, metaCobranca, selosReajuste, valorSimples } from './comum';
 
 function itemProximo(i: ItemProximo): HTMLElement {
@@ -33,13 +35,14 @@ export function telaInicio(): Tela {
       marca: true,
       aba: 'inicio',
       conteudo: [
+        contadorLimite(),
         estadoVazio({
           testid: 'empty-state',
           titulo: 'Nenhuma cobrança por aqui',
           textos: temOutras
             ? ['Nenhuma assinatura ativa no momento. As pausadas e canceladas ficam em Assinaturas.']
             : ['Cadastre suas assinaturas para ver o que vai ser cobrado e quando.', 'Seus dados ficam só neste celular.'],
-          botao: botao('Adicionar assinatura', 'primario', () => navegar('#/nova'), { testid: 'btn-adicionar-vazio', icone: 'mais' }),
+          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio', icone: 'mais' }),
         }),
       ],
     };
@@ -51,6 +54,6 @@ export function telaInicio(): Tela {
     aba: 'inicio',
     fab: true,
     subtitulo: textoJanelaAviso(n),
-    conteudo: [h('ul', { class: 'lista', testid: 'upcoming-list', 'aria-label': 'Próximas cobranças' }, itens.map(itemProximo))],
+    conteudo: [contadorLimite(), avisoLembretes(), lembreteExportar(), h('ul', { class: 'lista', testid: 'upcoming-list', 'aria-label': 'Próximas cobranças' }, itens.map(itemProximo))],
   };
 }

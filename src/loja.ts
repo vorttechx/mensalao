@@ -27,10 +27,26 @@ export function obterEstado(): Estado {
   return estado;
 }
 
+const ouvintes = new Set<() => void>();
+
+/** Avisado depois de cada gravação do estado (ex.: cópias automáticas, US-14.CA2). */
+export function aoMudarEstado(fn: () => void): void {
+  ouvintes.add(fn);
+}
+
 /** Substitui o estado e grava no localStorage. */
 export function definirEstado(novo: Estado): void {
   estado = novo;
   salvar(novo);
+  for (const fn of ouvintes) fn();
+}
+
+/** "Agora" local: dia ISO e "aaaa-mm-ddThh:mm" (cópias automáticas). */
+export function agoraLocal(): { dia: string; dataHora: string } {
+  const d = new Date();
+  const dois = (n: number): string => String(n).padStart(2, '0');
+  const dia = isoDeDate(d);
+  return { dia, dataHora: `${dia}T${dois(d.getHours())}:${dois(d.getMinutes())}` };
 }
 
 /** Troca o estado em memória sem gravar (usado na carga inicial). */

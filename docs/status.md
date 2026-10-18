@@ -1,29 +1,39 @@
-# Status da sprint 1 — Mensalão
+# Status da sprint 2 — Mensalão
 
 Atualizado a cada etapa pelo orquestrador. Estados: pendente, andamento, concluída, aguardando você, aprovada, rejeitada, falhou.
+Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs/sprint1/`.
 
 | Etapa | Quem | Estado | Observação |
 | --- | --- | --- | --- |
-| P1 Escrever backlog | Produto | concluída | 8 histórias (US-01 a US-08) em `docs/backlog.md` |
-| G1 Aprovar backlog antes do UX | Renato | aprovada | Aprovado pelo Renato em 17/10/2026 |
-| U1 Planejar design | UX | concluída | `docs/design.md` e `docs/design-preview.html` |
-| GD Aprovar design antes do Dev | Renato | aprovada | Aprovado pelo Renato em 17/10/2026, com as Decisões de UX |
-| D1 Implementar histórias | Dev | concluída | US-01 a US-08, notas em `docs/dev-notes.md` |
-| G2 Aprovar código antes do QA | Renato | aprovada | Aprovado pelo Renato em 17/10/2026 |
-| Q1 Testar e abrir bugs | QA | concluída | 82 unitários e 64 E2E passando, 0 bugs abertos |
-| G3 Revisar relatório de QA | Renato | aprovada | Renato escolheu entregar |
-| D2 Corrigir bugs (máx. 3 rodadas) | Dev | não necessária | Nenhum bug aberto. Rodadas usadas: 0 |
-| E Entrega | Renato | concluída | `docs/relatorio-final.md` |
+| P1 Escrever backlog | Produto | concluída | 8 histórias (US-09, US-11 a US-17) e decisões D-01 a D-12 em `docs/backlog.md` |
+| G1 Aprovar backlog antes do UX | Renato | aprovada | Aprovado pelo Renato em 18/10/2026 |
+| U1 Planejar design | UX | concluída | Parte 2 em `docs/design.md` e nova `docs/design-preview.html` |
+| GD Aprovar design antes do Dev | Renato | aprovada | Aprovado pelo Renato em 18/10/2026 |
+| D1 Implementar histórias | Dev | concluída | US-09, US-11 a US-17 e empacotamento; notas em `docs/dev-notes.md` |
+| G2 Aprovar código antes do QA | Renato | aprovada | Aprovado pelo Renato em 18/10/2026, após a correção da máscara de data |
+| Q1 Testar e abrir bugs | QA | concluída (reteste OK) | 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos |
+| G3 Revisar relatório de QA | Renato | aprovada | 1ª revisão: corrigir. Reteste: 178 unitários e 196 E2E passando, 0 bugs abertos. Entrega aprovada em 18/10/2026 |
+| D2 Corrigir bugs (máx. 3 rodadas) | Dev | concluída | Rodada 1: BUG-01 e BUG-02 corrigidos e retestados |
+| E Entrega | Renato | concluída | Relatório final em `docs/relatorio-final.md` |
 
 ## Registro
 
-- 17/10/2026: Renato aprovou o backlog (G1). Etapa U1 (UX) iniciada.
-- 17/10/2026: UX entregou o design (U1). Portão GD aguardando o Renato; o Dev não começa antes disso.
-- 17/10/2026: Renato aprovou o design (GD), incluindo as Decisões de UX. Etapa D1 (Dev) iniciada.
-- 17/10/2026: Dev entregou US-01 a US-08 (D1), build sem erros. Portão G2 aguardando o Renato; o QA não começa antes disso.
-- 17/10/2026: Renato aprovou o código (G2). Etapa Q1 (QA) iniciada.
-- 17/10/2026: QA entregou o relatório (Q1): 82 unitários e 64 E2E passando, nenhum bug aberto. Portão G3 aguardando o Renato.
-- 17/10/2026: Renato definiu a monetização da sprint 2 (freemium com compra única Pro), registrada em `docs/sprint2-direcao.md`.
-- 17/10/2026: Renato aprovou a entrega (G3). Relatório final em `docs/relatorio-final.md`. Sprint 1 encerrada, sem push.
-- 01/10/2026: entrou o agente de UX. Depois do backlog aprovado (G1), o UX escreve `docs/design.md` e `docs/design-preview.html`, e o Dev só começa após a aprovação do design (GD). Direção visual do Renato para o Mensalão: moderna, minimalista, em tons de verde que remetam a dinheiro.
-- O Dev chegou a rodar antes da aprovação do backlog (G1) por falha de orquestração. O rascunho foi guardado na branch `dev/rascunho-sem-aprovacao` e não faz parte da `main`. A decisão de aproveitá-lo ou descartá-lo é do Renato.
+- 18/10/2026: Renato iniciou a sprint 2. Documentos da sprint 1 movidos para `docs/sprint1/`. Etapa P1 (Produto) iniciada.
+- 18/10/2026: Produto entregou o backlog da sprint 2 (P1). Portão G1 aguardando o Renato; o UX não começa antes disso.
+- 18/10/2026: Renato pediu uma versão de teste com Pro liberado sem pagamento. Produto incluiu a US-18 e ajustou D-06 e D-10. Portão G1 continua aguardando o Renato.
+- 18/10/2026: Renato perguntou sobre o domínio. Produto registrou na D-05 o domínio próprio como recomendação (registro pelo Renato nesta sprint, pré-requisito só da publicação). Portão G1 continua aguardando o Renato.
+- 18/10/2026: a pedido do Renato, a US-10 (proteção de quem já tinha mais de 5 ativas) saiu do backlog, porque nenhuma versão foi para produção. Portão G1 continua aguardando o Renato.
+- 18/10/2026: a pedido do Renato, a US-18 (versão de teste com Pro liberado) saiu do backlog. Portão G1 continua aguardando o Renato.
+- 18/10/2026: Renato escolheu domínio próprio para a produção (D-05), registrado por ele nesta sprint.
+- 18/10/2026: Renato aprovou o backlog (G1). Etapa U1 (UX) iniciada.
+- 18/10/2026: UX entregou o design da sprint 2 (U1). Portão GD aguardando o Renato; o Dev não começa antes disso.
+- 18/10/2026: Renato aprovou o design (GD), incluindo as Decisões de UX. Etapa D1 (Dev) iniciada.
+- 18/10/2026: Dev entregou a sprint 2 (D1): build sem erros, 82 unitários e 64 E2E da sprint 1 passando, verificação do bundle OK. Portão G2 aguardando o Renato; o QA não começa antes disso.
+- 18/10/2026: Renato pediu a barra automática no campo de data (teclado numérico no celular); Dev corrigiu com máscara.
+- 18/10/2026: Renato aprovou o código (G2). Etapa Q1 (QA) iniciada.
+- 18/10/2026: QA entregou o relatório (Q1): 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos. Portão G3 aguardando o Renato.
+- 18/10/2026: Renato revisou o relatório de QA (G3) e escolheu corrigir. Etapa D2 (Dev, rodada 1) iniciada.
+- 18/10/2026: Dev corrigiu BUG-01 e BUG-02 (rodada 1): 178 unitários e 193 E2E passando. Aguardando a aprovação do Renato para o reteste do QA.
+- 18/10/2026: Renato aprovou as correções da rodada 1. Reteste do QA iniciado.
+- 18/10/2026: QA retestou: 178 unitários e 196 E2E passando, BUG-01 e BUG-02 fechados, 0 bugs abertos. Portão G3 aguardando o Renato para entrega.
+- 18/10/2026: Renato aprovou a entrega da sprint 2 (G3). Relatório final em `docs/relatorio-final.md`.

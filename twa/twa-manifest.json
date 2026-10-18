@@ -1,0 +1,50 @@
+{
+  "packageId": "br.com.mensalao.app",
+  "host": "DOMINIO-A-DEFINIR.com.br",
+  "name": "Mensalão",
+  "launcherName": "Mensalão",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0B6B47",
+  "themeColorDark": "#0E1A15",
+  "navigationColor": "#0B6B47",
+  "navigationColorDark": "#0E1A15",
+  "navigationDividerColor": "#0B6B47",
+  "navigationDividerColorDark": "#0E1A15",
+  "backgroundColor": "#F5F8F6",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://DOMINIO-A-DEFINIR.com.br/icons/icon-512.png",
+  "maskableIconUrl": "https://DOMINIO-A-DEFINIR.com.br/icons/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./mensalao-upload.keystore",
+    "alias": "mensalao"
+  },
+  "appVersionName": "2.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://DOMINIO-A-DEFINIR.com.br/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "playBilling": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://DOMINIO-A-DEFINIR.com.br/",
+  "minSdkVersion": 21,
+  "retainedBundles": [],
+  "fingerprints": [
+    {
+      "name": "assinatura-play",
+      "value": "SHA256_DA_CHAVE_DE_ASSINATURA_A_PREENCHER"
+    }
+  ]
+}

@@ -18,6 +18,10 @@ const CAMINHOS: Record<string, string> = {
   totais: '<path d="M5 20V12M12 20V5M19 20v-9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
   ajustes: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="17" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/>',
   moeda: '<rect width="24" height="24" rx="6" fill="#08573A"/><circle cx="12" cy="12" r="6.7" fill="#D4A72C"/><circle cx="12" cy="12" r="5.6" fill="none" stroke="#08573A" stroke-width=".6"/><path d="M8.9 15.2V8.8l3.1 3.6 3.1-3.6v6.4" fill="none" stroke="#08573A" stroke-width="1.5" stroke-linejoin="round"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  sino: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  tabela: '<rect x="3.5" y="4.5" width="17" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 9.5h17M3.5 14.5h17M10 9.5v10" stroke="currentColor" stroke-width="2"/>',
+  girar: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.4" opacity=".25"/><path d="M12 4a8 8 0 0 1 8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
   fechar: '<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
 };
 
@@ -34,6 +38,13 @@ export function icone(nome: NomeIcone, classe: 'ic' | 'ic24' = 'ic'): SVGSVGElem
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
   svg.innerHTML = CAMINHOS[nome];
+  return svg;
+}
+
+/** Moeda grande decorativa (56 px) da tela Pro. */
+export function moedaGrande(): SVGSVGElement {
+  const svg = icone('moeda', 'ic24');
+  svg.setAttribute('class', 'moeda-grande');
   return svg;
 }
 

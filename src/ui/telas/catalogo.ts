@@ -5,7 +5,14 @@ import { sufixoCiclo } from '../../domain/tipos';
 import { botao } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
+import { avisarLimite, guardarTelaDeCadastro, podeAdicionar } from '../limite';
 import { navegar, voltar } from '../navegacao';
+
+/** Segue para o formulário só se houver vaga (US-09.CA2); senão, diálogo de limite. */
+function irPara(hash: string): void {
+  if (podeAdicionar()) navegar(hash);
+  else void avisarLimite({ sobreTela: true });
+}
 import type { Tela } from '../tela';
 
 function itemCatalogo(s: ServicoCatalogo): HTMLElement {
@@ -14,7 +21,7 @@ function itemCatalogo(s: ServicoCatalogo): HTMLElement {
     {},
     h(
       'button',
-      { type: 'button', class: 'cat', testid: 'catalog-item', 'data-catalogo-id': s.id, onclick: () => navegar(`#/nova/form/${encodeURIComponent(s.id)}`) },
+      { type: 'button', class: 'cat', testid: 'catalog-item', 'data-catalogo-id': s.id, onclick: () => irPara(`#/nova/form/${encodeURIComponent(s.id)}`) },
       h('b', {}, s.nome),
       h('span', {}, `${formatarBRL(s.valorCentavos)}${sufixoCiclo(s.ciclo)} · ${s.categoria}`),
     ),
@@ -48,6 +55,7 @@ export function telaCatalogo(): Tela {
   }
   busca.addEventListener('input', filtrar);
   filtrar();
+  guardarTelaDeCadastro();
 
   return {
     titulo: 'Nova assinatura',
@@ -59,7 +67,7 @@ export function telaCatalogo(): Tela {
         h('label', { for: 'busca-catalogo' }, 'Buscar serviço'),
         h('div', { class: 'prefixo busca' }, icone('busca'), busca),
       ),
-      botao('Cadastrar livremente', 'secundario', () => navegar('#/nova/form'), { testid: 'btn-cadastrar-livre', larga: true }),
+      botao('Cadastrar livremente', 'secundario', () => irPara('#/nova/form'), { testid: 'btn-cadastrar-livre', larga: true }),
       h('h2', { class: 'secao', id: 'titulo-catalogo' }, 'Serviços conhecidos'),
       anuncio,
       lista,
