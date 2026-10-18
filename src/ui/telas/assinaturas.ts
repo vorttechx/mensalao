@@ -5,7 +5,7 @@ import { rotuloPagamento, sufixoCiclo, type Assinatura } from '../../domain/tipo
 import { obterEstado } from '../../loja';
 import { botao, estadoVazio, selo } from '../componentes';
 import { h } from '../dom';
-import { navegar } from '../navegacao';
+import { adicionar, contadorLimite } from '../limite';
 import type { Tela } from '../tela';
 import { itemAssinatura, selosReajuste } from './comum';
 
@@ -38,10 +38,11 @@ export function telaAssinaturas(): Tela {
       titulo: 'Assinaturas',
       aba: 'assinaturas',
       conteudo: [
+        contadorLimite(),
         estadoVazio({
           testid: 'empty-state-assinaturas',
           textos: ['Você ainda não cadastrou assinaturas.'],
-          botao: botao('Adicionar assinatura', 'primario', () => navegar('#/nova'), { testid: 'btn-adicionar-vazio', icone: 'mais' }),
+          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio', icone: 'mais' }),
         }),
       ],
     };
@@ -57,6 +58,7 @@ export function telaAssinaturas(): Tela {
     fab: true,
     subtitulo: resumo || 'Nenhuma assinatura ativa',
     conteudo: [
+      contadorLimite(),
       principais.length ? h('ul', { class: 'lista', testid: 'sub-list', 'aria-label': 'Assinaturas ativas e pausadas' }, principais.map(item)) : null,
       canceladas.length
         ? h(

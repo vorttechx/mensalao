@@ -9,6 +9,7 @@ import { renderizar } from '../app';
 import { botao, confirmar, estadoVazio, selo } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
+import { avisarLimite, podeAdicionar } from '../limite';
 import { avisar, navegar, substituir, voltar } from '../navegacao';
 import type { Tela } from '../tela';
 import { hrefDetalhe, selosReajuste } from './comum';
@@ -59,6 +60,11 @@ function acaoPausar(a: Assinatura): void {
 }
 
 function acaoReativar(a: Assinatura): void {
+  // Reativar cria uma nova ativa: no limite do grátis, continua pausada/cancelada (US-09.CA4).
+  if (!podeAdicionar()) {
+    void avisarLimite({ reativarNome: a.nome });
+    return;
+  }
   const r = reativar(a, hoje());
   aplicar(r, `${a.nome} reativada. Próxima cobrança: ${formatarDataBR(r.proxima)}.`);
 }

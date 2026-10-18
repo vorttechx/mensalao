@@ -6,7 +6,7 @@ import { hoje, obterEstado } from '../../loja';
 import { botao, estadoVazio } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
-import { navegar } from '../navegacao';
+import { adicionar } from '../limite';
 import type { Tela } from '../tela';
 
 function plural(n: number, singular: string, pluralTxt: string): string {
@@ -69,7 +69,7 @@ export function telaTotais(): Tela {
             testid: 'empty-state-totais',
             ilustracao: false,
             textos: ['Sem assinaturas ativas. Os totais aparecem quando você cadastrar ou reativar uma.'],
-            botao: botao('Adicionar assinatura', 'primario', () => navegar('#/nova'), { testid: 'btn-adicionar-vazio', icone: 'mais' }),
+            botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio', icone: 'mais' }),
           })
         : null,
       vazio ? null : grupo('Por forma de pagamento', 'titulo-por-pagamento', 'total-por-pagamento', t.porPagamento, rotuloPagamento),

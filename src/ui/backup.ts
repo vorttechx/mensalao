@@ -1,7 +1,9 @@
 // Fluxos de exportar/importar backup na interface (usados em Ajustes e na recuperação de dados).
 import { gerarBackup, lerBackup, mensagensErroBackup, nomeArquivoBackup } from '../domain/backup';
 import type { Estado } from '../domain/tipos';
+import { contarAtivas, LIMITE_GRATIS } from '../domain/plano';
 import { definirEstado, hoje, obterEstado } from '../loja';
+import { ehPro } from '../servicos/pro';
 import { confirmar } from './componentes';
 import { h } from './dom';
 import { avisar } from './navegacao';
@@ -42,10 +44,24 @@ export async function importarArquivo(arquivo: File, aoTerminar: (importou: bool
     aoTerminar(false);
     return;
   }
+  // Importar nunca é bloqueado pelo limite; só avisa (US-09.CA12).
+  const ativas = contarAtivas(r.estado);
+  const extra =
+    !ehPro() && ativas >= LIMITE_GRATIS
+      ? {
+          testid: 'import-aviso-limite',
+          texto: `${
+            ativas > LIMITE_GRATIS
+              ? `Este backup tem ${ativas} assinaturas ativas, acima das ${LIMITE_GRATIS} do plano grátis.`
+              : `Este backup tem ${ativas} assinaturas ativas, o limite do plano grátis.`
+          } Todas serão importadas. Enquanto houver ${LIMITE_GRATIS} ou mais ativas, adicionar e reativar ficam indisponíveis.`,
+        }
+      : undefined;
   const ok = await confirmar({
     titulo: 'Importar backup?',
     texto: `O arquivo tem ${plural(r.quantidade)}. Seus dados atuais serão substituídos e isso não pode ser desfeito.`,
     rotuloConfirmar: 'Substituir dados',
+    extra,
   });
   if (!ok) {
     aoTerminar(false);

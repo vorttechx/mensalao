@@ -8,6 +8,7 @@ import { ORDEM_CAMPOS, validarFormulario, type CampoFormulario, type EntradaForm
 import { definirEstado, gerarId, hoje, obterEstado } from '../../loja';
 import { botao, campoSelecao, campoTexto, estadoVazio, type Banner, type Campo } from '../componentes';
 import { h } from '../dom';
+import { avisarLimite, guardarTelaDeCadastro, podeAdicionar } from '../limite';
 import { avisar, voltar, voltarAte } from '../navegacao';
 import type { Tela } from '../tela';
 import { textoReajusteBanner } from './comum';
@@ -24,6 +25,7 @@ export function telaFormulario(m: ModoFormulario): Tela {
     };
   }
   const servico = m.modo === 'nova' ? servicoPorId(m.catalogoId) : undefined;
+  if (m.modo === 'nova') guardarTelaDeCadastro();
 
   // Valores iniciais: edição usa os dados atuais; catálogo pré-preenche nome, valor, ciclo e categoria.
   const ini = existente
@@ -123,6 +125,11 @@ export function telaFormulario(m: ModoFormulario): Tela {
 
   function salvar(ev: Event): void {
     ev.preventDefault();
+    // No limite do grátis nada é gravado (US-09.CA6).
+    if (!existente && !podeAdicionar()) {
+      void avisarLimite({ sobreTela: true });
+      return;
+    }
     const r = validarFormulario(lerEntrada(), hoje());
     for (const c of ORDEM_CAMPOS) campos[c].definirErro(r.ok ? null : r.erros[c] ?? null);
     if (!r.ok) {

@@ -4,7 +4,8 @@ import { aoMudarPlano, ehPro, fecharAvisoRevogacao, haAvisoRevogacao, verificarA
 import { botao, criarBanner, seloPro } from './componentes';
 import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
-import { consumirBanner, fecharBanner, navegar, registrarTroca, rotaAtual } from './navegacao';
+import { adicionar } from './limite';
+import { consumirBanner, fecharBanner, registrarTroca, rotaAtual } from './navegacao';
 import type { Aba, Tela } from './tela';
 import { telaAjustes } from './telas/ajustes';
 import { telaAssinaturas } from './telas/assinaturas';
@@ -121,7 +122,7 @@ export function renderizar(): void {
   );
 
   const app = h('div', { class: `app${tela.aba ? ' com-nav' : ''}` }, topo, main);
-  if (tela.fab) app.append(botao('Adicionar', 'primario', () => navegar('#/nova'), { testid: 'btn-adicionar', icone: 'mais', attrs: { class: 'btn btn-primario fab' } }));
+  if (tela.fab) app.append(botao('Adicionar', 'primario', adicionar, { testid: 'btn-adicionar', icone: 'mais', attrs: { class: 'btn btn-primario fab' } }));
   if (tela.aba) app.append(montarNav(tela.aba));
 
   raiz.replaceChildren(app);

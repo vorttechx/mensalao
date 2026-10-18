@@ -10,7 +10,7 @@ import { h } from '../dom';
 import { icone } from '../icones';
 import { avisar, navegar } from '../navegacao';
 import { ehPro } from '../../servicos/pro';
-import { contarAtivas, LIMITE_GRATIS } from '../../domain/plano';
+import { contarAtivas, textoContador } from '../../domain/plano';
 import { seloPro } from '../componentes';
 import type { Tela } from '../tela';
 
@@ -102,7 +102,7 @@ function secaoPlano(): HTMLElement {
         'div',
         { class: 'cartao plano-cartao', testid: 'plano-cartao' },
         h('p', { class: 'plano-nome' }, 'Plano grátis'),
-        h('p', { class: 'nota' }, `${contarAtivas(obterEstado())} de ${LIMITE_GRATIS} assinaturas ativas`),
+        h('p', { class: 'nota' }, textoContador(contarAtivas(obterEstado()))),
         botao('Conhecer o Pro', 'secundario', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
       );
   return h('section', { 'aria-labelledby': 'titulo-plano' }, h('h2', { class: 'secao', id: 'titulo-plano' }, 'Plano', pro ? ' ' : null, pro ? seloPro() : null), cartao);

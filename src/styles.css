@@ -446,3 +446,13 @@ h2.secao .selo-pro { vertical-align: middle; }
 .plano-nome svg { border-radius: 6px; }
 .plano-cartao .btn { margin-top: var(--espaco-3); }
 .plano-cartao .btn-texto { margin-left: calc(-1 * var(--espaco-2)); margin-top: var(--espaco-1); }
+
+/* ---------- Contador de limite (8.2) ---------- */
+.limite { margin: 0 0 var(--espaco-4); }
+.limite-texto { font-size: var(--texto-sm); font-weight: var(--peso-medio); color: var(--cor-texto); margin: 0 0 6px; }
+.medidor { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.medidor i { display: block; height: 6px; border-radius: 3px; background: var(--cor-superficie-2); border: 1px solid var(--cor-divisor); }
+.medidor i.cheio { background: var(--cor-primaria); border-color: var(--cor-primaria); }
+.limite-apoio { font-size: var(--texto-sm); color: var(--cor-texto-2); margin: var(--espaco-2) 0 0; }
+.limite .btn-texto { margin-left: calc(-1 * var(--espaco-2)); }
+.vazio .btn-texto { margin-top: var(--espaco-2); }
