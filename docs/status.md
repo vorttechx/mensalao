@@ -8,8 +8,8 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 | P1 Escrever backlog | Produto | concluída | 8 histórias (US-09, US-11 a US-17) e decisões D-01 a D-12 em `docs/backlog.md` |
 | G1 Aprovar backlog antes do UX | Renato | aprovada | Aprovado pelo Renato em 18/10/2026 |
 | U1 Planejar design | UX | concluída | Parte 2 em `docs/design.md` e nova `docs/design-preview.html` |
-| GD Aprovar design antes do Dev | Renato | aguardando você | |
-| D1 Implementar histórias | Dev | pendente | |
+| GD Aprovar design antes do Dev | Renato | aprovada | Aprovado pelo Renato em 18/10/2026 |
+| D1 Implementar histórias | Dev | andamento | |
 | G2 Aprovar código antes do QA | Renato | pendente | |
 | Q1 Testar e abrir bugs | QA | pendente | |
 | G3 Revisar relatório de QA | Renato | pendente | |
@@ -27,3 +27,4 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 - 18/10/2026: Renato escolheu domínio próprio para a produção (D-05), registrado por ele nesta sprint.
 - 18/10/2026: Renato aprovou o backlog (G1). Etapa U1 (UX) iniciada.
 - 18/10/2026: UX entregou o design da sprint 2 (U1). Portão GD aguardando o Renato; o Dev não começa antes disso.
+- 18/10/2026: Renato aprovou o design (GD), incluindo as Decisões de UX. Etapa D1 (Dev) iniciada.
