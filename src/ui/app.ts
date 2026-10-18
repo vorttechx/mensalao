@@ -7,6 +7,7 @@ import { botao, criarBanner, seloPro } from './componentes';
 import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
 import { adicionar } from './limite';
+import { aplicarTema } from './temas';
 import { consumirBanner, fecharBanner, registrarTroca, rotaAtual } from './navegacao';
 import type { Aba, Tela } from './tela';
 import { telaAjustes } from './telas/ajustes';
@@ -175,6 +176,7 @@ export function iniciarApp(el: HTMLElement): void {
   // A resposta da loja chega depois da primeira tela (US-12.CA9) e atualiza a tela sem recarregar.
   aoMudarEstado(() => processarCopias());
   aoMudarPlano((m) => {
+    aplicarTema(); // revogado: volta ao padrão sem apagar a escolha (US-17.CA6)
     processarCopias();
     void processarLembretes();
     setTimeout(() => {
@@ -193,6 +195,7 @@ export function iniciarApp(el: HTMLElement): void {
     void processarLembretes();
     if (!telaComFormulario() && !document.querySelector('dialog[open]')) renderizar();
   });
+  aplicarTema();
   registrarTroca();
   renderizar();
   void verificarAoAbrir();

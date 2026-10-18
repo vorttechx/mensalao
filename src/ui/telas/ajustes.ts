@@ -15,6 +15,7 @@ import { seloPro } from '../componentes';
 import { secaoBackupAutomatico } from './copias';
 import { secaoLembretes } from './lembretes';
 import { secaoPlanilha } from './planilha';
+import { secaoTemas } from './temas';
 import type { Tela } from '../tela';
 
 function secaoAvisos(): HTMLElement {
@@ -123,6 +124,7 @@ export function telaAjustes(): Tela {
       secaoAvisos(),
       secaoLembretes(),
       secaoBackup(),
+      secaoTemas(),
       h(
         'section',
         { 'aria-labelledby': 'titulo-sobre' },

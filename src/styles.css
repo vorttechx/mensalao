@@ -299,14 +299,14 @@ select.controle {
 
 /* ---------- Totais ---------- */
 .total {
-  background: #0B6B47; color: #FFFFFF;
+  background: var(--cor-total-fundo); color: var(--cor-total-texto);
   border-radius: var(--raio-lg); padding: 20px var(--espaco-5) var(--espaco-5);
   border-top: 4px solid var(--cor-acento);
 }
-.total .rot { color: #E3F4EC; font-size: var(--texto-sm); font-weight: var(--peso-medio); display: block; }
+.total .rot { color: var(--cor-total-rotulo); font-size: var(--texto-sm); font-weight: var(--peso-medio); display: block; }
 .total .mes { display: block; font-size: var(--texto-2xl); font-weight: var(--peso-numero); line-height: var(--altura-linha-numero); margin: 2px 0 var(--espaco-3); font-variant-numeric: tabular-nums; }
 .total .ano { display: block; font-size: var(--texto-xl); font-weight: var(--peso-numero); line-height: var(--altura-linha-numero); margin-top: 2px; font-variant-numeric: tabular-nums; }
-.total .rodape { color: #E3F4EC; font-size: var(--texto-sm); margin: var(--espaco-3) 0 0; }
+.total .rodape { color: var(--cor-total-rotulo); font-size: var(--texto-sm); margin: var(--espaco-3) 0 0; }
 .em-teste {
   display: flex; gap: var(--espaco-2); align-items: flex-start;
   background: var(--cor-info-suave); color: var(--cor-info);
@@ -559,3 +559,75 @@ table.legenda { width: 100%; border-collapse: collapse; font-variant-numeric: ta
 .legenda .pct { font-weight: var(--peso-medio); white-space: nowrap; text-align: right; }
 .grafico-vazio { text-align: center; color: var(--cor-texto-2); margin: var(--espaco-3) 0; }
 .cartao-pro .previa { margin-top: var(--espaco-3); }
+
+/* ---------- Temas Pro (7.3). Os blocos claros ficam fora de media query (especificidade, design 7.3). ---------- */
+[data-tema="azul-noite"] {
+  --cor-fundo: #F4F6FA;  --cor-superficie: #FFFFFF;  --cor-superficie-2: #E8ECF3;
+  --cor-texto: #121A2B;  --cor-texto-2: #475266;  --cor-borda: #76839A;  --cor-divisor: #D9DFE9;
+  --cor-primaria: #1F4E8C;  --cor-primaria-forte: #173D6E;  --cor-primaria-suave: #E3ECF8;
+  --cor-sobre-primaria: #FFFFFF;  --cor-foco: #1F4E8C;
+  --cor-total-fundo: #1F4E8C;  --cor-total-texto: #FFFFFF;  --cor-total-rotulo: #E3ECF8;
+}
+@media (prefers-color-scheme: dark) {
+  [data-tema="azul-noite"] {
+    --cor-fundo: #0D1424;  --cor-superficie: #152037;  --cor-superficie-2: #1E2B45;
+    --cor-texto: #E6ECF7;  --cor-texto-2: #A8B4CA;  --cor-borda: #6E7C96;  --cor-divisor: #26344F;
+    --cor-primaria: #8DB8FF;  --cor-primaria-forte: #B0CEFF;  --cor-primaria-suave: #1E2B45;
+    --cor-sobre-primaria: #0D1424;  --cor-foco: #8DB8FF;
+    --cor-aviso-suave: #1E2B45;  --cor-perigo-suave: #1E2B45;  --cor-info-suave: #1E2B45;
+  }
+}
+
+[data-tema="grafite"] {
+  --cor-fundo: #F5F5F4;  --cor-superficie: #FFFFFF;  --cor-superficie-2: #EAEAE8;
+  --cor-texto: #1C1C1E;  --cor-texto-2: #545458;  --cor-borda: #7D7D82;  --cor-divisor: #DEDEDB;
+  --cor-primaria: #34495E;  --cor-primaria-forte: #243444;  --cor-primaria-suave: #E7EAED;
+  --cor-sobre-primaria: #FFFFFF;  --cor-foco: #34495E;
+  --cor-total-fundo: #34495E;  --cor-total-texto: #FFFFFF;  --cor-total-rotulo: #E7EAED;
+}
+@media (prefers-color-scheme: dark) {
+  [data-tema="grafite"] {
+    --cor-fundo: #121212;  --cor-superficie: #1C1C1E;  --cor-superficie-2: #2A2A2D;
+    --cor-texto: #ECECEC;  --cor-texto-2: #B0B0B5;  --cor-borda: #7A7A80;  --cor-divisor: #333336;
+    --cor-primaria: #C9D3DD;  --cor-primaria-forte: #E1E7ED;  --cor-primaria-suave: #2A2A2D;
+    --cor-sobre-primaria: #121212;  --cor-foco: #C9D3DD;
+    --cor-aviso-suave: #2A2A2D;  --cor-perigo-suave: #2A2A2D;  --cor-info-suave: #2A2A2D;
+  }
+}
+
+[data-tema="ameixa"] {
+  --cor-fundo: #F8F5F7;  --cor-superficie: #FFFFFF;  --cor-superficie-2: #EFE9ED;
+  --cor-texto: #22161E;  --cor-texto-2: #5C4B56;  --cor-borda: #8A7884;  --cor-divisor: #E4DAE0;
+  --cor-primaria: #7A2E62;  --cor-primaria-forte: #5F2049;  --cor-primaria-suave: #F5E6EF;
+  --cor-sobre-primaria: #FFFFFF;  --cor-foco: #7A2E62;
+  --cor-total-fundo: #7A2E62;  --cor-total-texto: #FFFFFF;  --cor-total-rotulo: #F5E6EF;
+}
+@media (prefers-color-scheme: dark) {
+  [data-tema="ameixa"] {
+    --cor-fundo: #170F15;  --cor-superficie: #221820;  --cor-superficie-2: #30232D;
+    --cor-texto: #F2E9EF;  --cor-texto-2: #C2AFBC;  --cor-borda: #8C7986;  --cor-divisor: #3A2B36;
+    --cor-primaria: #F0A8D8;  --cor-primaria-forte: #F7C8E7;  --cor-primaria-suave: #30232D;
+    --cor-sobre-primaria: #170F15;  --cor-foco: #F0A8D8;
+    --cor-aviso-suave: #30232D;  --cor-perigo-suave: #30232D;  --cor-info-suave: #30232D;
+  }
+}
+
+/* ---------- Opção de tema (8.5) ---------- */
+fieldset.temas { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--espaco-2); }
+fieldset.temas legend { font-size: var(--texto-sm); font-weight: var(--peso-medio); padding: 0; margin-bottom: var(--espaco-2); }
+.opcao-tema {
+  display: flex; align-items: center; gap: var(--espaco-3); min-height: 64px; padding: var(--espaco-2) var(--espaco-4);
+  background: var(--cor-superficie); border: 2px solid transparent; border-radius: var(--raio-md); box-shadow: var(--sombra-1); cursor: pointer;
+}
+.opcao-tema:hover { background: var(--cor-primaria-suave); }
+.opcao-tema.selecionado { border-color: var(--cor-primaria); }
+.opcao-tema:focus-within { outline: 3px solid var(--cor-foco); outline-offset: 2px; }
+.opcao-tema input { width: 24px; height: 24px; margin: 0; accent-color: var(--cor-primaria); flex: none; }
+.opcao-tema input:focus-visible { outline: none; }
+.previa-tema { display: flex; gap: 6px; flex: none; }
+.bolinhas { display: inline-flex; gap: 2px; }
+.bolinhas i { display: block; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--cor-borda); }
+.nome-tema { flex: 1; font-weight: var(--peso-medio); min-width: 0; }
+.em-uso { font-size: var(--texto-sm); color: var(--cor-texto-2); }
+.previa-temas { display: flex; gap: var(--espaco-3); }
+.previa-temas .bolinhas i { width: 20px; height: 20px; }
