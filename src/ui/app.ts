@@ -1,5 +1,6 @@
 // Moldura da aplicação e roteador: decide a tela pela rota e monta topo, banner, conteúdo e navegação.
 import { emRecuperacao, normalizarAgora } from '../loja';
+import { processarLembretes } from '../servicos/lembretes';
 import { aoMudarPlano, ehPro, fecharAvisoRevogacao, haAvisoRevogacao, verificarAoAbrir } from '../servicos/pro';
 import { botao, criarBanner, seloPro } from './componentes';
 import { h } from './dom';
@@ -154,6 +155,7 @@ export function iniciarApp(el: HTMLElement): void {
   });
   // A resposta da loja chega depois da primeira tela (US-12.CA9) e atualiza a tela sem recarregar.
   aoMudarPlano((m) => {
+    void processarLembretes();
     setTimeout(() => {
       const naTelaPro = rotaAtual() === '#/pro';
       if ((m.planoMudou || naTelaPro || haAvisoRevogacao()) && !telaComFormulario()) renderizar();
@@ -164,6 +166,12 @@ export function iniciarApp(el: HTMLElement): void {
   };
   window.addEventListener('online', aoMudarRede);
   window.addEventListener('offline', aoMudarRede);
+  // Ao voltar ao app (aba visível), recalcula datas e lembretes (melhor esforço, D-07).
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    void processarLembretes();
+    if (!telaComFormulario() && !document.querySelector('dialog[open]')) renderizar();
+  });
   registrarTroca();
   renderizar();
   void verificarAoAbrir();

@@ -12,6 +12,7 @@ import { avisar, navegar } from '../navegacao';
 import { ehPro } from '../../servicos/pro';
 import { contarAtivas, textoContador } from '../../domain/plano';
 import { seloPro } from '../componentes';
+import { secaoLembretes } from './lembretes';
 import type { Tela } from '../tela';
 
 function secaoAvisos(): HTMLElement {
@@ -115,6 +116,7 @@ export function telaAjustes(): Tela {
     conteudo: [
       secaoPlano(),
       secaoAvisos(),
+      secaoLembretes(),
       secaoBackup(),
       h(
         'section',

@@ -53,6 +53,17 @@ self.addEventListener('fetch', (ev) => {
   // Demais arquivos: cache primeiro, rede como reserva.
   ev.respondWith(caches.match(req, { ignoreSearch: true }).then((r) => r || fetch(req)));
 });
+
+// Toque numa notificação de lembrete (US-13): abre o app no Início.
+self.addEventListener('notificationclick', (ev) => {
+  ev.notification.close();
+  ev.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((janelas) => {
+      for (const j of janelas) if ('focus' in j) return j.focus();
+      return self.clients.openWindow('./');
+    }),
+  );
+});
 `;
       this.emitFile({ type: 'asset', fileName: 'sw.js', source: codigo });
     },

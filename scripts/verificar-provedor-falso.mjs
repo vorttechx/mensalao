@@ -5,8 +5,8 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-// Identificadores que só existem no código de teste (src/plataforma/falso.ts e ambiente.teste.ts).
-const MARCADORES = ['provedor-falso-mensalao', 'mensalao:teste:provedor', '__mensalaoTeste'];
+// Identificadores que só existem no código de teste (src/plataforma/falso.ts, notificador-falso.ts e ambiente.teste.ts).
+const MARCADORES = ['provedor-falso-mensalao', 'mensalao:teste:provedor', 'mensalao:teste:notificacao', '__mensalaoTeste'];
 const EXTENSOES = /\.(js|mjs|cjs|html|json|webmanifest|map|txt)$/;
 
 const [pastaProducao = 'dist', pastaTeste = 'dist-teste'] = process.argv.slice(2);

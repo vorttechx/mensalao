@@ -277,3 +277,18 @@ export function cartaoRecursoPro(op: {
     botao('Conhecer o Pro', 'secundario', op.aoConhecer, { testid: 'lock-btn-pro', attrs: { 'aria-label': `Conhecer o Pro para ${op.recurso}` } }),
   );
 }
+
+/* ---------- Interruptor (design 8.4) ---------- */
+
+export function interruptor(op: { rotulo: string; testid: string; marcado: boolean; aoMudar: (ligado: boolean, input: HTMLInputElement) => void }): HTMLElement {
+  const input = h('input', { type: 'checkbox', role: 'switch', class: 'switch-input', testid: op.testid });
+  input.checked = op.marcado;
+  input.addEventListener('change', () => op.aoMudar(input.checked, input));
+  return h(
+    'label',
+    { class: 'switch' },
+    h('span', { class: 'switch-rotulo' }, op.rotulo),
+    input,
+    h('span', { class: 'switch-trilho', 'aria-hidden': 'true' }, h('span', { class: 'switch-botao' }, icone('check'))),
+  );
+}

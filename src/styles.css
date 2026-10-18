@@ -69,6 +69,24 @@
   --duracao-rapida: 120ms;
   --duracao-media: 200ms;
   --curva: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Sprint 2 (design 7.2) — cartão de total (antes fixo no CSS) */
+  --cor-total-fundo: #0B6B47;
+  --cor-total-texto: #FFFFFF;
+  --cor-total-rotulo: #E3F4EC;
+
+  /* Gráfico por categoria — tema claro (iguais em todos os temas) */
+  --cor-grafico-1: #0B6B47;
+  --cor-grafico-2: #2563B0;
+  --cor-grafico-3: #B4530F;
+  --cor-grafico-4: #7B3FA8;
+  --cor-grafico-5: #B0285F;
+  --cor-grafico-6: #5C6E0A;
+  --cor-grafico-7: #66706B;
+
+  /* Interruptor (switch) */
+  --largura-switch: 52px;
+  --altura-switch: 32px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -96,6 +114,13 @@
     --cor-info: #A5A0FF;
     --cor-info-suave: #1F3329;
     --cor-foco: #5FD4A0;
+    --cor-grafico-1: #5FD4A0;
+    --cor-grafico-2: #7DB3FF;
+    --cor-grafico-3: #FFA36B;
+    --cor-grafico-4: #C9A2FF;
+    --cor-grafico-5: #FF8FB8;
+    --cor-grafico-6: #C8D46A;
+    --cor-grafico-7: #A9BBB2;
   }
   /* No escuro todos os selos têm o mesmo fundo: ganham borda na cor do texto. */
   .selo { border: 1px solid currentColor; }
@@ -456,3 +481,40 @@ h2.secao .selo-pro { vertical-align: middle; }
 .limite-apoio { font-size: var(--texto-sm); color: var(--cor-texto-2); margin: var(--espaco-2) 0 0; }
 .limite .btn-texto { margin-left: calc(-1 * var(--espaco-2)); }
 .vazio .btn-texto { margin-top: var(--espaco-2); }
+
+/* ---------- Interruptor (8.4) ---------- */
+.cartao-switch { padding: 0 var(--espaco-4); }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: var(--espaco-3); min-height: 56px; cursor: pointer; }
+.switch-rotulo { font-weight: var(--peso-medio); }
+.switch-input { position: absolute; opacity: 0; width: var(--largura-switch); height: var(--altura-switch); margin: 0; cursor: pointer; }
+.switch { position: relative; }
+.switch-input { right: 0; top: 50%; transform: translateY(-50%); z-index: 1; }
+.switch-trilho { pointer-events: none; }
+.switch-trilho {
+  flex: none; position: relative; width: var(--largura-switch); height: var(--altura-switch);
+  border-radius: var(--raio-pilula); background: var(--cor-superficie-2); border: 2px solid var(--cor-borda);
+  transition: background-color var(--duracao-rapida) var(--curva);
+}
+.switch-botao {
+  position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--cor-texto-2); display: grid; place-items: center;
+  transition: transform var(--duracao-rapida) var(--curva);
+}
+.switch-botao svg { width: 12px; height: 12px; visibility: hidden; color: var(--cor-primaria); }
+.switch-input:checked + .switch-trilho { background: var(--cor-primaria); border-color: var(--cor-primaria); }
+.switch-input:checked + .switch-trilho .switch-botao { transform: translateX(20px); background: var(--cor-sobre-primaria); }
+.switch-input:checked + .switch-trilho .switch-botao svg { visibility: visible; }
+.switch-input:focus-visible + .switch-trilho { outline: 3px solid var(--cor-foco); outline-offset: 2px; }
+.switch-input:disabled + .switch-trilho { border-style: dashed; }
+
+/* ---------- Aviso de lembretes (8.6) ---------- */
+.aviso-lembretes { background: var(--cor-aviso-suave); border-radius: var(--raio-md); padding: var(--espaco-3) var(--espaco-4); margin: 0 0 var(--espaco-4); }
+.aviso-lembretes h2 { display: flex; align-items: center; gap: var(--espaco-2); font-size: var(--texto-base); font-weight: var(--peso-forte); margin: 0 0 var(--espaco-1); }
+.aviso-lembretes h2 svg { color: var(--cor-aviso); }
+.aviso-lembretes ul { list-style: none; margin: 0; padding: 0; }
+.aviso-lembretes a { display: flex; align-items: center; gap: var(--espaco-2); min-height: var(--toque-min); color: var(--cor-texto); text-decoration: none; font-variant-numeric: tabular-nums; }
+.aviso-lembretes a:hover span { text-decoration: underline; }
+.aviso-lembretes a.fim-teste svg { color: var(--cor-info); }
+.aviso-lembretes .nota { margin: var(--espaco-1) 0 0; }
+@media (prefers-color-scheme: dark) { .aviso-lembretes { background: var(--cor-superficie-2); border: 1px solid var(--cor-aviso); } }
+#form-lembrete, form[data-testid="form-lembrete"] { margin-top: var(--espaco-4); }
