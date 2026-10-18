@@ -26,7 +26,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      # Gera os builds de produção e de teste e falha se o provedor falso estiver na produção (US-12.CA14).
+      - run: npm run verificar:bundle
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
