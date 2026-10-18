@@ -21,3 +21,4 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 - 18/10/2026: Renato iniciou a sprint 2. Documentos da sprint 1 movidos para `docs/sprint1/`. Etapa P1 (Produto) iniciada.
 - 18/10/2026: Produto entregou o backlog da sprint 2 (P1). Portão G1 aguardando o Renato; o UX não começa antes disso.
 - 18/10/2026: Renato pediu uma versão de teste com Pro liberado sem pagamento. Produto incluiu a US-18 e ajustou D-06 e D-10. Portão G1 continua aguardando o Renato.
+- 18/10/2026: Renato perguntou sobre o domínio. Produto registrou na D-05 o domínio próprio como recomendação (registro pelo Renato nesta sprint, pré-requisito só da publicação). Portão G1 continua aguardando o Renato.
