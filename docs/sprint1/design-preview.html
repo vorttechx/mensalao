@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mensalão — Prévia do design (Sprint 1)</title>
+<style>
+  :root {
+    --cor-fundo: #F5F8F6; --cor-superficie: #FFFFFF; --cor-superficie-2: #ECEFED;
+    --cor-texto: #13221B; --cor-texto-2: #4A5C53; --cor-borda: #7A8C83; --cor-divisor: #DCE3DF;
+    --cor-primaria: #0B6B47; --cor-primaria-forte: #08573A; --cor-primaria-suave: #E3F4EC;
+    --cor-sobre-primaria: #FFFFFF; --cor-acento: #D4A72C;
+    --cor-aviso: #8F4A00; --cor-aviso-suave: #FFF3DC;
+    --cor-perigo: #B42318; --cor-perigo-suave: #FDECEA;
+    --cor-info: #4338A8; --cor-info-suave: #EEEDFB; --cor-foco: #0B6B47;
+    --fonte: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    --texto-sm: .875rem; --texto-base: 1rem; --texto-md: 1.125rem; --texto-lg: 1.375rem; --texto-xl: 1.75rem; --texto-2xl: 2.25rem;
+    --espaco-1: 4px; --espaco-2: 8px; --espaco-3: 12px; --espaco-4: 16px; --espaco-5: 24px; --espaco-6: 32px; --espaco-7: 48px;
+    --raio-sm: 8px; --raio-md: 12px; --raio-lg: 16px; --raio-pilula: 999px;
+    --sombra-1: 0 1px 2px rgba(19,34,27,.08); --sombra-2: 0 4px 12px rgba(19,34,27,.12); --sombra-dialogo: 0 12px 32px rgba(19,34,27,.24);
+  }
+  .escuro {
+    --cor-fundo: #0E1A15; --cor-superficie: #16261F; --cor-superficie-2: #1F3329;
+    --cor-texto: #E8F1EC; --cor-texto-2: #A9BBB2; --cor-borda: #6F8579; --cor-divisor: #253A30;
+    --cor-primaria: #5FD4A0; --cor-primaria-forte: #7FE0B5; --cor-primaria-suave: #1F3329; --cor-sobre-primaria: #0E1A15;
+    --cor-aviso: #F2B544; --cor-aviso-suave: #1F3329; --cor-perigo: #FF8A80; --cor-perigo-suave: #1F3329;
+    --cor-info: #A5A0FF; --cor-info-suave: #1F3329; --cor-foco: #5FD4A0;
+  }
+  .escuro .selo { border: 1px solid currentColor; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--fonte); color: #13221B; background: #E9EEEB; line-height: 1.5; }
+  .doc { max-width: 1200px; margin: 0 auto; padding: 32px 16px 64px; }
+  .doc > h1 { font-size: 2rem; margin: 0 0 4px; }
+  .doc > p.lead { color: #4A5C53; margin: 0 0 32px; }
+  .doc h2.secao { font-size: 1.375rem; margin: 48px 0 16px; padding-top: 16px; border-top: 1px solid #C9D3CE; }
+  .nota { font-size: .875rem; color: #4A5C53; }
+  .nums { font-variant-numeric: tabular-nums; }
+  svg.ic { width: 16px; height: 16px; flex: none; }
+  svg.ic24 { width: 24px; height: 24px; flex: none; }
+
+  /* Paleta */
+  .paleta { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .amostra { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--sombra-1); font-size: .875rem; }
+  .amostra .cor { height: 64px; display: flex; align-items: flex-end; padding: 8px; font-weight: 600; }
+  .amostra .info { padding: 8px 12px; }
+  .amostra code { font-size: .8125rem; }
+  table.contraste { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; font-size: .875rem; }
+  table.contraste th, table.contraste td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #DCE3DF; }
+  table.contraste td.ex { font-weight: 600; }
+
+  /* Tipografia */
+  .tipo { background: #fff; border-radius: 12px; padding: 16px 24px; }
+  .tipo div { display: flex; gap: 16px; align-items: baseline; border-bottom: 1px solid #DCE3DF; padding: 8px 0; flex-wrap: wrap; }
+  .tipo span.rot { width: 160px; font-size: .875rem; color: #4A5C53; }
+
+  /* Componentes */
+  .vitrine { display: flex; flex-wrap: wrap; gap: 24px; }
+  .bloco { background: var(--cor-fundo); border-radius: 12px; padding: 16px; min-width: 300px; flex: 1; color: var(--cor-texto); }
+  .bloco h3 { margin: 0 0 12px; font-size: 1rem; }
+  .linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+
+  .btn { font: inherit; font-size: 1rem; font-weight: 500; min-height: 48px; padding: 0 20px; border-radius: var(--raio-sm);
+         border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+  .btn-prim { background: var(--cor-primaria); color: var(--cor-sobre-primaria); }
+  .btn-prim:hover { background: var(--cor-primaria-forte); }
+  .btn-sec { background: var(--cor-superficie); color: var(--cor-primaria); border-color: var(--cor-borda); }
+  .btn-sec:hover { background: var(--cor-primaria-suave); }
+  .btn-perigo { background: var(--cor-superficie); color: var(--cor-perigo); border-color: var(--cor-perigo); }
+  .btn-perigo-solido { background: var(--cor-perigo); color: #fff; }
+  .escuro .btn-perigo-solido { color: #0E1A15; }
+  .btn:disabled { background: var(--cor-superficie-2); color: var(--cor-texto-2); border-color: transparent; cursor: not-allowed; }
+  .btn-larga { width: 100%; }
+  .btn-texto { background: none; color: var(--cor-primaria); border: 0; padding: 0 8px; min-height: 44px; }
+  .foco-demo, .btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--cor-foco); outline-offset: 2px; }
+  .fab { position: absolute; right: 16px; bottom: 80px; min-height: 56px; border-radius: var(--raio-pilula); box-shadow: var(--sombra-2); padding: 0 20px; }
+
+  .campo { margin-bottom: 16px; }
+  .campo label, .campo .label { display: block; font-size: .875rem; font-weight: 500; margin-bottom: 4px; color: var(--cor-texto); }
+  .campo .ajuda { display: block; font-size: .875rem; color: var(--cor-texto-2); margin: -2px 0 4px; }
+  .controle { width: 100%; min-height: 48px; font: inherit; font-size: 1rem; padding: 0 12px; border: 1px solid var(--cor-borda);
+              border-radius: var(--raio-sm); background: var(--cor-superficie); color: var(--cor-texto); }
+  .prefixo { position: relative; }
+  .prefixo span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--cor-texto-2); }
+  .prefixo .controle { padding-left: 40px; }
+  .controle.erro { border: 2px solid var(--cor-perigo); }
+  .msg-erro { display: flex; gap: 6px; align-items: flex-start; color: var(--cor-perigo); font-size: .875rem; margin-top: 4px; }
+  .msg-erro svg { margin-top: 2px; }
+  .check { display: flex; align-items: center; gap: 12px; min-height: 44px; font-size: 1rem; }
+  .check .caixa { width: 24px; height: 24px; border-radius: 6px; background: var(--cor-primaria); color: var(--cor-sobre-primaria);
+                  display: grid; place-items: center; }
+
+  .selo { display: inline-flex; align-items: center; gap: 4px; font-size: .875rem; font-weight: 500; padding: 3px 10px;
+          border-radius: var(--raio-pilula); line-height: 1.4; }
+  .s-logo { color: var(--cor-aviso); background: var(--cor-aviso-suave); }
+  .s-teste { color: var(--cor-info); background: var(--cor-info-suave); }
+  .s-subiu { color: var(--cor-perigo); background: var(--cor-perigo-suave); }
+  .s-caiu { color: var(--cor-primaria); background: var(--cor-primaria-suave); }
+  .s-neutro { color: var(--cor-texto-2); background: var(--cor-superficie-2); }
+  .s-cancel { color: var(--cor-texto-2); background: var(--cor-superficie-2); border: 1px dashed var(--cor-borda); }
+
+  .item { display: block; text-decoration: none; color: var(--cor-texto); background: var(--cor-superficie); border-radius: var(--raio-md);
+          box-shadow: var(--sombra-1); padding: 14px 16px; margin-bottom: 8px; min-height: 72px; }
+  .item:hover { background: var(--cor-primaria-suave); }
+  .item .l1 { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .item .nome { font-size: 1.125rem; font-weight: 600; }
+  .item .valor { font-size: 1.125rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .item .meta { font-size: .875rem; color: var(--cor-texto-2); font-variant-numeric: tabular-nums; }
+  .item .selos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .item .aviso { display: flex; gap: 6px; font-size: .875rem; color: var(--cor-texto-2); margin-top: 8px; }
+  .item.apagado .nome, .item.apagado .valor { color: var(--cor-texto-2); }
+
+  .total { background: #0B6B47; color: #fff; border-radius: var(--raio-lg); padding: 20px 24px 24px; border-top: 4px solid #D4A72C; }
+  .total .rot { color: #E3F4EC; font-size: .875rem; font-weight: 500; }
+  .total .mes { font-size: 2.25rem; font-weight: 700; line-height: 1.1; margin: 2px 0 12px; font-variant-numeric: tabular-nums; }
+  .total .ano { font-size: 1.75rem; font-weight: 700; line-height: 1.1; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .total .rodape { color: #E3F4EC; font-size: .875rem; margin-top: 12px; }
+
+  .cartao { background: var(--cor-superficie); border-radius: var(--raio-md); box-shadow: var(--sombra-1); padding: 12px 16px; margin-bottom: 8px; }
+  .grupo .lin { display: flex; justify-content: space-between; font-size: 1rem; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .grupo .lin b { font-weight: 700; }
+  .barra { height: 6px; border-radius: 3px; background: var(--cor-superficie-2); margin: 6px 0 4px; overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--cor-primaria); }
+
+  .vazio { text-align: center; padding: 32px 16px; }
+  .vazio h2 { font-size: 1.125rem; margin: 16px 0 4px; }
+  .vazio p { color: var(--cor-texto-2); margin: 0 0 20px; }
+
+  .banner { display: flex; gap: 10px; align-items: flex-start; border-radius: var(--raio-md); padding: 10px 8px 10px 14px; margin-bottom: 16px; font-size: .9375rem; }
+  .banner p { margin: 2px 0 0; flex: 1; }
+  .banner .fechar { min-width: 44px; min-height: 44px; margin: -10px 0; background: none; border: 0; color: inherit; font-size: 1.25rem; cursor: pointer; }
+  .b-ok { background: var(--cor-primaria-suave); color: var(--cor-texto); }
+  .b-erro { background: var(--cor-perigo-suave); color: var(--cor-perigo); }
+
+  .dialogo { background: var(--cor-superficie); border-radius: var(--raio-lg); padding: 24px; box-shadow: var(--sombra-dialogo); color: var(--cor-texto); }
+  .dialogo h2 { font-size: 1.375rem; margin: 0 0 8px; line-height: 1.25; }
+  .dialogo p { margin: 0 0 24px; color: var(--cor-texto-2); }
+  .dialogo .acoes { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+  /* Telas */
+  .telas { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+  .tela-wrap h3 { font-size: 1rem; margin: 0 0 8px; }
+  .tela-wrap .nota { max-width: 360px; margin: 8px 0 0; }
+  .tela { width: 360px; height: 740px; background: var(--cor-fundo); color: var(--cor-texto); border-radius: 24px; overflow: hidden;
+          position: relative; box-shadow: 0 0 0 8px #13221B, 0 12px 32px rgba(0,0,0,.25); display: flex; flex-direction: column; }
+  .topo { height: 56px; display: flex; align-items: center; gap: 4px; padding: 0 16px; flex: none; }
+  .topo .voltar { width: 44px; height: 44px; margin-left: -12px; display: grid; place-items: center; color: var(--cor-texto); }
+  .topo .marca { font-weight: 700; font-size: 1.125rem; display: flex; align-items: center; gap: 8px; }
+  .topo .titulo { font-size: 1.375rem; font-weight: 600; }
+  .conteudo { flex: 1; overflow: hidden; padding: 0 16px 96px; }
+  .conteudo h1 { font-size: 1.375rem; margin: 4px 0 0; line-height: 1.25; }
+  .conteudo .sub { color: var(--cor-texto-2); font-size: .875rem; margin: 2px 0 16px; }
+  .conteudo h2.sec { font-size: 1.125rem; margin: 20px 0 8px; }
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: var(--cor-superficie); border-top: 1px solid var(--cor-divisor);
+         display: grid; grid-template-columns: repeat(4, 1fr); }
+  .nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none;
+           color: var(--cor-texto-2); font-size: .875rem; }
+  .nav a .pil { display: grid; place-items: center; width: 56px; height: 28px; border-radius: 14px; }
+  .nav a[aria-current] { color: var(--cor-primaria); font-weight: 600; }
+  .nav a[aria-current] .pil { background: var(--cor-primaria-suave); }
+  .escuro .nav a[aria-current] .pil { background: #1F3329; }
+  dl.dados { margin: 0; }
+  dl.dados div { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--cor-divisor); font-size: .9375rem; }
+  dl.dados div:last-child { border-bottom: 0; }
+  dl.dados dt { color: var(--cor-texto-2); }
+  dl.dados dd { margin: 0; font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
+  .guia { background: var(--cor-superficie); border: 1px solid var(--cor-divisor); border-radius: var(--raio-md); padding: 12px 16px; margin: 8px 0; font-size: .9375rem; }
+  .guia p { margin: 0 0 8px; }
+  ol.hist { list-style: none; margin: 0; padding: 0; font-size: .9375rem; font-variant-numeric: tabular-nums; }
+  ol.hist li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--cor-divisor); }
+  ol.hist li.atual { border-bottom: 0; font-weight: 700; }
+  .cat { display: block; padding: 10px 16px; border-bottom: 1px solid var(--cor-divisor); min-height: 56px; text-decoration: none; color: var(--cor-texto); }
+  .cat:last-child { border-bottom: 0; }
+  .cat b { display: block; font-weight: 600; }
+  .cat span { font-size: .875rem; color: var(--cor-texto-2); }
+  .veu { position: absolute; inset: 0; background: rgba(19,34,27,.5); display: flex; align-items: center; padding: 16px; }
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  details.canc summary { min-height: 44px; display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; }
+  .testid { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .75rem; color: #6B4FA0; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-ampulheta" viewBox="0 0 24 24"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-cima" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-baixo" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pausa" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M12 7v6M12 16.5v.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-voltar" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-inicio" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-lista" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1.5" fill="currentColor"/><circle cx="4.5" cy="12" r="1.5" fill="currentColor"/><circle cx="4.5" cy="18" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-totais" viewBox="0 0 24 24"><path d="M5 20V12M12 20V5M19 20v-9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-ajustes" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="17" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-moeda" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#08573A"/><circle cx="12" cy="12" r="6.7" fill="#D4A72C"/><circle cx="12" cy="12" r="5.6" fill="none" stroke="#08573A" stroke-width=".6"/><path d="M8.9 15.2V8.8l3.1 3.6 3.1-3.6v6.4" fill="none" stroke="#08573A" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-carteira" viewBox="0 0 96 96"><rect x="14" y="28" width="68" height="46" rx="10" fill="none" stroke="#0B6B47" stroke-width="4"/><path d="M14 40h68" stroke="#0B6B47" stroke-width="4"/><rect x="58" y="48" width="24" height="14" rx="7" fill="none" stroke="#0B6B47" stroke-width="4"/><circle cx="66" cy="20" r="10" fill="#D4A72C"/></symbol>
+  </defs>
+</svg>
+
+<div class="doc">
+  <h1>Mensalão — prévia do design</h1>
+  <p class="lead">Sprint 1 · Agente UX · 17/10/2026. Referência visual para aprovação do Renato; o detalhamento está em <code>docs/design.md</code>. Moderno, minimalista, verde-cédula, números em destaque.</p>
+
+  <!-- PALETA -->
+  <h2 class="secao">1. Paleta</h2>
+  <div class="paleta">
+    <div class="amostra"><div class="cor" style="background:#0B6B47;color:#fff">Primária</div><div class="info"><code>#0B6B47</code><br>verde-cédula: botões, links, foco, total</div></div>
+    <div class="amostra"><div class="cor" style="background:#08573A;color:#fff">Primária forte</div><div class="info"><code>#08573A</code><br>pressionado, fundo do ícone</div></div>
+    <div class="amostra"><div class="cor" style="background:#E3F4EC;color:#13221B">Menta</div><div class="info"><code>#E3F4EC</code><br>selo "caiu", nav ativa</div></div>
+    <div class="amostra"><div class="cor" style="background:#D4A72C;color:#13221B">Acento dourado</div><div class="info"><code>#D4A72C</code><br>só decorativo (moeda, filete)</div></div>
+    <div class="amostra"><div class="cor" style="background:#F5F8F6;color:#13221B;border-bottom:1px solid #DCE3DF">Fundo</div><div class="info"><code>#F5F8F6</code><br>fundo da página</div></div>
+    <div class="amostra"><div class="cor" style="background:#FFFFFF;color:#13221B;border-bottom:1px solid #DCE3DF">Superfície</div><div class="info"><code>#FFFFFF</code><br>cartões, campos</div></div>
+    <div class="amostra"><div class="cor" style="background:#ECEFED;color:#4A5C53">Superfície 2</div><div class="info"><code>#ECEFED</code><br>selos neutros, trilho</div></div>
+    <div class="amostra"><div class="cor" style="background:#13221B;color:#fff">Texto</div><div class="info"><code>#13221B</code><br>texto e números</div></div>
+    <div class="amostra"><div class="cor" style="background:#4A5C53;color:#fff">Texto 2</div><div class="info"><code>#4A5C53</code><br>metadados, ajuda</div></div>
+    <div class="amostra"><div class="cor" style="background:#7A8C83;color:#fff">Borda</div><div class="info"><code>#7A8C83</code><br>borda de campos (3:1)</div></div>
+    <div class="amostra"><div class="cor" style="background:#8F4A00;color:#fff">Aviso (âmbar)</div><div class="info"><code>#8F4A00</code> / <code>#FFF3DC</code><br>vence logo</div></div>
+    <div class="amostra"><div class="cor" style="background:#B42318;color:#fff">Perigo</div><div class="info"><code>#B42318</code> / <code>#FDECEA</code><br>subiu, erros, excluir</div></div>
+    <div class="amostra"><div class="cor" style="background:#4338A8;color:#fff">Info (índigo)</div><div class="info"><code>#4338A8</code> / <code>#EEEDFB</code><br>teste grátis</div></div>
+  </div>
+
+  <h3 style="margin-top:24px">Pares de contraste (WCAG AA)</h3>
+  <table class="contraste">
+    <thead><tr><th>Exemplo</th><th>Par</th><th>Razão</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td class="ex" style="color:#13221B;background:#fff">R$ 44,90</td><td>#13221B / #FFFFFF</td><td>16,50:1</td><td>texto principal</td></tr>
+      <tr><td class="ex" style="color:#4A5C53;background:#fff">03/10/2026 · Cartão</td><td>#4A5C53 / #FFFFFF</td><td>7,13:1</td><td>metadados</td></tr>
+      <tr><td class="ex" style="color:#fff;background:#0B6B47">Salvar</td><td>#FFFFFF / #0B6B47</td><td>6,54:1</td><td>botão primário, total</td></tr>
+      <tr><td class="ex" style="color:#0B6B47;background:#fff">Como cancelar</td><td>#0B6B47 / #FFFFFF</td><td>6,54:1</td><td>link, botão secundário</td></tr>
+      <tr><td class="ex" style="color:#0B6B47;background:#E3F4EC">caiu R$ 5,00</td><td>#0B6B47 / #E3F4EC</td><td>5,74:1</td><td>selo caiu</td></tr>
+      <tr><td class="ex" style="color:#8F4A00;background:#FFF3DC">em 3 dias</td><td>#8F4A00 / #FFF3DC</td><td>6,07:1</td><td>selo vence logo</td></tr>
+      <tr><td class="ex" style="color:#B42318;background:#FDECEA">subiu 12,5%</td><td>#B42318 / #FDECEA</td><td>5,75:1</td><td>selo subiu, banner de erro</td></tr>
+      <tr><td class="ex" style="color:#B42318;background:#fff">Informe o nome</td><td>#B42318 / #FFFFFF</td><td>6,57:1</td><td>erro de campo</td></tr>
+      <tr><td class="ex" style="color:#4338A8;background:#EEEDFB">Teste grátis</td><td>#4338A8 / #EEEDFB</td><td>7,66:1</td><td>selo teste</td></tr>
+      <tr><td class="ex" style="color:#4A5C53;background:#ECEFED">Pausada</td><td>#4A5C53 / #ECEFED</td><td>6,15:1</td><td>selo neutro</td></tr>
+      <tr><td class="ex" style="background:#fff"><span style="display:inline-block;width:80px;height:24px;border:1px solid #7A8C83;border-radius:6px"></span></td><td>#7A8C83 / #FFFFFF</td><td>3,56:1</td><td>borda de campo (não-texto, 3:1)</td></tr>
+      <tr><td class="ex" style="color:#E8F1EC;background:#16261F">Escuro: texto</td><td>#E8F1EC / #16261F</td><td>13,69:1</td><td>tema escuro</td></tr>
+      <tr><td class="ex" style="color:#0E1A15;background:#5FD4A0">Escuro: Salvar</td><td>#0E1A15 / #5FD4A0</td><td>9,69:1</td><td>botão primário escuro</td></tr>
+    </tbody>
+  </table>
+  <p class="nota">O dourado <code>#D4A72C</code> não é usado como texto: sobre fundos claros não atinge 4,5:1. Ajuste por acessibilidade registrado no design.md.</p>
+
+  <!-- TIPOGRAFIA -->
+  <h2 class="secao">2. Tipografia</h2>
+  <div class="tipo">
+    <p class="nota" style="margin:0 0 8px">Fonte de sistema (system-ui, -apple-system, Segoe UI, Roboto…). Números tabulares em valores e datas.</p>
+    <div><span class="rot">36 / 700 · total mensal</span><span class="nums" style="font-size:2.25rem;font-weight:700;line-height:1.1">R$ 58,80</span></div>
+    <div><span class="rot">28 / 700 · valor detalhe</span><span class="nums" style="font-size:1.75rem;font-weight:700;line-height:1.1">R$ 705,60</span></div>
+    <div><span class="rot">22 / 600 · título da tela</span><span style="font-size:1.375rem;font-weight:600">Próximas cobranças</span></div>
+    <div><span class="rot">18 / 600 · nome, seção</span><span style="font-size:1.125rem;font-weight:600">Netflix</span></div>
+    <div><span class="rot">16 / 400 · corpo, campo</span><span style="font-size:1rem">Cadastre suas assinaturas para ver o que vai ser cobrado.</span></div>
+    <div style="border-bottom:0"><span class="rot">14 / 400 · metadado, selo</span><span class="nums" style="font-size:.875rem;color:#4A5C53">03/10/2026 · Pix Automático · Nubank</span></div>
+  </div>
+
+  <!-- COMPONENTES -->
+  <h2 class="secao">3. Componentes</h2>
+  <div class="vitrine">
+    <div class="bloco">
+      <h3>Botões (altura 48 px)</h3>
+      <div class="linha"><button class="btn btn-prim">Salvar assinatura</button><button class="btn btn-prim foco-demo">Com foco</button></div>
+      <div class="linha"><button class="btn btn-sec">Editar</button><button class="btn btn-perigo">Excluir assinatura</button></div>
+      <div class="linha"><button class="btn btn-perigo-solido">Excluir</button><button class="btn btn-prim" disabled>Desabilitado</button></div>
+      <div class="linha"><button class="btn btn-texto">Link de texto</button></div>
+    </div>
+    <div class="bloco">
+      <h3>Selos</h3>
+      <div class="linha"><span class="selo s-logo"><svg class="ic"><use href="#i-relogio"/></svg>hoje</span><span class="selo s-logo"><svg class="ic"><use href="#i-relogio"/></svg>em 3 dias</span></div>
+      <div class="linha"><span class="selo s-teste"><svg class="ic"><use href="#i-ampulheta"/></svg>Teste grátis termina em 5 dias</span></div>
+      <div class="linha"><span class="selo s-subiu"><svg class="ic"><use href="#i-cima"/></svg>subiu 12,5% (R$ 5,00)</span><span class="selo s-caiu"><svg class="ic"><use href="#i-baixo"/></svg>caiu R$ 5,00 (11,1%)</span></div>
+      <div class="linha"><span class="selo s-neutro"><svg class="ic"><use href="#i-pausa"/></svg>Pausada</span><span class="selo s-cancel"><svg class="ic"><use href="#i-x"/></svg>Cancelada</span></div>
+    </div>
+    <div class="bloco">
+      <h3>Campos</h3>
+      <div class="campo"><label for="c1">Nome</label><input id="c1" class="controle" value="Spotify"></div>
+      <div class="campo"><label for="c2">Valor (R$)</label><div class="prefixo"><span aria-hidden="true">R$</span><input id="c2" class="controle erro" value="10,999" aria-invalid="true" aria-describedby="e2"></div>
+        <div class="msg-erro" id="e2"><svg class="ic"><use href="#i-alerta"/></svg>Use no máximo 2 casas decimais, como 10,99</div></div>
+      <div class="campo"><label for="c3">Ciclo</label><select id="c3" class="controle"><option>Mensal</option><option>Anual</option><option>Semanal</option></select></div>
+      <div class="check"><span class="caixa"><svg class="ic"><use href="#i-check"/></svg></span>Está em teste grátis</div>
+    </div>
+  </div>
+  <div class="vitrine" style="margin-top:24px">
+    <div class="bloco">
+      <h3>Item de lista</h3>
+      <a class="item" href="#"><div class="l1"><span class="nome">Netflix</span><span class="valor">R$ 44,90</span></div>
+        <div class="meta">20/10/2026 · Cartão · Nubank</div>
+        <div class="selos"><span class="selo s-logo"><svg class="ic"><use href="#i-relogio"/></svg>em 3 dias</span><span class="selo s-subiu"><svg class="ic"><use href="#i-cima"/></svg>subiu 12,5% (R$ 5,00)</span></div></a>
+      <a class="item foco-demo" href="#"><div class="l1"><span class="nome">Item com foco</span><span class="valor">R$ 9,99</span></div><div class="meta">05/11/2026 · Débito</div></a>
+    </div>
+    <div class="bloco">
+      <h3>Cartão de total</h3>
+      <div class="total"><div class="rot">Por mês</div><div class="mes">R$ 58,80</div><div class="rot">Por ano</div><div class="ano">R$ 705,60</div><div class="rodape">2 assinaturas ativas</div></div>
+    </div>
+    <div class="bloco">
+      <h3>Banners e diálogo</h3>
+      <div class="banner b-ok"><svg class="ic24"><use href="#i-info"/></svg><p>A próxima cobrança estava no passado e foi ajustada para 15/10/2026.</p><button class="fechar" aria-label="Fechar aviso">×</button></div>
+      <div class="banner b-erro"><svg class="ic24"><use href="#i-alerta"/></svg><p>Não foi possível importar. O arquivo não é um backup válido do Mensalão. Seus dados atuais não foram alterados.</p><button class="fechar" aria-label="Fechar aviso">×</button></div>
+      <div class="dialogo"><h2>Excluir Netflix?</h2><p>Esta ação não pode ser desfeita.</p><div class="acoes"><button class="btn btn-sec foco-demo">Voltar</button><button class="btn btn-perigo-solido">Excluir</button></div></div>
+    </div>
+  </div>
+
+  <!-- TELAS -->
+  <h2 class="secao">4. Telas em 360 px</h2>
+  <p class="nota">Os rótulos em roxo monoespaçado indicam onde ficam os <code>data-testid</code> (não aparecem no app).</p>
+  <div class="telas">
+
+    <!-- Início -->
+    <div class="tela-wrap"><h3>US-02 · Início (próximas cobranças)</h3>
+      <div class="tela">
+        <div class="topo"><span class="marca"><svg class="ic24"><use href="#i-moeda"/></svg>Mensalão</span></div>
+        <div class="conteudo">
+          <h1>Próximas cobranças</h1><p class="sub">Destaque para os próximos 3 dias <span class="testid">upcoming-list</span></p>
+          <a class="item" href="#"><div class="l1"><span class="nome">Spotify</span><span class="valor">R$ 21,90</span></div><div class="meta">17/10/2026 · Pix Automático</div>
+            <div class="selos"><span class="selo s-logo"><svg class="ic"><use href="#i-relogio"/></svg>hoje</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Netflix</span><span class="valor">R$ 44,90</span></div><div class="meta">20/10/2026 · Cartão · Nubank</div>
+            <div class="selos"><span class="selo s-logo"><svg class="ic"><use href="#i-relogio"/></svg>em 3 dias</span><span class="selo s-subiu"><svg class="ic"><use href="#i-cima"/></svg>subiu 12,5% (R$ 5,00)</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Max (HBO)</span><span class="valor">R$ 39,90</span></div><div class="meta">21/10/2026 · Cartão</div>
+            <div class="selos"><span class="selo s-teste"><svg class="ic"><use href="#i-ampulheta"/></svg>Teste grátis termina em 4 dias</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Globoplay</span><span class="valor">R$ 29,90</span></div><div class="meta">02/11/2026 · Boleto</div>
+            <div class="aviso"><svg class="ic"><use href="#i-info"/></svg>Teste terminou em 25/09/2026 — agora é cobrança normal</div></a>
+          <span class="testid">cada cartão: upcoming-item</span>
+        </div>
+        <button class="btn btn-prim fab"><svg class="ic24"><use href="#i-mais"/></svg>Adicionar</button>
+        <nav class="nav" aria-label="Principal">
+          <a href="#" aria-current="page"><span class="pil"><svg class="ic24"><use href="#i-inicio"/></svg></span>Início</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-lista"/></svg></span>Assinaturas</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-totais"/></svg></span>Totais</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-ajustes"/></svg></span>Ajustes</a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Início vazio -->
+    <div class="tela-wrap"><h3>US-02.CA9 · Início vazio</h3>
+      <div class="tela">
+        <div class="topo"><span class="marca"><svg class="ic24"><use href="#i-moeda"/></svg>Mensalão</span></div>
+        <div class="conteudo">
+          <h1>Próximas cobranças</h1>
+          <div class="vazio"><svg width="96" height="96" aria-hidden="true"><use href="#i-carteira"/></svg>
+            <h2>Nenhuma cobrança por aqui</h2>
+            <p>Cadastre suas assinaturas para ver o que vai ser cobrado e quando. Seus dados ficam só neste celular.</p>
+            <button class="btn btn-prim"><svg class="ic24"><use href="#i-mais"/></svg>Adicionar assinatura</button>
+            <p class="testid" style="margin-top:8px">empty-state</p></div>
+        </div>
+        <nav class="nav" aria-label="Principal">
+          <a href="#" aria-current="page"><span class="pil"><svg class="ic24"><use href="#i-inicio"/></svg></span>Início</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-lista"/></svg></span>Assinaturas</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-totais"/></svg></span>Totais</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-ajustes"/></svg></span>Ajustes</a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Catálogo -->
+    <div class="tela-wrap"><h3>US-01 · Nova assinatura (catálogo)</h3>
+      <div class="tela">
+        <div class="topo"><span class="voltar" aria-label="Voltar"><svg class="ic24"><use href="#i-voltar"/></svg></span><span class="titulo">Nova assinatura</span></div>
+        <div class="conteudo" style="padding-bottom:16px">
+          <div class="campo"><label for="b1">Buscar serviço <span class="testid">catalog-search</span></label>
+            <div class="prefixo"><span aria-hidden="true"><svg class="ic24" style="width:20px;height:20px"><use href="#i-busca"/></svg></span><input id="b1" class="controle" value="net"></div></div>
+          <button class="btn btn-sec btn-larga">Cadastrar livremente</button>
+          <h2 class="sec">Serviços conhecidos</h2>
+          <p class="sub" aria-live="polite" style="margin-top:-4px">1 serviço encontrado</p>
+          <div class="cartao" style="padding:0">
+            <a class="cat" href="#"><b>Netflix</b><span>R$ 44,90/mês · Streaming de vídeo</span></a>
+          </div>
+          <p class="sub" style="margin-top:12px">Valores sugeridos podem estar desatualizados. Você confere antes de salvar.</p>
+          <h2 class="sec">Sem busca (todos, A–Z)</h2>
+          <div class="cartao" style="padding:0">
+            <a class="cat" href="#"><b>Academia</b><span>R$ 99,90/mês · Saúde e bem-estar</span></a>
+            <a class="cat" href="#"><b>Amazon Prime</b><span>R$ 166,80/ano · Streaming / Compras</span></a>
+            <a class="cat" href="#"><b>Apple (iCloud+ / Apple One)</b><span>R$ 5,90/mês · Armazenamento em nuvem</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="tela-wrap"><h3>US-01 · Formulário com erros</h3>
+      <div class="tela">
+        <div class="topo"><span class="voltar" aria-label="Voltar"><svg class="ic24"><use href="#i-voltar"/></svg></span><span class="titulo">Nova assinatura</span></div>
+        <div class="conteudo" style="padding-bottom:16px">
+          <div class="campo"><label for="f1">Nome <span class="testid">field-nome</span></label><input id="f1" class="controle erro" value="">
+            <div class="msg-erro"><svg class="ic"><use href="#i-alerta"/></svg>Informe o nome</div></div>
+          <div class="campo"><label for="f2">Valor (R$) <span class="testid">field-valor</span></label><div class="prefixo"><span aria-hidden="true">R$</span><input id="f2" class="controle erro" value="abc"></div>
+            <div class="msg-erro"><svg class="ic"><use href="#i-alerta"/></svg>Informe um valor maior que zero, como 39,90 <span class="testid">error-valor</span></div></div>
+          <div class="campo"><label for="f3">Ciclo <span class="testid">field-ciclo</span></label><select id="f3" class="controle"><option>Mensal</option></select></div>
+          <div class="campo"><label for="f4">Próxima cobrança <span class="testid">field-proxima</span></label><input id="f4" class="controle erro" value="31/02/2026">
+            <div class="msg-erro"><svg class="ic"><use href="#i-alerta"/></svg>Data inválida. Use dd/mm/aaaa, como 15/10/2026</div></div>
+          <div class="campo"><label for="f5">Forma de pagamento <span class="testid">field-pagamento</span></label><select id="f5" class="controle"><option>Pix Automático</option></select></div>
+          <div class="campo"><label for="f6">Banco ou cartão (opcional) <span class="testid">field-banco</span></label><input id="f6" class="controle" placeholder="Ex.: Nubank, Itaú, cartão final 1234"></div>
+          <div class="campo"><label for="f7">Categoria <span class="testid">field-categoria</span></label><select id="f7" class="controle"><option>Música</option></select></div>
+          <div class="check"><span class="caixa"><svg class="ic"><use href="#i-check"/></svg></span>Está em teste grátis <span class="testid">field-teste</span></div>
+          <div class="campo"><label for="f8">Fim do teste grátis <span class="testid">field-fim-teste</span></label><input id="f8" class="controle" placeholder="dd/mm/aaaa"></div>
+          <button class="btn btn-prim btn-larga">Salvar assinatura</button><span class="testid">btn-salvar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalhe -->
+    <div class="tela-wrap"><h3>US-03/05/06 · Detalhe</h3>
+      <div class="tela">
+        <div class="topo"><span class="voltar" aria-label="Voltar"><svg class="ic24"><use href="#i-voltar"/></svg></span><span class="titulo">Netflix</span></div>
+        <div class="conteudo" style="padding-bottom:16px">
+          <div class="nums" style="font-size:1.75rem;font-weight:700;line-height:1.1">R$ 44,90 <span style="font-size:1rem;font-weight:400;color:var(--cor-texto-2)">/mês</span></div>
+          <div style="margin:8px 0 12px"><span class="selo s-subiu"><svg class="ic"><use href="#i-cima"/></svg>subiu 12,5% (R$ 5,00)</span></div>
+          <div class="cartao"><dl class="dados">
+            <div><dt>Próxima cobrança</dt><dd>20/10/2026</dd></div><div><dt>Pagamento</dt><dd>Cartão · Nubank</dd></div>
+            <div><dt>Categoria</dt><dd>Streaming de vídeo</dd></div><div><dt>Situação</dt><dd>Ativa</dd></div></dl></div>
+          <div class="duas"><button class="btn btn-sec">Editar</button><button class="btn btn-sec" aria-expanded="true">Como cancelar</button></div>
+          <div class="guia"><span class="testid">cancel-guide</span>
+            <p>No site ou app: Conta &gt; Assinatura &gt; Cancelar assinatura.</p>
+            <p style="color:var(--cor-texto-2)">Comprou pela loja de apps? Cancele na própria loja.</p>
+            <p style="display:flex;gap:6px"><svg class="ic" style="margin-top:4px"><use href="#i-info"/></svg>O Mensalão não cancela nada automaticamente. Depois de cancelar no serviço:</p>
+            <button class="btn btn-texto" style="padding:0">Marcar como cancelada</button></div>
+          <h2 class="sec">Histórico de preços <span class="testid">price-history</span></h2>
+          <div class="cartao"><ol class="hist">
+            <li><span>12/06/2026</span><span>R$ 34,90 → R$ 39,90</span></li>
+            <li><span>01/10/2026</span><span>R$ 39,90 → R$ 44,90</span></li>
+            <li class="atual"><span>Valor atual</span><span>R$ 44,90</span></li></ol></div>
+          <button class="btn btn-sec btn-larga" style="margin-top:8px">Pausar</button>
+          <button class="btn btn-sec btn-larga" style="margin-top:8px">Marcar como cancelada</button>
+          <button class="btn btn-perigo btn-larga" style="margin-top:24px">Excluir assinatura</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assinaturas -->
+    <div class="tela-wrap"><h3>US-05 · Assinaturas (lista geral)</h3>
+      <div class="tela">
+        <div class="topo"><span class="titulo">Assinaturas</span></div>
+        <div class="conteudo">
+          <p class="sub" style="margin-top:-8px">4 ativas · 1 pausada</p>
+          <a class="item" href="#"><div class="l1"><span class="nome">Academia</span><span class="valor">R$ 99,90/mês</span></div><div class="meta">Saúde e bem-estar · Débito</div></a>
+          <a class="item apagado" href="#"><div class="l1"><span class="nome">Deezer</span><span class="valor">R$ 22,90/mês</span></div><div class="meta">Música · Cartão</div>
+            <div class="selos"><span class="selo s-neutro"><svg class="ic"><use href="#i-pausa"/></svg>Pausada</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Netflix</span><span class="valor">R$ 44,90/mês</span></div><div class="meta">Streaming de vídeo · Cartão</div>
+            <div class="selos"><span class="selo s-subiu"><svg class="ic"><use href="#i-cima"/></svg>subiu 12,5% (R$ 5,00)</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Spotify</span><span class="valor">R$ 19,90/mês</span></div><div class="meta">Música · Pix Automático</div>
+            <div class="selos"><span class="selo s-caiu"><svg class="ic"><use href="#i-baixo"/></svg>caiu R$ 2,00 (9,1%)</span></div></a>
+          <details class="canc" open><summary>Canceladas (1)</summary>
+            <a class="item apagado" href="#"><div class="l1"><span class="nome">Paramount+</span><span class="valor">R$ 27,90/mês</span></div>
+              <div class="selos"><span class="selo s-cancel"><svg class="ic"><use href="#i-x"/></svg>Cancelada em 02/09/2026</span></div></a></details>
+        </div>
+        <button class="btn btn-prim fab"><svg class="ic24"><use href="#i-mais"/></svg>Adicionar</button>
+        <nav class="nav" aria-label="Principal">
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-inicio"/></svg></span>Início</a>
+          <a href="#" aria-current="page"><span class="pil"><svg class="ic24"><use href="#i-lista"/></svg></span>Assinaturas</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-totais"/></svg></span>Totais</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-ajustes"/></svg></span>Ajustes</a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Totais -->
+    <div class="tela-wrap"><h3>US-04 · Totais</h3>
+      <div class="tela">
+        <div class="topo"><span class="titulo">Totais</span></div>
+        <div class="conteudo">
+          <div class="total"><div class="rot">Por mês</div><div class="mes">R$ 58,80</div><div class="rot">Por ano</div><div class="ano">R$ 705,60</div><div class="rodape">2 assinaturas ativas</div></div>
+          <p class="testid" style="margin:4px 0 0">total-mensal · total-anual</p>
+          <div class="banner" style="background:var(--cor-info-suave);color:var(--cor-info);margin-top:12px"><svg class="ic24"><use href="#i-ampulheta"/></svg><p>Em teste: 1 assinatura — R$ 39,90/mês após o teste</p></div>
+          <h2 class="sec">Por forma de pagamento <span class="testid">total-por-pagamento</span></h2>
+          <div class="cartao grupo">
+            <div class="lin"><span>Cartão</span><b>R$ 44,90</b></div><div class="barra" aria-hidden="true"><i style="width:100%"></i></div>
+            <div class="lin"><span>Pix Automático</span><b>R$ 13,90</b></div><div class="barra" aria-hidden="true"><i style="width:31%"></i></div></div>
+          <h2 class="sec">Por categoria <span class="testid">total-por-categoria</span></h2>
+          <div class="cartao grupo">
+            <div class="lin"><span>Streaming de vídeo</span><b>R$ 44,90</b></div><div class="barra" aria-hidden="true"><i style="width:100%"></i></div>
+            <div class="lin"><span>Streaming / Compras</span><b>R$ 13,90</b></div><div class="barra" aria-hidden="true"><i style="width:31%"></i></div></div>
+        </div>
+        <nav class="nav" aria-label="Principal">
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-inicio"/></svg></span>Início</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-lista"/></svg></span>Assinaturas</a>
+          <a href="#" aria-current="page"><span class="pil"><svg class="ic24"><use href="#i-totais"/></svg></span>Totais</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-ajustes"/></svg></span>Ajustes</a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Ajustes -->
+    <div class="tela-wrap"><h3>US-02/07 · Ajustes</h3>
+      <div class="tela">
+        <div class="topo"><span class="titulo">Ajustes</span></div>
+        <div class="conteudo">
+          <h2 class="sec" style="margin-top:4px">Avisos</h2>
+          <div class="campo"><label for="a1">Destacar cobranças com quantos dias de antecedência? <span class="testid">config-dias-aviso</span></label>
+            <span class="ajuda">De 0 a 30 dias. 0 = só no dia.</span>
+            <div style="display:flex;align-items:center;gap:8px"><input id="a1" class="controle erro" style="width:120px" value="45"><span>dias</span></div>
+            <div class="msg-erro"><svg class="ic"><use href="#i-alerta"/></svg>Use um número inteiro de 0 a 30</div></div>
+          <button class="btn btn-sec">Salvar aviso</button>
+          <h2 class="sec">Backup</h2>
+          <p class="sub" style="margin-top:0">Seus dados ficam só neste celular. Guarde uma cópia em arquivo para não perder tudo ao trocar de aparelho.</p>
+          <button class="btn btn-prim btn-larga">Exportar backup</button><span class="testid">btn-exportar</span>
+          <button class="btn btn-sec btn-larga" style="margin-top:8px">Importar backup</button><span class="testid">btn-importar</span>
+          <h2 class="sec">Sobre</h2>
+          <p class="sub" style="margin-top:0">Mensalão não se conecta a bancos e não envia seus dados para a internet.</p>
+        </div>
+        <nav class="nav" aria-label="Principal">
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-inicio"/></svg></span>Início</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-lista"/></svg></span>Assinaturas</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-totais"/></svg></span>Totais</a>
+          <a href="#" aria-current="page"><span class="pil"><svg class="ic24"><use href="#i-ajustes"/></svg></span>Ajustes</a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Diálogo importar -->
+    <div class="tela-wrap"><h3>US-07.CA2 · Confirmar importação</h3>
+      <div class="tela">
+        <div class="topo"><span class="titulo">Ajustes</span></div>
+        <div class="conteudo"></div>
+        <div class="veu"><div class="dialogo" style="width:100%"><h2>Importar backup?</h2>
+          <p>O arquivo tem 12 assinaturas. Seus dados atuais serão substituídos e isso não pode ser desfeito.</p>
+          <div class="acoes"><button class="btn btn-sec foco-demo">Voltar</button><button class="btn btn-perigo-solido">Substituir dados</button></div></div></div>
+      </div>
+      <p class="nota">Foco abre no botão seguro "Voltar". Esc = Voltar.</p>
+    </div>
+
+    <!-- Corrompido -->
+    <div class="tela-wrap"><h3>US-08.CA4 · Dados corrompidos</h3>
+      <div class="tela">
+        <div class="topo"><span class="marca"><svg class="ic24"><use href="#i-moeda"/></svg>Mensalão</span></div>
+        <div class="conteudo">
+          <div class="banner b-erro" style="padding:16px"><svg class="ic24"><use href="#i-alerta"/></svg>
+            <p><strong style="display:block;font-size:1.125rem;margin-bottom:4px">Não conseguimos ler seus dados salvos</strong>
+            Os dados deste aparelho parecem danificados. Nada foi apagado. Você pode restaurar um backup ou começar do zero.</p></div>
+          <button class="btn btn-prim btn-larga">Importar backup</button>
+          <button class="btn btn-perigo btn-larga" style="margin-top:8px">Começar do zero</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Escuro -->
+    <div class="tela-wrap"><h3>Tema escuro · Início</h3>
+      <div class="tela escuro">
+        <div class="topo"><span class="marca"><svg class="ic24"><use href="#i-moeda"/></svg>Mensalão</span></div>
+        <div class="conteudo">
+          <h1>Próximas cobranças</h1><p class="sub">Destaque para os próximos 3 dias</p>
+          <a class="item" href="#"><div class="l1"><span class="nome">Spotify</span><span class="valor">R$ 21,90</span></div><div class="meta">17/10/2026 · Pix Automático</div>
+            <div class="selos"><span class="selo s-logo"><svg class="ic"><use href="#i-relogio"/></svg>hoje</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Netflix</span><span class="valor">R$ 44,90</span></div><div class="meta">20/10/2026 · Cartão · Nubank</div>
+            <div class="selos"><span class="selo s-logo"><svg class="ic"><use href="#i-relogio"/></svg>em 3 dias</span><span class="selo s-subiu"><svg class="ic"><use href="#i-cima"/></svg>subiu 12,5% (R$ 5,00)</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Max (HBO)</span><span class="valor">R$ 39,90</span></div><div class="meta">21/10/2026 · Cartão</div>
+            <div class="selos"><span class="selo s-teste"><svg class="ic"><use href="#i-ampulheta"/></svg>Teste grátis termina em 4 dias</span></div></a>
+          <a class="item" href="#"><div class="l1"><span class="nome">Spotify Duo</span><span class="valor">R$ 27,90</span></div><div class="meta">05/11/2026 · Débito</div>
+            <div class="selos"><span class="selo s-caiu"><svg class="ic"><use href="#i-baixo"/></svg>caiu R$ 2,00 (6,7%)</span></div></a>
+        </div>
+        <button class="btn btn-prim fab"><svg class="ic24"><use href="#i-mais"/></svg>Adicionar</button>
+        <nav class="nav" aria-label="Principal">
+          <a href="#" aria-current="page"><span class="pil"><svg class="ic24"><use href="#i-inicio"/></svg></span>Início</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-lista"/></svg></span>Assinaturas</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-totais"/></svg></span>Totais</a>
+          <a href="#"><span class="pil"><svg class="ic24"><use href="#i-ajustes"/></svg></span>Ajustes</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANIFEST -->
+  <h2 class="secao">5. Ícone e manifest</h2>
+  <div class="vitrine">
+    <div class="bloco" style="flex:none;display:flex;gap:24px;align-items:flex-end">
+      <div style="text-align:center"><svg width="192" height="192" aria-label="Ícone 192 px"><use href="#i-moeda"/></svg><div class="nota">192 × 192</div></div>
+      <div style="text-align:center"><svg width="96" height="96" aria-label="Ícone reduzido"><use href="#i-moeda"/></svg><div class="nota">512 × 512 (mesmo desenho; aqui reduzido)</div></div>
+    </div>
+    <div class="bloco">
+      <h3>Manifest</h3>
+      <p class="nota" style="margin:0">name/short_name: Mensalão · display: standalone · start_url/scope: ./ · lang: pt-BR<br>
+      theme_color: <code>#0B6B47</code> · background_color: <code>#F5F8F6</code><br>
+      Ícone: fundo cheio #08573A (maskable, desenho na zona segura de 80%), moeda dourada #D4A72C com "M" verde #08573A.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
