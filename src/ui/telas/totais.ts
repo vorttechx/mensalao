@@ -8,6 +8,7 @@ import { h } from '../dom';
 import { icone } from '../icones';
 import { adicionar } from '../limite';
 import type { Tela } from '../tela';
+import { secaoGrafico } from './grafico';
 
 function plural(n: number, singular: string, pluralTxt: string): string {
   return `${n} ${n === 1 ? singular : pluralTxt}`;
@@ -64,6 +65,7 @@ export function telaTotais(): Tela {
     conteudo: [
       cartao,
       emTeste,
+      secaoGrafico(),
       vazio
         ? estadoVazio({
             testid: 'empty-state-totais',

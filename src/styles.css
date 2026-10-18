@@ -540,3 +540,22 @@ h2.secao + h3.subsecao { margin-top: var(--espaco-2); }
 .copia-danificada .nota { margin: 0; }
 .lembrete-backup .acoes-banner { display: flex; flex-wrap: wrap; gap: var(--espaco-2); margin-top: var(--espaco-2); }
 .lembrete-backup .acoes-banner .btn-secundario { min-height: var(--toque-min); }
+
+/* ---------- Gráfico por categoria (8.8) ---------- */
+.grafico { padding: var(--espaco-4); }
+.rosca-caixa { position: relative; width: 176px; height: 176px; margin: 0 auto var(--espaco-4); }
+.rosca { display: block; }
+.rosca circle { stroke-linecap: butt; }
+.rosca-centro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.rosca-centro b { font-size: var(--texto-md); font-weight: var(--peso-numero); font-variant-numeric: tabular-nums; }
+.rosca-centro span { font-size: var(--texto-sm); color: var(--cor-texto-2); }
+table.legenda { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.legenda td { padding: 6px 0; vertical-align: top; }
+.legenda tr + tr td { border-top: 1px solid var(--cor-divisor); }
+.legenda .cor { width: 20px; padding-top: 11px; }
+.legenda .cor i { display: block; width: 12px; height: 12px; border-radius: 2px; }
+.legenda .cat { overflow-wrap: anywhere; padding-right: var(--espaco-2); }
+.legenda .val { font-weight: var(--peso-numero); white-space: nowrap; text-align: right; padding-right: var(--espaco-3); }
+.legenda .pct { font-weight: var(--peso-medio); white-space: nowrap; text-align: right; }
+.grafico-vazio { text-align: center; color: var(--cor-texto-2); margin: var(--espaco-3) 0; }
+.cartao-pro .previa { margin-top: var(--espaco-3); }
