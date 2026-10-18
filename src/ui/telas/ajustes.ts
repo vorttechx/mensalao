@@ -12,6 +12,7 @@ import { avisar, navegar } from '../navegacao';
 import { ehPro } from '../../servicos/pro';
 import { contarAtivas, textoContador } from '../../domain/plano';
 import { seloPro } from '../componentes';
+import { secaoBackupAutomatico } from './copias';
 import { secaoLembretes } from './lembretes';
 import type { Tela } from '../tela';
 
@@ -72,7 +73,8 @@ function secaoBackup(): HTMLElement {
   return h(
     'section',
     { 'aria-labelledby': 'titulo-backup' },
-    h('h2', { class: 'secao', id: 'titulo-backup' }, 'Backup'),
+    h('h2', { class: 'secao', id: 'titulo-backup' }, 'Backup e exportação'),
+    h('h3', { class: 'subsecao' }, 'Backup em arquivo'),
     h('p', { class: 'nota' }, 'Seus dados ficam só neste celular. Guarde uma cópia em arquivo para não perder tudo ao trocar de aparelho.'),
     h(
       'div',
@@ -85,6 +87,7 @@ function secaoBackup(): HTMLElement {
       botao('Importar backup', 'secundario', seletor.abrir, { testid: 'btn-importar', larga: true }),
       seletor.input,
     ),
+    secaoBackupAutomatico(),
   );
 }
 

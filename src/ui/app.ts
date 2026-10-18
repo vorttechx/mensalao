@@ -1,5 +1,6 @@
 // Moldura da aplicação e roteador: decide a tela pela rota e monta topo, banner, conteúdo e navegação.
-import { emRecuperacao, normalizarAgora } from '../loja';
+import { aoMudarEstado, emRecuperacao, normalizarAgora } from '../loja';
+import { fecharErroEspaco, haErroEspaco, processarCopias } from '../servicos/copias';
 import { processarLembretes } from '../servicos/lembretes';
 import { aoMudarPlano, ehPro, fecharAvisoRevogacao, haAvisoRevogacao, verificarAoAbrir } from '../servicos/pro';
 import { botao, criarBanner, seloPro } from './componentes';
@@ -112,11 +113,29 @@ export function renderizar(): void {
         )
       : null;
 
+  // Cópia automática sem espaço (US-14.CA7): aviso até ser fechado.
+  const elEspaco =
+    haErroEspaco() && !emRecuperacao()
+      ? criarBanner(
+          {
+            tipo: 'erro',
+            linhas: ['Não foi possível criar a cópia automática (sem espaço)', 'Exporte um arquivo de backup para não ficar sem cópia.'],
+            testid: 'backup-erro-espaco',
+          },
+          () => {
+            fecharErroEspaco();
+            elEspaco?.remove();
+            h1.focus();
+          },
+        )
+      : null;
+
   const main = h(
     'main',
     { class: 'conteudo', id: 'conteudo' },
     elRevogacao,
     elBanner,
+    elEspaco,
     tela.marca ? h1 : null,
     tela.subtitulo ? h('p', { class: 'sub', testid: 'subtitulo' }, tela.subtitulo) : null,
     tela.conteudo,
@@ -154,11 +173,13 @@ export function iniciarApp(el: HTMLElement): void {
     renderizar();
   });
   // A resposta da loja chega depois da primeira tela (US-12.CA9) e atualiza a tela sem recarregar.
+  aoMudarEstado(() => processarCopias());
   aoMudarPlano((m) => {
+    processarCopias();
     void processarLembretes();
     setTimeout(() => {
       const naTelaPro = rotaAtual() === '#/pro';
-      if ((m.planoMudou || naTelaPro || haAvisoRevogacao()) && !telaComFormulario()) renderizar();
+      if ((m.planoMudou || naTelaPro || haAvisoRevogacao() || haErroEspaco()) && !telaComFormulario()) renderizar();
     }, 0);
   });
   const aoMudarRede = (): void => {

@@ -7,6 +7,7 @@ import { h } from '../dom';
 import { icone } from '../icones';
 import { adicionar, contadorLimite } from '../limite';
 import type { Tela } from '../tela';
+import { lembreteExportar } from './copias';
 import { avisoLembretes } from './lembretes';
 import { itemAssinatura, metaCobranca, selosReajuste, valorSimples } from './comum';
 
@@ -53,6 +54,6 @@ export function telaInicio(): Tela {
     aba: 'inicio',
     fab: true,
     subtitulo: textoJanelaAviso(n),
-    conteudo: [contadorLimite(), avisoLembretes(), h('ul', { class: 'lista', testid: 'upcoming-list', 'aria-label': 'Próximas cobranças' }, itens.map(itemProximo))],
+    conteudo: [contadorLimite(), avisoLembretes(), lembreteExportar(), h('ul', { class: 'lista', testid: 'upcoming-list', 'aria-label': 'Próximas cobranças' }, itens.map(itemProximo))],
   };
 }

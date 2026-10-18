@@ -3,6 +3,7 @@ import { gerarBackup, lerBackup, mensagensErroBackup, nomeArquivoBackup } from '
 import type { Estado } from '../domain/tipos';
 import { contarAtivas, LIMITE_GRATIS } from '../domain/plano';
 import { definirEstado, hoje, obterEstado } from '../loja';
+import { registrarExportacao } from '../servicos/copias';
 import { ehPro } from '../servicos/pro';
 import { confirmar } from './componentes';
 import { h } from './dom';
@@ -18,6 +19,7 @@ export function exportarBackup(): string {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  registrarExportacao();
   return nome;
 }
 

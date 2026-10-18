@@ -29,7 +29,7 @@ export function criarBanner(b: Banner, aoFechar: () => void): HTMLElement {
 
 /* ---------- Selos ---------- */
 
-export type TipoSelo = 'logo' | 'teste' | 'subiu' | 'caiu' | 'neutro' | 'cancelada';
+export type TipoSelo = 'logo' | 'teste' | 'subiu' | 'caiu' | 'neutro' | 'cancelada' | 'danificada';
 const ICONE_SELO: Record<TipoSelo, NomeIcone> = {
   logo: 'relogio',
   teste: 'ampulheta',
@@ -37,6 +37,7 @@ const ICONE_SELO: Record<TipoSelo, NomeIcone> = {
   caiu: 'baixo',
   neutro: 'pausa',
   cancelada: 'x',
+  danificada: 'alerta',
 };
 
 export function selo(tipo: TipoSelo, texto: string, testid: string): HTMLElement {

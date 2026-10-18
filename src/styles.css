@@ -260,7 +260,7 @@ select.controle {
 }
 .selo-logo { color: var(--cor-aviso); background: var(--cor-aviso-suave); }
 .selo-teste { color: var(--cor-info); background: var(--cor-info-suave); }
-.selo-subiu { color: var(--cor-perigo); background: var(--cor-perigo-suave); }
+.selo-subiu, .selo-danificada { color: var(--cor-perigo); background: var(--cor-perigo-suave); }
 .selo-caiu { color: var(--cor-primaria); background: var(--cor-primaria-suave); }
 .selo-neutro { color: var(--cor-texto-2); background: var(--cor-superficie-2); }
 .selo-cancelada { color: var(--cor-texto-2); background: var(--cor-superficie-2); border: 1px dashed var(--cor-borda); }
@@ -518,3 +518,25 @@ h2.secao .selo-pro { vertical-align: middle; }
 .aviso-lembretes .nota { margin: var(--espaco-1) 0 0; }
 @media (prefers-color-scheme: dark) { .aviso-lembretes { background: var(--cor-superficie-2); border: 1px solid var(--cor-aviso); } }
 #form-lembrete, form[data-testid="form-lembrete"] { margin-top: var(--espaco-4); }
+
+/* ---------- Backup e exportação (9.5, 9.7) ---------- */
+h3.subsecao { font-size: var(--texto-base); font-weight: var(--peso-forte); margin: var(--espaco-5) 0 var(--espaco-2); }
+h2.secao + h3.subsecao { margin-top: var(--espaco-2); }
+.aviso-caixa {
+  display: flex; gap: var(--espaco-3); align-items: flex-start;
+  background: var(--cor-aviso-suave); color: var(--cor-texto); border-radius: var(--raio-md);
+  padding: var(--espaco-3) var(--espaco-4); margin-top: var(--espaco-3);
+}
+.aviso-caixa svg { color: var(--cor-aviso); flex: none; }
+.aviso-caixa p { margin: 0; }
+@media (prefers-color-scheme: dark) { .aviso-caixa { background: var(--cor-superficie-2); border: 1px solid var(--cor-aviso); } }
+.rotulo-lista { font-size: var(--texto-sm); font-weight: var(--peso-medio); margin: var(--espaco-4) 0 var(--espaco-2); }
+.lista-copias { margin-top: var(--espaco-2); }
+.copia { display: flex; justify-content: space-between; align-items: center; gap: var(--espaco-3); padding: var(--espaco-3) var(--espaco-4); flex-wrap: wrap; }
+.copia-info b { display: block; font-weight: var(--peso-forte); font-variant-numeric: tabular-nums; }
+.copia-info span { font-size: var(--texto-sm); color: var(--cor-texto-2); }
+.copia .btn { min-height: var(--toque-min); min-width: 104px; }
+.copia-danificada { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.copia-danificada .nota { margin: 0; }
+.lembrete-backup .acoes-banner { display: flex; flex-wrap: wrap; gap: var(--espaco-2); margin-top: var(--espaco-2); }
+.lembrete-backup .acoes-banner .btn-secundario { min-height: var(--toque-min); }
