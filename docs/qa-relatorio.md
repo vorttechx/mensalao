@@ -63,3 +63,24 @@ Nenhuma divergência visível nova encontrada pelos testes automatizados (360 px
 ## Recomendação
 
 Corrigir antes de liberar, em uma rodada curta: não há bug de severidade alta ou crítica, mas o BUG-01 (média) é um comportamento visível em um fluxo central da sprint (limite) e o conserto é pequeno (fechar os diálogos abertos quando a rota muda). O BUG-02 (baixa) pode entrar na mesma rodada ou ficar como pendência conhecida. Depois da correção, o reteste é rodar a suíte inteira; os dois testes que hoje falham passam a validar as correções. O que depende de Play, domínio e dispositivo real continua pendente do Renato (R-01 a R-10).
+
+## Reteste da rodada 1 de correções (18/10/2026)
+
+Código testado: após as correções de BUG-01 e BUG-02.
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run build` | OK |
+| `npm run verificar:bundle` | OK (produção sem provedor falso; build de teste com ele) |
+| `npm test` (Vitest) | 178 passaram, 0 falharam |
+| `npm run test:e2e` | 196 passaram, 0 falharam (193 anteriores + 3 novos; os 2 que falhavam agora passam) |
+
+Testes novos em `tests/e2e/dialogos-rota.spec.ts` (BUG-01): o diálogo de confirmação de excluir fecha sem excluir quando a rota muda (US-05.CA5); o diálogo de permissão do lembrete fecha sem ligar o lembrete nem pedir permissão (US-13.CA5); o diálogo de limite fecha e "Agora não" não navega de novo, ficando em `#/pro` (US-09.CA2).
+
+Bugs: BUG-01 fechado (verificado para limite, confirmar e lembrete); BUG-02 fechado (teste "abertura direta em Ajustes" passa). Nenhuma regressão encontrada, nenhum bug novo.
+
+| Severidade | Abertos |
+| --- | --- |
+| Crítica / Alta / Média / Baixa | 0 |
+
+Recomendação: liberar do ponto de vista do QA. Seguem pendentes apenas os itens que dependem do Renato (Play, domínio, dispositivo real: R-01 a R-10).
