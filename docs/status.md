@@ -11,8 +11,8 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 | GD Aprovar design antes do Dev | Renato | aprovada | Aprovado pelo Renato em 18/10/2026 |
 | D1 Implementar histórias | Dev | concluída | US-09, US-11 a US-17 e empacotamento; notas em `docs/dev-notes.md` |
 | G2 Aprovar código antes do QA | Renato | aprovada | Aprovado pelo Renato em 18/10/2026, após a correção da máscara de data |
-| Q1 Testar e abrir bugs | QA | andamento | |
-| G3 Revisar relatório de QA | Renato | pendente | |
+| Q1 Testar e abrir bugs | QA | concluída | 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos |
+| G3 Revisar relatório de QA | Renato | aguardando você | |
 | D2 Corrigir bugs (máx. 3 rodadas) | Dev | pendente | |
 | E Entrega | Renato | pendente | |
 
@@ -31,3 +31,4 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 - 18/10/2026: Dev entregou a sprint 2 (D1): build sem erros, 82 unitários e 64 E2E da sprint 1 passando, verificação do bundle OK. Portão G2 aguardando o Renato; o QA não começa antes disso.
 - 18/10/2026: Renato pediu a barra automática no campo de data (teclado numérico no celular); Dev corrigiu com máscara.
 - 18/10/2026: Renato aprovou o código (G2). Etapa Q1 (QA) iniciada.
+- 18/10/2026: QA entregou o relatório (Q1): 178 unitários e 191 de 193 E2E passando; BUG-01 (média) e BUG-02 (baixa) abertos. Portão G3 aguardando o Renato.
