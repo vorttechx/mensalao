@@ -24,3 +24,4 @@ Direção: `docs/sprint2-direcao.md`. Documentos da sprint 1 arquivados em `docs
 - 18/10/2026: Renato perguntou sobre o domínio. Produto registrou na D-05 o domínio próprio como recomendação (registro pelo Renato nesta sprint, pré-requisito só da publicação). Portão G1 continua aguardando o Renato.
 - 18/10/2026: a pedido do Renato, a US-10 (proteção de quem já tinha mais de 5 ativas) saiu do backlog, porque nenhuma versão foi para produção. Portão G1 continua aguardando o Renato.
 - 18/10/2026: a pedido do Renato, a US-18 (versão de teste com Pro liberado) saiu do backlog. Portão G1 continua aguardando o Renato.
+- 18/10/2026: Renato escolheu domínio próprio para a produção (D-05), registrado por ele nesta sprint.
