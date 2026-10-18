@@ -1,6 +1,6 @@
 # Mensalão — Backlog da Sprint 2 (Pro e publicação nas lojas)
 
-Entrada: `docs/sprint2-direcao.md`. Base: sprint 1 entregue (`docs/sprint1/backlog.md` e `docs/sprint1/relatorio-final.md`). As convenções de domínio da sprint 1 continuam valendo (centavos inteiros, equivalentes mensal/anual, avanço de datas, status `ativa`/`pausada`/`cancelada`, BRL e `dd/mm/aaaa`). As histórias da sprint 2 vão de US-09 a US-18 (10 histórias, incluindo a US-18 pedida depois pelo Renato).
+Entrada: `docs/sprint2-direcao.md`. Base: sprint 1 entregue (`docs/sprint1/backlog.md` e `docs/sprint1/relatorio-final.md`). As convenções de domínio da sprint 1 continuam valendo (centavos inteiros, equivalentes mensal/anual, avanço de datas, status `ativa`/`pausada`/`cancelada`, BRL e `dd/mm/aaaa`). As histórias da sprint 2 são 9: US-09 e US-11 a US-18 (a US-10 foi removida a pedido do Renato, sem renumerar; a US-18 foi pedida depois por ele).
 
 ## 1. Visão do produto
 
@@ -67,33 +67,21 @@ Sufixos de `data-testid`: `pro-*` para a tela Pro, `limite-*` para o limite, `lo
 - **US-09.CA2** — Dado o plano grátis com 5 ativas, quando toco em "Adicionar assinatura" (inclusive pelo botão do estado vazio da lista, pelo catálogo e pelo formulário livre), então não abre o formulário e vejo a mensagem "Você chegou ao limite de 5 assinaturas ativas do plano grátis" (`data-testid="limite-aviso"`) com botão "Conhecer o Pro" (`data-testid="limite-btn-pro"`) que leva à tela Pro (US-11) e botão "Agora não".
 - **US-09.CA3** — Dado o plano grátis com 5 ativas, quando pauso ou cancelo uma, então sobra 1 vaga e consigo cadastrar uma nova. Pausadas e canceladas **não** contam no limite.
 - **US-09.CA4** — Dado o plano grátis com 5 ativas e uma assinatura pausada, quando toco em "Reativar" nela, então a reativação é bloqueada com a mesma mensagem da CA2 e a assinatura continua pausada. Com 4 ativas, a reativação funciona e o contador vira "5 de 5".
-- **US-09.CA5** — Dado o plano grátis, então o limite vale para qualquer origem de nova ativa: cadastro novo, reativação e importação (esta com regra própria na US-10). Editar, pausar, cancelar e excluir **nunca** são bloqueados pelo limite.
+- **US-09.CA5** — Dado o plano grátis, então o limite vale para qualquer origem de nova ativa: cadastro novo e reativação; a importação não é bloqueada (ver CA12). Editar, pausar, cancelar e excluir **nunca** são bloqueados pelo limite.
 - **US-09.CA6** — Dado o plano grátis com 5 ativas, quando a tentativa de adicionar é bloqueada, então nada é gravado e os dados continuam idênticos.
 - **US-09.CA7** — Dado o plano Pro, então não há contador de limite, não há bloqueio e consigo cadastrar mais de 5 (por exemplo, 12) ativas.
 - **US-09.CA8** — Dado o plano grátis com assinatura em teste grátis, então ela conta como ativa no limite (mesmo não entrando nos totais).
 - **US-09.CA9** — Dado o plano grátis com 0 ativas (lista vazia), então o contador mostra "0 de 5" e o estado vazio da US-02.CA9 continua igual.
 - **US-09.CA10** — Dado o plano grátis, então o limite se aplica por assinatura ativa e não por valor: uma assinatura de R$ 0,01 conta como uma vaga.
 - **US-09.CA11** — Os textos de limite são informativos e sem culpa (sem "bloqueado", sem urgência artificial), e a mensagem do limite é anunciada a leitores de tela (`role="alert"` ou equivalente).
+- **US-09.CA12** — Dado o plano grátis, quando importo um backup com mais de 5 ativas (ex.: 12), então a importação traz **todas** (nada é removido, pausado ou ignorado), o contador mostra "12 de 5 assinaturas ativas — acima do limite do plano grátis" e a confirmação da US-07.CA2 avisa disso. Enquanto as ativas forem 5 ou mais, só **adicionar** e **reativar** ficam bloqueados; editar, pausar, cancelar, excluir, exportar, totais e próximas cobranças continuam normais e contam todas as ativas. Volta a poder adicionar ao ficar abaixo de 5 ativas ou ao virar Pro.
+- **US-09.CA13** — Dado um usuário Pro com mais de 5 ativas (ex.: 20) cujo Pro foi revogado (reembolso, US-12.CA6), então vale a mesma regra da CA12: nada é apagado, o contador mostra "20 de 5 — acima do limite" e só adicionar e reativar ficam bloqueados.
 
 ---
 
-### US-10 — Dados acima do limite e importação de backup (P1)
+### US-10 — Removida a pedido do Renato
 
-**Como** Carlos, que já usava o app na sprint 1 com 8 assinaturas ativas, **quero** que nada seja perdido, escondido ou travado quando o limite passar a existir, **para** continuar confiando no app.
-
-**Critérios de aceite**
-
-- **US-10.CA1** — Dado um usuário grátis que atualizou o app e tem 8 ativas, quando abre o app, então vê as 8 assinaturas, próximas cobranças, totais e histórico exatamente como antes, sem nenhuma pausada, removida ou ocultada automaticamente.
-- **US-10.CA2** — Dado o usuário da CA1, então ele vê o contador "8 de 5 assinaturas ativas — acima do limite do plano grátis" (`data-testid="limite-contador"`), numa linha informativa que não bloqueia a leitura.
-- **US-10.CA3** — Dado o usuário da CA1, então ele continua podendo editar, pausar, cancelar e excluir qualquer assinatura, exportar backup e ver todos os totais. Só **adicionar** e **reativar** ficam bloqueados enquanto as ativas forem 5 ou mais.
-- **US-10.CA4** — Dado o usuário da CA1, quando pausa/cancela/exclui assinaturas até ficar com 4 ativas, então volta a poder adicionar uma nova (chegando a 5). Com 5 ativas exatas, adicionar continua bloqueado.
-- **US-10.CA5** — Dado o usuário grátis, quando importa um backup com 12 ativas, então vê a confirmação da US-07.CA2 com o aviso adicional "Este backup tem 12 assinaturas ativas; o plano grátis permite adicionar novas só com menos de 5 ativas. Seus dados serão importados por inteiro, nada será removido." Ao confirmar, **todas** as 12 são importadas. Nenhuma é pausada, cortada ou ignorada.
-- **US-10.CA6** — Dado um backup da sprint 1 (formato versão 1, sem campos novos), quando importo no plano grátis ou Pro, então a importação funciona como antes (US-07), inclusive a regra de avançar datas no passado.
-- **US-10.CA7** — Dado um backup que contenha qualquer campo de plano Pro (`pro`, `compra`, `token` ou semelhante), quando importo, então esses campos são **ignorados** e o plano do aparelho não muda. Importar nunca concede nem remove o Pro.
-- **US-10.CA8** — Dado um usuário Pro com 20 ativas cujo Pro foi revogado (ex.: reembolso) na verificação, então ele cai no plano grátis na situação da CA1: nenhuma assinatura é alterada, o contador mostra "20 de 5 — acima do limite" e vale a CA3.
-- **US-10.CA9** — Dado o plano grátis acima do limite, então os totais e a lista de próximas cobranças continuam contando **todas** as ativas (o limite não afeta cálculo, só cadastro).
-- **US-10.CA10** — Dado um recurso Pro já usado (ex.: tema escuro-azulado), quando o Pro é revogado, então o app volta ao tema padrão **sem apagar** a preferência; se o Pro voltar, a preferência é restaurada. As cópias automáticas e os lembretes param, e nenhum dado das assinaturas é perdido.
-- **US-10.CA11** — Dado que o estado do plano (`mensalao:pro:v1`) é corrompido, quando abro o app, então ele se comporta como grátis, não trava e não altera as assinaturas (se houver mais de 5 ativas, vale a CA1).
+Nenhuma versão do app foi para produção, então não há usuários antigos a proteger. Os IDs das demais histórias não foram renumerados. Os casos que não dependem de usuário antigo ficaram na US-09 (CA12 e CA13) e na US-12 (CA12 e CA13).
 
 ---
 
@@ -128,12 +116,14 @@ Sufixos de `data-testid`: `pro-*` para a tela Pro, `limite-*` para o limite, `lo
 - **US-12.CA3** — Dado "Restaurar compra" sem nenhuma compra no provedor, então vejo "Não encontramos compra do Pro nesta conta da Google Play" e o plano segue grátis.
 - **US-12.CA4** — Dado "Restaurar compra" com erro ou offline, então vejo "Não foi possível verificar agora. Tente de novo mais tarde.", o plano não muda e nada trava.
 - **US-12.CA5** — Dado que reinstalei o app (armazenamento limpo) e a Play tem a compra, quando abro o app, então a verificação automática ao abrir (listar compras) ativa o Pro sem eu tocar em nada, e o botão "Restaurar compra" continua disponível como alternativa.
-- **US-12.CA6** — Dado que sou Pro e o app abre com o provedor respondendo **sem** a compra (reembolso/estorno), então o Pro é revogado, o app vai ao plano grátis e aplica a US-10.CA8, com um aviso único "Seu Mensalão Pro não foi encontrado na Google Play. Você voltou ao plano grátis; seus dados continuam todos aqui." (`data-testid="pro-revogado-aviso"`).
+- **US-12.CA6** — Dado que sou Pro e o app abre com o provedor respondendo **sem** a compra (reembolso/estorno), então o Pro é revogado, o app vai ao plano grátis e aplica a US-09.CA13, com um aviso único "Seu Mensalão Pro não foi encontrado na Google Play. Você voltou ao plano grátis; seus dados continuam todos aqui." (`data-testid="pro-revogado-aviso"`).
 - **US-12.CA7** — Dado que sou Pro e o app abre offline ou o provedor dá erro/timeout, então continuo Pro (não revoga por falha) e nada é exibido ao usuário.
 - **US-12.CA8** — Dado que sou Pro e importo um backup, ou excluo/restauro dados, ou limpo todas as assinaturas, então o estado Pro não muda.
 - **US-12.CA9** — Dado a abertura do app, então a verificação não atrasa a primeira tela (a tela aparece com o estado local; a resposta da loja atualiza depois) e roda no máximo uma vez por abertura.
 - **US-12.CA10** — Dado um navegador comum (provedor "Indisponível"), então não há verificação nem botão de restaurar ativo; o plano é sempre grátis, mesmo que exista estado Pro local (ele não é honrado, ver US-18.CA11); o botão "Restaurar compra" aparece desabilitado com a explicação da US-11.CA7.
-- **US-12.CA11** — Dado que o JSON de `mensalao:pro:v1` tem tipos errados (ex.: `pro: "sim"`), então vale a US-10.CA11 (trata como grátis).
+- **US-12.CA11** — Dado que o JSON de `mensalao:pro:v1` tem tipos errados (ex.: `pro: "sim"`), então o app se comporta como grátis, não trava e não altera as assinaturas.
+- **US-12.CA12** — Dado um backup que contenha qualquer campo de plano Pro (`pro`, `compra`, `token` ou semelhante), quando importo, então esses campos são **ignorados** e o plano do aparelho não muda. Importar nunca concede nem remove o Pro.
+- **US-12.CA13** — Dado que o Pro foi revogado, então o app volta ao tema padrão **sem apagar** as preferências; lembretes e cópias automáticas param; nenhum dado das assinaturas é perdido. Se o Pro voltar, as preferências são restauradas.
 
 ---
 
@@ -240,7 +230,7 @@ Sufixos de `data-testid`: `pro-*` para a tela Pro, `limite-*` para o limite, `lo
 - **US-17.CA3** — Dado que escolho um tema, então ele é aplicado na hora a todas as telas, sem recarregar, por variáveis CSS, e fica salvo em `mensalao:prefs:v1`, valendo após fechar e reabrir (inclusive offline).
 - **US-17.CA4** — Dado cada tema extra, então ele atende contraste AA em texto e controles (par de cores verificado pelo UX no design), mantém foco visível e continua legível em 360 px.
 - **US-17.CA5** — Dado o sistema em modo escuro, então cada tema extra define sua versão para claro e escuro (ou fica explícito no design que ele é único); "Verde-cédula" mantém o automático.
-- **US-17.CA6** — Dado o Pro revogado, então o app usa o tema padrão sem apagar a preferência (US-10.CA10); se o Pro voltar, o tema escolhido é reaplicado.
+- **US-17.CA6** — Dado o Pro revogado, então o app usa o tema padrão sem apagar a preferência (US-12.CA13); se o Pro voltar, o tema escolhido é reaplicado.
 - **US-17.CA7** — Dado um valor de tema desconhecido ou corrompido nas preferências, então o app usa o padrão sem travar.
 - **US-17.CA8** — A cor do navegador (`theme-color`) acompanha o tema escolhido.
 - **US-17.CA9** — A troca de tema não depende de rede e não envia dado nenhum.
@@ -257,7 +247,7 @@ Sufixos de `data-testid`: `pro-*` para a tela Pro, `limite-*` para o limite, `lo
 - **US-18.CA2** — Dado o Android, então existe configuração TWA de teste (`twa/teste/`) com pacote `br.com.mensalao.app.teste`, que pode ficar instalado ao lado do app de produção (`br.com.mensalao.app`). O `assetlinks.json` lista os dois pacotes.
 - **US-18.CA3** — Dado o build de teste, então todas as telas exibem uma faixa/selo "Versão de teste" (`data-testid="faixa-teste"`), visível, com contraste AA e sem cobrir conteúdo nem botões em 360 px.
 - **US-18.CA4** — Dado o build de teste no plano grátis, quando abro a tela Pro, então vejo o controle "Liberar Pro (teste)" (`data-testid="pro-teste-liberar"`). Ao tocar, o Pro é ativado sem passar pela loja, os recursos Pro são liberados sem recarregar e a tela mostra "Você é Pro (modo teste)".
-- **US-18.CA5** — Dado o build de teste com Pro liberado, quando toco em "Voltar ao grátis" (`data-testid="pro-teste-voltar"`), então o plano volta a grátis imediatamente, as preferências e dados são mantidos e vale a US-10.CA8 (nada é removido, mesmo acima do limite).
+- **US-18.CA5** — Dado o build de teste com Pro liberado, quando toco em "Voltar ao grátis" (`data-testid="pro-teste-voltar"`), então o plano volta a grátis imediatamente, as preferências e dados são mantidos e vale a US-09.CA13 (nada é removido, mesmo acima do limite).
 - **US-18.CA6** — Dado o build de teste, então o estado liberado persiste ao fechar e reabrir (inclusive offline). A verificação ao abrir (US-12) usa o provedor falso e **não** revoga o Pro liberado manualmente.
 - **US-18.CA7** — Dado o build de teste, então o fluxo normal de compra (US-11) também pode ser exercitado com o provedor falso (ok, cancelado, erro, offline, reembolso), para uso do QA.
 - **US-18.CA8** — Dado o build de teste, então seus dados são separados dos da produção: todas as chaves usam o prefixo `mensalao-teste:` (ex.: `mensalao-teste:v1`, `mensalao-teste:pro:v1`, `mensalao-teste:prefs:v1`), pois `localStorage` é compartilhado entre subcaminhos da mesma origem. Alterar dados na versão de teste não altera os da produção, e vice-versa.
@@ -275,7 +265,7 @@ Sufixos de `data-testid`: `pro-*` para a tela Pro, `limite-*` para o limite, `lo
 
 | ID | Decisão | Motivo / consequência |
 |---|---|---|
-| D-01 | **Limite do grátis:** 5 assinaturas **ativas**. Pausadas e canceladas não contam; em teste grátis conta. O limite bloqueia só **adicionar** e **reativar**; editar, pausar, cancelar, excluir, ver, totais e exportar nunca são bloqueados. Dados acima do limite (usuário da sprint 1 com 8 ativas, importação, Pro revogado) **nunca são removidos, pausados nem ocultados**; o usuário só fica sem poder adicionar até voltar a menos de 5 ativas. | Respeita a confiança do usuário que já usava o app. Evita "refém dos próprios dados". |
+| D-01 | **Limite do grátis:** 5 assinaturas **ativas**. Pausadas e canceladas não contam; em teste grátis conta. O limite bloqueia só **adicionar** e **reativar**; editar, pausar, cancelar, excluir, ver, totais e exportar nunca são bloqueados. Dados acima do limite (importação de backup, Pro revogado) **nunca são removidos, pausados nem ocultados**; o usuário só fica sem poder adicionar até voltar a menos de 5 ativas. | Regra simples: o limite barra só novas ativas. Evita "refém dos próprios dados". |
 | D-02 | **Fora da TWA (navegador comum):** a compra não está disponível. A tela Pro mostra a oferta e a mensagem "disponível no app da Google Play" (com botão para a ficha quando publicada), sem forma de ativar o Pro e sem comprar por outro meio. O app grátis funciona normalmente no navegador. | A Digital Goods API só existe na TWA via Play. |
 | D-03 | **iOS fica fora da sprint 2.** Um PWA não acessa compra dentro do app da Apple; exigiria invólucro nativo (Capacitor + StoreKit), conta Apple Developer (US$ 99/ano), Mac e revisão da App Store. Proposta: sprint futura própria. No iPhone, o PWA grátis continua instalável pelo Safari, sem Pro. | Reduz risco desta sprint e mantém foco em uma loja. |
 | D-04 | **Preço proposto: R$ 16,90**, vitalício, a **confirmar pelo Renato** (faixa R$ 14,90 a R$ 19,90). O preço fica cadastrado no Play Console (SKU `mensalao_pro`) e o app exibe o valor devolvido pela loja, sem preço em código. Trocar o preço depois não exige nova versão do app. | Ponto médio da faixa, abaixo de R$ 20 (percepção de "compra simples"). |
@@ -283,7 +273,7 @@ Sufixos de `data-testid`: `pro-*` para a tela Pro, `limite-*` para o limite, `lo
 | D-06 | **Verificação de compra no aparelho:** ao abrir, lista as compras na Play; se a compra existe, Pro; se a loja responde sem a compra, revoga; se falhar/offline, mantém o que já estava. O estado Pro fica em `localStorage` só como cache para offline/erro na TWA; fora da TWA ele não é honrado. Quem adulterar o armazenamento dentro da TWA ainda pode obter Pro offline até a próxima verificação: risco aceito, é o limite do modelo sem servidor. Estado Pro fora do backup. | Mantém "sem servidor e sem cadastro". |
 | D-07 | **Lembrete:** o PWA não agenda notificação confiável com o app fechado. Comportamento definido: aviso dentro do app ao abrir (garantido) + notificação local ao abrir quando há permissão + verificação periódica em segundo plano, quando o aparelho suportar, em melhor esforço. A limitação é dita ao usuário na tela. Padrão: 1 dia antes (0 a 7 configurável). Notificação real com app fechado, com hora certa, fica para depois (exigiria push ou app nativo). | Honesto e testável. |
 | D-08 | **Backup automático:** cópias locais rotativas (1 por dia, só se houve mudança, 3 mais recentes, com restauro) + lembrete a cada 7 dias para exportar um arquivo. Não protege contra perda do aparelho nem limpeza do navegador; o aviso diz isso. Exportação manual JSON segue grátis. | Sem nuvem, é o que dá para entregar com honestidade. |
-| D-09 | **Divisão grátis × Pro:** continua grátis tudo da sprint 1 (catálogo, próximas cobranças, reajuste, totais e totais por categoria em lista, editar/pausar/cancelar/excluir, guia, backup manual JSON, instalar e offline, tema claro/escuro automático). Pro: ilimitadas, lembrete, backup automático, CSV, gráficos, temas extras. | Ninguém perde funcionalidade que já tinha. |
+| D-09 | **Divisão grátis × Pro:** continua grátis tudo da sprint 1 (catálogo, próximas cobranças, reajuste, totais e totais por categoria em lista, editar/pausar/cancelar/excluir, guia, backup manual JSON, instalar e offline, tema claro/escuro automático). Pro: ilimitadas, lembrete, backup automático, CSV, gráficos, temas extras. | Mantém o app grátis útil e deixa o Pro como ampliação. |
 | D-10 | **Versão de teste do Renato (US-18):** o build de teste (`npm run build:teste`, flag `VITE_MODO=teste`) deixa de ser só do QA e passa a ser a **versão de teste instalável do Renato**, com Pro liberável sem pagamento. Nomes: endereço `https://<domínio>/teste/` (subcaminho da produção; antes do domínio, `vorttechx.github.io/mensalao/teste/`); pacote Android de produção `br.com.mensalao.app` e de teste `br.com.mensalao.app.teste` (ids a confirmar pelo Renato antes de criar o app na Play, pois não mudam depois); chave de armazenamento com prefixo `mensalao-teste:`; nome exibido "Mensalão (teste)". O provedor falso e o controle "Liberar Pro (teste)" são removidos do bundle de produção em tempo de build; em produção nenhuma URL, parâmetro, console ou valor de `localStorage` ativa o Pro. | Evita "Pro de graça" em produção e permite ao Renato testar tudo no celular. |
 | D-11 | **Recursos Pro na versão grátis:** aparecem bloqueados e explicados, nunca escondidos, e levam à tela Pro. Sem anúncios, sem contagem regressiva, sem pop-up repetitivo. | Coerência com a proposta do produto. |
 | D-12 | **Política de privacidade:** a squad escreve e hospeda no mesmo domínio (`/privacidade.html`); diz que nenhum dado sai do aparelho, que a compra é processada pela Google e que não há análises nem anúncios. O Renato revisa antes de enviar. | Exigência da Play. |
@@ -329,10 +319,10 @@ Sufixos de `data-testid`: `pro-*` para a tela Pro, `limite-*` para o limite, `lo
 Vale a da sprint 1 (itens 1 a 10) e, nesta sprint, também:
 
 1. Todos os critérios de aceite das histórias foram verificados pelo QA, sem bug de severidade Alta/Crítica aberto em `docs/bugs.md`.
-2. Limite, estado Pro, verificação de compra, lembretes, cópias, CSV e agregação por categoria estão em módulos puros com testes unitários cobrindo os casos de borda citados (exatamente 5 ativas, 8 ativas de usuário da sprint 1, importação acima do limite, centavos, ciclo anual/semanal, lista vazia, data no passado, estado corrompido, revogação de Pro).
+2. Limite, estado Pro, verificação de compra, lembretes, cópias, CSV e agregação por categoria estão em módulos puros com testes unitários cobrindo os casos de borda citados (exatamente 5 ativas, importação com mais de 5 ativas, Pro revogado com mais de 5 ativas, centavos, ciclo anual/semanal, lista vazia, data no passado, estado corrompido, revogação de Pro).
 3. Toda a lógica de pagamento passa pela interface `ProvedorCompra`; os E2E usam o build de teste com o provedor falso (compra ok, cancelada, erro, offline, restaurar, reembolso). O build de produção não contém o provedor falso nem os controles de teste, verificado por script automático (US-18.CA10).
 4. Backup JSON da sprint 1 importa sem mudanças; backups não carregam nem concedem estado Pro.
-5. Dados de um usuário da sprint 1 com mais de 5 ativas permanecem íntegros após a atualização (teste E2E com dados semeados).
+5. Backup com mais de 5 ativas importado no plano grátis permanece íntegro, com adicionar e reativar bloqueados (teste E2E com dados semeados).
 6. Interface conforme o `docs/design.md` aprovado, incluindo telas de limite, Pro, recursos bloqueados, lembretes, cópias, gráficos e temas, com contraste AA verificado para cada tema.
 7. `npm run build` sem erros, `npm test` e `npm run test:e2e` passando, nenhum dado enviado a rede, funciona offline após o primeiro carregamento.
 8. Entregas E-01 a E-08 presentes e revisadas; as ações R-01 a R-09 estão registradas no relatório final como pendentes do Renato (não bloqueiam a aceitação da sprint, mas bloqueiam a publicação).
