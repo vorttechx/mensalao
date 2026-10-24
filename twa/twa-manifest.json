@@ -1,6 +1,6 @@
 {
   "packageId": "br.com.mensalao.app",
-  "host": "DOMINIO-A-DEFINIR.com.br",
+  "host": "mensalao.app",
   "name": "Mensalão",
   "launcherName": "Mensalão",
   "display": "standalone",
@@ -14,8 +14,8 @@
   "backgroundColor": "#F5F8F6",
   "enableNotifications": true,
   "startUrl": "/",
-  "iconUrl": "https://DOMINIO-A-DEFINIR.com.br/icons/icon-512.png",
-  "maskableIconUrl": "https://DOMINIO-A-DEFINIR.com.br/icons/icon-512.png",
+  "iconUrl": "https://mensalao.app/icons/icon-512.png",
+  "maskableIconUrl": "https://mensalao.app/icons/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./mensalao-upload.keystore",
@@ -25,7 +25,7 @@
   "appVersionCode": 1,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://DOMINIO-A-DEFINIR.com.br/manifest.webmanifest",
+  "webManifestUrl": "https://mensalao.app/manifest.webmanifest",
   "fallbackType": "customtabs",
   "features": {
     "playBilling": {
@@ -38,7 +38,7 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
-  "fullScopeUrl": "https://DOMINIO-A-DEFINIR.com.br/",
+  "fullScopeUrl": "https://mensalao.app/",
   "minSdkVersion": 21,
   "retainedBundles": [],
   "fingerprints": [
