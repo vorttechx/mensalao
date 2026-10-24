@@ -68,7 +68,7 @@ test.describe('US-13 Lembrete antes da cobrança (Pro)', () => {
     await expect(page.getByTestId('lembrete-dialogo')).toBeVisible();
     expect(JSON.parse((await lerChave(page, 'mensalao:teste:notificacao')) ?? '{}').permissao ?? 'default').toBe('default');
     await page.getByTestId('lembrete-btn-continuar').click();
-    await expect.poll(async () => JSON.parse((await lerChave(page, 'mensalao:teste:notificacao'))!).permissao).toBe('granted');
+    await expect.poll(async () => JSON.parse((await lerChave(page, 'mensalao:teste:notificacao')) ?? '{}').permissao).toBe('granted');
     expect(JSON.parse((await lerChave(page, 'mensalao:prefs:v1'))!).lembrete.ativo).toBe(true);
     await expect(page.getByTestId('lembrete-sem-permissao')).toHaveCount(0);
   });
