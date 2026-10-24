@@ -11,7 +11,7 @@ test.describe('US-01 Máscara de data dd/mm/aaaa no formulário (ajuste do G2)',
     await expect(campo).toHaveValue('30/09/2026');
     await preencher(page, { nome: 'Mascara', valor: '10,00', ciclo: 'mensal', pagamento: 'cartao', categoria: 'Outros' });
     await page.getByTestId('btn-salvar').click();
-    await expect.poll(async () => (await lerEstado(page)).assinaturas[0]?.proxima).toBe('2026-09-30');
+    await expect.poll(async () => (await lerEstado(page))?.assinaturas[0]?.proxima).toBe('2026-09-30');
   });
 
   test('US-01: barras aparecem durante a digitação ("3009" vira "30/09") e letras são ignoradas', async ({ page }) => {

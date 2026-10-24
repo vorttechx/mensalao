@@ -88,7 +88,7 @@ test.describe('US-12 Restaurar compra e estado Pro persistido', () => {
     await page.goto('./#/assinatura/a0');
     await page.getByTestId('btn-excluir').click();
     await page.getByTestId('btn-confirmar').click();
-    await expect.poll(async () => JSON.parse((await lerChave(page, 'mensalao:v1'))!).assinaturas.length).toBe(1);
+    await expect.poll(async () => JSON.parse((await lerChave(page, 'mensalao:v1')) ?? '{"assinaturas":[]}').assinaturas.length).toBe(1);
     await page.getByTestId('nav-ajustes').click();
     await page.getByTestId('input-importar').setInputFiles(backupArquivo([]));
     await page.getByTestId('btn-confirmar').click();

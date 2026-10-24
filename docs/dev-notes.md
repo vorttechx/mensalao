@@ -144,7 +144,7 @@ Os 82 unitários e os 64 E2E passam sem alteração (os E2E agora rodam contra o
 
 ## Empacotamento: o que ficou pendente do Renato
 
-- **Domínio (R-02):** `twa/twa-manifest.json` usa `DOMINIO-A-DEFINIR.com.br`. O `CNAME` só é gerado com a variável `MENSALAO_DOMINIO` (no CI, variável do repositório); sem ela o Pages atual segue igual.
+- **Domínio (R-02):** `mensalao.app`, registrado pelo Renato na Hostinger em 24/10/2026 e já em `twa/twa-manifest.json`. O `CNAME` só é gerado com a variável `MENSALAO_DOMINIO` (no CI, variável do repositório); sem ela o Pages atual segue igual.
 - **Fingerprint SHA-256 (R-03):** marcador `SHA256_DA_CHAVE_DE_ASSINATURA_A_PREENCHER` em `twa/twa-manifest.json` e `public/.well-known/assetlinks.json`.
 - **Id do pacote (R-10):** `br.com.mensalao.app` usado nos dois arquivos, a confirmar.
 - **Ficha publicada:** `URL_FICHA_PLAY` em `src/ui/telas/pro.ts` está vazio; com ele preenchido aparece "Abrir na Google Play".

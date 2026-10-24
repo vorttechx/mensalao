@@ -76,7 +76,10 @@ test.describe('US-14 Backup automático local (Pro)', () => {
 
   test('US-14.CA5: restaurar pede confirmação, guarda a cópia do estado atual antes e atualiza as telas; cancelar não altera', async ({ page }) => {
     await abrirS2(page, { pro: true, assinaturas: ativas(4), copias: [copia('c1', '2026-09-20T08:00', 2)], hash: '#/ajustes' });
-    await page.getByTestId('copia-restaurar').first().click();
+    // Ao abrir, o app cria a cópia do dia (4 assinaturas) no topo e a lista é remontada (BUG-02);
+    // esperar as duas cópias evita clicar antes da remontagem. A c1 é a última da lista.
+    await expect(page.getByTestId('copia-item')).toHaveCount(2);
+    await page.getByTestId('copia-restaurar').last().click();
     await expect(page.getByTestId('confirm-dialog')).toContainText('Substituir os dados atuais por esta cópia (2 assinaturas)?');
     await page.getByTestId('btn-dialogo-voltar').click();
     expect(JSON.parse((await lerChave(page, 'mensalao:v1'))!).assinaturas).toHaveLength(4);

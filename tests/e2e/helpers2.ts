@@ -44,6 +44,13 @@ export async function abrirS2(page: Page, o: OpcoesS2 = {}) {
   // Só uma recarga depois de semear: cada abertura roda a verificação da loja (o aviso de revogação é por abertura).
   if (o.hash) await page.evaluate((h) => { location.hash = h; }, o.hash);
   await page.reload();
+  // Pro com dados aberto em Ajustes: ao abrir, o app cria a cópia do dia e remonta a tela (BUG-02).
+  // Esperar essa remontagem evita que um toque do teste caia na tela antiga e se perca.
+  const backupLigado = (o.prefs as { backup?: { ativo?: boolean } } | undefined)?.backup?.ativo !== false;
+  if (o.hash === '#/ajustes' && o.pro && o.assinaturas?.length && backupLigado) {
+    const esperadas = (o.copias?.length ?? 0) + 1;
+    await expect(page.getByTestId('copia-item')).toHaveCount(esperadas);
+  }
 }
 
 export async function configurarProvedor(page: Page, parcial: Record<string, unknown>) {

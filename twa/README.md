@@ -6,7 +6,7 @@ Empacota o PWA publicado no domínio próprio como app Android (Trusted Web Acti
 
 | Marcador | Onde | Quem fornece |
 | --- | --- | --- |
-| `DOMINIO-A-DEFINIR.com.br` | `twa-manifest.json` (`host`, `iconUrl`, `maskableIconUrl`, `webManifestUrl`, `fullScopeUrl`) | Renato (R-02, D-05) |
+| `mensalao.app` (definido em 24/10/2026) | `twa-manifest.json` (`host`, `iconUrl`, `maskableIconUrl`, `webManifestUrl`, `fullScopeUrl`) | Renato (R-02, D-05) |
 | `SHA256_DA_CHAVE_DE_ASSINATURA_A_PREENCHER` | `twa-manifest.json` (`fingerprints`) e `public/.well-known/assetlinks.json` | Renato (R-03): fingerprint SHA-256 da chave de assinatura do Play App Signing (Play Console > Integridade do app) |
 | `packageId` `br.com.mensalao.app` | `twa-manifest.json` e `assetlinks.json` | Renato confirma (R-10); não muda depois de publicado |
 

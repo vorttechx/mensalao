@@ -14,7 +14,7 @@ test.describe('US-09 Limite de 5 ativas no plano grátis', () => {
     await cadastroLivre(page);
     await preencher(page, { nome: 'Quinta', valor: '10,00', ciclo: 'mensal', proxima: '10/10/2026', pagamento: 'cartao', categoria: 'Outros' });
     await page.getByTestId('btn-salvar').click();
-    await expect.poll(async () => (await lerEstado(page)).assinaturas.length).toBe(5);
+    await expect.poll(async () => (await lerEstado(page))?.assinaturas.length).toBe(5);
     await page.goto('./#/');
     await expect(page.getByTestId('limite-contador')).toHaveText('5 de 5 assinaturas ativas');
   });
@@ -105,7 +105,7 @@ test.describe('US-09 Limite de 5 ativas no plano grátis', () => {
     await page.goto('./#/assinatura/a4');
     await page.getByTestId('btn-excluir').click();
     await page.getByTestId('btn-confirmar').click();
-    await expect.poll(async () => (await lerEstado(page)).assinaturas.length).toBe(4);
+    await expect.poll(async () => (await lerEstado(page))?.assinaturas.length).toBe(4);
     const e = await lerEstado(page);
     expect(e.assinaturas).toHaveLength(4);
     expect(e.assinaturas.find((a: any) => a.id === 'a2').status).toBe('pausada');
@@ -122,7 +122,7 @@ test.describe('US-09 Limite de 5 ativas no plano grátis', () => {
     await cadastroLivre(page);
     await preencher(page, { nome: 'Decima terceira', valor: '1,00', ciclo: 'mensal', proxima: '10/10/2026', pagamento: 'cartao', categoria: 'Outros' });
     await page.getByTestId('btn-salvar').click();
-    await expect.poll(async () => (await lerEstado(page)).assinaturas.length).toBe(13);
+    await expect.poll(async () => (await lerEstado(page))?.assinaturas.length).toBe(13);
   });
 
   test('US-09.CA8: teste grátis conta como ativa no limite', async ({ page }) => {
