@@ -56,7 +56,7 @@ test.describe('US-05 Editar, pausar, cancelar, excluir', () => {
     expect((await lerEstado(page)).assinaturas).toHaveLength(1);
     await page.getByTestId('btn-excluir').click();
     await page.getByTestId('btn-confirmar').click();
-    await expect.poll(async () => (await lerEstado(page)).assinaturas.length).toBe(0);
+    await expect.poll(async () => (await lerEstado(page))?.assinaturas.length).toBe(0);
   });
 
   test('US-05.CA6: excluir a última leva ao estado vazio', async ({ page }) => {

@@ -73,7 +73,7 @@ test.describe('US-07 Backup', () => {
     const b = { formato: 'mensalao-backup', versao: 1, exportadoEm: '2026-01-01T00:00:00Z', config: { diasAviso: 3 }, assinaturas: [sub({ proxima: '2026-08-20' })] };
     await page.getByTestId('input-importar').setInputFiles({ name: 'b.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(b)) });
     await page.getByTestId('btn-confirmar').click();
-    await expect.poll(async () => (await lerEstado(page)).assinaturas[0].proxima).toBe('2026-10-20');
+    await expect.poll(async () => (await lerEstado(page))?.assinaturas[0]?.proxima).toBe('2026-10-20');
   });
 
   test('US-07.CA7: não envia dados à rede', async ({ page }) => {
