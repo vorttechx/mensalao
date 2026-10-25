@@ -749,3 +749,9 @@ fieldset.consent-opcoes { border: 0; min-width: 0; margin: 0; padding: 0; }
 .opcao-consent { min-height: 48px; gap: var(--espaco-3); cursor: pointer; }
 .opcao-consent .nome-consent { flex: 1; min-width: 0; }
 .consent-bloco { color: var(--cor-texto); }
+
+/* US-28 — Premiado (14.4): linha ocupada enquanto o anúncio carrega e mensagens logo abaixo do grupo */
+.lin-acao.premiado-carregando { color: var(--cor-texto-2); justify-content: flex-start; gap: var(--espaco-2); cursor: default; }
+.lin-acao.premiado-carregando svg { animation: girar 1s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .lin-acao.premiado-carregando svg { animation: none; } }
+.banner.status-perto { margin: var(--espaco-2) var(--espaco-4) 0; }

@@ -117,6 +117,11 @@ export function resolverAgora(trocou: boolean): ResolucaoConsentimento {
   return resolverConsentimento({ escolha: escolhaAtual(), google });
 }
 
+/** A resolução sem efeitos colaterais (não consulta o UMP): usada pela oferta do premiado. */
+export function resolucaoAtual(): ResolucaoConsentimento {
+  return resolverConsentimento({ escolha: escolhaAtual(), google });
+}
+
 /** Grava a escolha do aviso ou de Ajustes. Efeito imediato: o banner atual sai e volta no novo modo (US-27.CA7). */
 export function escolher(escolha: EscolhaAnuncios): void {
   const antes = escolhaAtual();

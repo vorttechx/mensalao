@@ -3,7 +3,7 @@
 // A troca vale na hora: o rádio é anunciado, o rodapé atualiza a data e a faixa do anúncio segue a 14.1.
 import { formatarDataBR, isoDeDate } from '../../domain/datas';
 import { varianteAjustes, type EscolhaAnuncios, type VarianteAjustesAnuncios } from '../../domain/consentimento';
-import { anunciosDisponiveis } from '../../servicos/anuncios';
+import { anunciosDisponiveis, avisarMudancaAnuncios, verificarDisponibilidade } from '../../servicos/anuncios';
 import {
   abrirOpcoesGoogle,
   aoMudarConsentimento,
@@ -13,7 +13,7 @@ import {
   escolher,
   situacaoGoogle,
 } from '../../servicos/consentimento';
-import { ehPro, planoAnuncios } from '../../servicos/pro';
+import { aoMudarPlano, ehPro, planoAnuncios } from '../../servicos/pro';
 import { linhaAcao } from '../componentes';
 import { h } from '../dom';
 import { linhaPolitica } from '../politica';
@@ -78,6 +78,22 @@ function montar(v: VarianteAjustesAnuncios): { grupo: HTMLElement; rodape: HTMLE
   };
 }
 
+/**
+ * Em Ajustes, a oferta do premiado e a variante desta seção dependem de o SDK existir e da região (UMP).
+ * As duas consultas só acontecem no plano grátis efetivo (US-27.CA9); a resposta atualiza as seções.
+ */
+function prepararAnunciosAjustes(): void {
+  if (ehPro() || planoAnuncios() !== 'gratis') return;
+  const consultar = (d: boolean): void => {
+    if (d) conhecerRegiao();
+  };
+  const d = anunciosDisponiveis();
+  if (d === null) void verificarDisponibilidade().then(consultar);
+  else consultar(d);
+}
+
+let ouvindoPlano = false;
+
 export function secaoAnunciosPrivacidade(): HTMLElement {
   const secao = h('section', { 'aria-labelledby': 'titulo-anuncios', testid: 'consent-ajustes' });
   const titulo = h('h2', { class: 'g-titulo', id: 'titulo-anuncios' }, 'Anúncios e privacidade');
@@ -88,8 +104,16 @@ export function secaoAnunciosPrivacidade(): HTMLElement {
   };
   preencher();
 
-  // A região (UMP) só é consultada para o plano grátis efetivo com o SDK presente (US-27.CA9).
-  if (!ehPro() && planoAnuncios() === 'gratis' && anunciosDisponiveis() === true) conhecerRegiao();
+  prepararAnunciosAjustes();
+  if (!ouvindoPlano) {
+    ouvindoPlano = true;
+    // A loja respondeu depois da montagem (grátis confirmado): consulta agora e atualiza a oferta do premiado.
+    aoMudarPlano(() => {
+      if (!document.querySelector('[data-testid="consent-ajustes"]')) return;
+      prepararAnunciosAjustes();
+      avisarMudancaAnuncios();
+    });
+  }
 
   const parar = aoMudarConsentimento(() => {
     if (!secao.isConnected) return parar();

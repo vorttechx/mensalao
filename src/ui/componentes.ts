@@ -335,6 +335,8 @@ export function dialogoInfo(op: {
   testidPrincipal: string;
   testidSaida: string;
   alerta?: boolean;
+  /** Variante da ação principal (padrão: primário). O premiado usa dois secundários (UX-S4-08). */
+  variantePrincipal?: VarianteBotao;
 }): Promise<boolean | null> {
   return new Promise((resolver) => {
     const anterior = document.activeElement as HTMLElement | null;
@@ -349,7 +351,7 @@ export function dialogoInfo(op: {
       'aria-describedby': idTexto,
     });
     const sair = botao(op.rotuloSaida, 'secundario', () => dlg.close(), { testid: op.testidSaida });
-    const ok = botao(op.rotuloPrincipal, 'primario', () => {
+    const ok = botao(op.rotuloPrincipal, op.variantePrincipal ?? 'primario', () => {
       principal = true;
       dlg.close();
     }, { testid: op.testidPrincipal });
@@ -394,6 +396,8 @@ export function cartaoRecursoPro(op: {
   extra?: Node | null;
   formato?: 'grupo' | 'linha';
   tituloOculto?: boolean;
+  /** Linhas do grupo logo acima de "Conhecer o Pro" (premiado, US-28 / design 14.4). */
+  antesDoPro?: Node[];
   aoConhecer: () => void;
 }): HTMLElement {
   const idTitulo = novoId('lock-titulo');
@@ -426,6 +430,7 @@ export function cartaoRecursoPro(op: {
     ),
     op.previa ? h('div', { class: 'lin-bloco recurso-pro-previa' }, op.previa) : null,
     op.extra ? h('div', { class: 'lin-bloco' }, op.extra) : null,
+    op.antesDoPro ?? [],
     linhaAcao('Conhecer o Pro', op.aoConhecer, { testid: 'lock-btn-pro', seta: true, attrs: rotulo }),
   );
 }
