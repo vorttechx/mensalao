@@ -4,7 +4,8 @@
 // - número grande, "Por ano", valor dos itens de lista e legenda do gráfico: se o texto sem quebra não cabe no
 //   bloco, a fonte diminui até caber (piso: 16 px);
 // - abas: 4 colunas, 2 ou 1, conforme os rótulos realmente caibam na largura de cada aba;
-// - aviso de lembretes: com 3 ou mais, se o trecho passar do limite do design, a nota vai para "Mais N lembretes".
+// - aviso de lembretes: com 3 ou mais, se o trecho passar do limite do design e couber sem a nota, ela vai para
+//   "Mais N lembretes" (com texto grande, em que nem assim cabe, fica à vista).
 // Roda a cada montagem de tela e, via ResizeObserver, quando o bloco ou a escala do texto mudam.
 
 /** Elementos cujo texto não quebra e precisa caber na largura do bloco: número grande, "Por ano", valor dos itens
@@ -68,13 +69,18 @@ function ajustarAbas(lista: HTMLElement): void {
   }
 }
 
-/** Design 3.11: com "Mais N lembretes", o aviso fecha em até 184 px (ou 1/4 da tela, se menor). */
+/** Design 3.11: com "Mais N lembretes", o aviso fecha em até 184 px (ou 1/4 da tela, se menor). A nota vai para
+ *  dentro do <details> só quando isso faz o aviso caber (fonte larga a 100%); senão continua à vista (BUG-12). */
 function ajustarAvisoLembretes(aviso: HTMLElement): void {
   const mais = aviso.querySelector<HTMLDetailsElement>(':scope > details');
   const nota = aviso.querySelector<HTMLElement>('.nota');
   if (!mais || !nota || mais.open) return;
+  const limite = Math.min(184, window.innerHeight / 4);
   aviso.append(nota);
-  if (aviso.getBoundingClientRect().height > Math.min(184, window.innerHeight / 4)) mais.append(nota);
+  if (aviso.getBoundingClientRect().height <= limite) return;
+  // BUG-12: só esconde a nota se, sem ela, o aviso passar a caber; com texto grande, nem assim cabe e ela fica à vista.
+  mais.append(nota);
+  if (aviso.getBoundingClientRect().height > limite) aviso.append(nota);
 }
 
 function ajustarTudo(raiz: ParentNode): void {

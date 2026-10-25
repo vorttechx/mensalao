@@ -473,7 +473,7 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 .avisos details[open] > summary .seta { transform: rotate(180deg); }
 .avisos summary .seta { transition: transform var(--duracao-media) var(--curva); }
 /* BUG-01: a nota usa a largura toda do trecho para caber em 2 linhas e manter o aviso ≤ 184 px (3.11).
-   US-22.CA4: se com a fonte do aparelho ainda passar disso, a nota vai para dentro de "Mais N lembretes" (ajuste.ts). */
+   US-22.CA4: se com a fonte do aparelho ainda passar disso, e sem a nota couber, ela vai para "Mais N lembretes" (ajuste.ts). */
 .avisos .nota { padding-left: 0; }
 .aviso-backup { margin: var(--espaco-4) var(--margem-tela) 0; padding: 10px 0; border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); display: grid; gap: 2px; }
 .avisos + .aviso-backup { margin-top: 0; border-top: 0; }
