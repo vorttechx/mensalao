@@ -488,17 +488,20 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 .item:focus-visible { outline-offset: -3px; }
 .item .corpo {
   flex: 1; min-width: 0;
-  display: grid; grid-template-columns: 1fr auto; column-gap: var(--espaco-3); row-gap: 2px;
+  display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--espaco-3); row-gap: 2px;
   padding: var(--espaco-3) 0; border-bottom: 1px solid var(--cor-linha);
 }
+/* BUG-03: o nome guarda pelo menos 7rem na linha; se nome e valor não cabem juntos (texto grande),
+   o valor desce para a linha de baixo, à direita, sem quebrar, e o nome usa a largura toda. */
 .item .nome {
+  flex: 1 1 7rem;
   font-weight: var(--peso-forte); line-height: 1.3; min-width: 0; overflow-wrap: anywhere;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.item .valor { text-align: right; line-height: 1.3; }
-.item .meta { grid-column: 1 / -1; font-size: var(--texto-xs); color: var(--cor-texto-2); overflow-wrap: anywhere; }
-.item .marcas { grid-column: 1 / -1; margin-top: 2px; }
-.item .nota-item { grid-column: 1 / -1; display: flex; gap: 6px; align-items: flex-start; margin-top: 2px; font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.item .valor { flex: none; margin-left: auto; text-align: right; line-height: 1.3; }
+.item .meta { flex-basis: 100%; min-width: 0; font-size: var(--texto-xs); color: var(--cor-texto-2); overflow-wrap: anywhere; }
+.item .marcas { flex-basis: 100%; margin-top: 2px; }
+.item .nota-item { flex-basis: 100%; display: flex; gap: 6px; align-items: flex-start; margin-top: 2px; font-size: var(--texto-xs); color: var(--cor-texto-2); }
 .item .nota-item svg { width: 14px; height: 14px; margin-top: 1px; }
 /* Pausada/cancelada na lista geral: tinta clara e monograma em cinza; a marca diz o motivo. */
 .item.apagado .nome, .item.apagado .valor { color: var(--cor-texto-2); font-weight: var(--peso-normal); }
@@ -509,9 +512,11 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
   width: var(--monograma); height: var(--monograma); margin-top: var(--espaco-3); flex: none;
   display: grid; place-items: center; border-radius: var(--raio-campo);
   background: var(--mono-fundo); color: var(--mono-texto);
-  font-size: 0.875rem; font-weight: var(--peso-numero); letter-spacing: 0; line-height: 1; white-space: nowrap; overflow: hidden;
+  /* BUG-03: o quadrado tem tamanho fixo e é decorativo (aria-hidden), então as iniciais ficam em px
+     (14/700; 18/700 no grande) e não passam do quadrado com o texto do sistema aumentado (3.5, regra 3). */
+  font-size: 14px; font-weight: var(--peso-numero); letter-spacing: 0; line-height: 1; white-space: nowrap; overflow: hidden;
 }
-.mono.mono-grande { width: var(--monograma-grande); height: var(--monograma-grande); margin: 0; border-radius: var(--raio-grupo); font-size: 1.125rem; }
+.mono.mono-grande { width: var(--monograma-grande); height: var(--monograma-grande); margin: 0; border-radius: var(--raio-grupo); font-size: 18px; }
 
 /* Canceladas recolhidas no fim de Assinaturas */
 details.canceladas { margin-top: var(--espaco-2); }
