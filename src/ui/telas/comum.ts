@@ -1,5 +1,5 @@
 // Peças compartilhadas pelas telas de lista e detalhe.
-import { formatarDataBR } from '../../domain/datas';
+import { formatarDataCurta } from '../../domain/datas';
 import { formatarBRL } from '../../domain/dinheiro';
 import { textoReajuste, ultimoReajuste } from '../../domain/reajuste';
 import { rotuloPagamento, type Assinatura } from '../../domain/tipos';
@@ -10,9 +10,9 @@ export function hrefDetalhe(a: Assinatura): string {
   return `#/assinatura/${encodeURIComponent(a.id)}`;
 }
 
-/** "17/10/2026 · Pix Automático · Nubank" */
-export function metaCobranca(a: Assinatura): string {
-  return [formatarDataBR(a.proxima), rotuloPagamento(a.pagamento), a.banco].filter(Boolean).join(' · ');
+/** Meta do item no Início (design 9.2): "Dom, 18 out · Pix Automático · Nubank" (ano só quando for outro ano). */
+export function metaCobrancaCurta(a: Assinatura, hoje: string): string {
+  return [formatarDataCurta(a.proxima, hoje), rotuloPagamento(a.pagamento), a.banco].filter(Boolean).join(' · ');
 }
 
 /** Cartão de assinatura (design.md 3.4): link para o detalhe com nome, valor, metadados e selos. */

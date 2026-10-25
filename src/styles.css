@@ -388,3 +388,64 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 .privacidade h2.secao { font-size: var(--texto-base); font-weight: var(--peso-forte); letter-spacing: 0; margin: var(--espaco-6) 0 var(--espaco-2); }
 .privacidade p + p, .privacidade ul { margin-top: var(--espaco-2); }
 .privacidade .nota { margin-top: var(--espaco-1); }
+
+/* =====================================================================
+   US-20 — Início: total, régua do mês, avisos discretos e contador de limite
+   ===================================================================== */
+.resumo { padding: var(--espaco-1) var(--margem-tela) 0; }
+.resumo .rotulo { font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.resumo .dinheiro-grande { display: block; margin-top: 2px; }
+
+/* Régua do mês (3.6): grade de N dias, base 1 px, risco de 4 px por dia, marcas proporcionais ao valor. */
+.regua-bloco { margin: 0; padding: var(--espaco-4) var(--margem-tela) 0; }
+.regua {
+  position: relative; height: var(--regua-altura);
+  display: grid; grid-template-columns: repeat(var(--dias), 1fr); align-items: end;
+  border-bottom: 1px solid var(--cor-borda);
+}
+.regua::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+  background: repeating-linear-gradient(to right,
+    transparent 0, transparent calc(100% / var(--dias) / 2 - 0.5px),
+    var(--cor-linha) calc(100% / var(--dias) / 2 - 0.5px), var(--cor-linha) calc(100% / var(--dias) / 2 + 0.5px),
+    transparent calc(100% / var(--dias) / 2 + 0.5px), transparent calc(100% / var(--dias)));
+}
+.regua b { position: relative; z-index: 1; display: block; width: 5px; margin: 0 auto; grid-row: 1; background: var(--cor-texto); border-radius: 1px 1px 0 0; }
+.regua b.pago { background: transparent; box-shadow: inset 0 0 0 1.5px var(--cor-texto-2); }
+/* Linha "hoje" atrás das marcas, passando 6 px acima e abaixo. */
+.regua .hoje { position: absolute; z-index: 0; top: -6px; bottom: -6px; width: 2px; margin-left: -1px; background: var(--cor-marca); }
+.regua-leg { position: relative; height: 20px; margin-top: 6px; font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.regua-leg span { position: absolute; top: 0; white-space: nowrap; }
+.regua-leg .ini { left: 0; }
+.regua-leg .fim { right: 0; }
+.regua-leg .h { color: var(--cor-marca); font-weight: var(--peso-forte); }
+.regua-leg .h-meio { transform: translateX(-50%); }
+.regua-leg .h-inicio { left: 0; }
+.regua-leg .h-fim { right: 0; }
+
+/* Aviso discreto de lembretes (3.11): trecho do extrato entre dois divisores. */
+.avisos { margin: var(--espaco-4) var(--margem-tela) 0; padding: var(--espaco-1) 0 10px; border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); }
+.avisos ul { list-style: none; margin: 0; padding: 0; }
+.avisos a, .avisos summary { display: flex; align-items: center; gap: 10px; min-height: var(--toque-min); color: var(--cor-texto); text-decoration: none; }
+.avisos a > svg:first-child { color: var(--cor-alerta); }
+.avisos a.fim-teste > svg:first-child { color: var(--cor-teste); }
+.avisos .seta { margin-left: auto; color: var(--cor-texto-2); }
+.avisos summary { cursor: pointer; list-style: none; padding-left: 26px; font-weight: var(--peso-forte); }
+.avisos summary::-webkit-details-marker { display: none; }
+.avisos details[open] > summary .seta { transform: rotate(180deg); }
+.avisos summary .seta { transition: transform var(--duracao-media) var(--curva); }
+.avisos .nota { padding-left: 26px; }
+.aviso-backup { margin: var(--espaco-4) var(--margem-tela) 0; padding: 10px 0; border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); display: grid; gap: 2px; }
+.avisos + .aviso-backup { margin-top: 0; border-top: 0; }
+.aviso-backup > p { display: flex; gap: 10px; align-items: flex-start; }
+.aviso-backup > p svg { margin-top: 3px; color: var(--cor-texto-2); }
+.aviso-backup .acoes { display: flex; flex-wrap: wrap; gap: 0 var(--espaco-4); padding-left: 22px; }
+
+/* Contador de limite (3.9) */
+.limite { padding: var(--espaco-4) var(--margem-tela) var(--espaco-1); display: grid; gap: 6px; justify-items: start; }
+.limite-l { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: var(--espaco-3); }
+.limite-texto { font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.medidor { display: flex; gap: 3px; flex: none; }
+.medidor i { display: block; width: 14px; height: 4px; border-radius: 1px; background: var(--cor-linha); }
+.medidor i.cheio { background: var(--cor-texto-2); }
+.limite-apoio { font-size: var(--texto-xs); color: var(--cor-texto-2); }

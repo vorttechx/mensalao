@@ -11,30 +11,46 @@ import { avisar, navegar } from '../navegacao';
 
 export const TEXTO_LIMITE_LEMBRETE = 'Com o app fechado, o aviso depende do seu aparelho e pode atrasar. Abra o app para ver tudo.';
 
-/** Aviso de lembretes no topo do Início; não existe sem lembrete na janela. */
+/** Linhas do aviso que ficam à vista; as demais vão para "Mais N lembretes" (design 3.11, US-20.CA4). */
+const LEMBRETES_VISIVEIS = 2;
+
+function linhaLembrete(i: ReturnType<typeof lembretesAtuais>[number]): HTMLElement {
+  const teste = i.tipo === 'fim-teste';
+  return h(
+    'li',
+    {},
+    h(
+      'a',
+      { href: `#/assinatura/${encodeURIComponent(i.assinaturaId)}`, testid: 'lembrete-item', class: teste ? 'fim-teste' : null },
+      icone(teste ? 'ampulheta' : 'sino'),
+      h('span', {}, i.texto),
+      icone('seta', 'ic seta'),
+    ),
+  );
+}
+
+/**
+ * Aviso discreto de lembretes no Início (design 3.11): um trecho do extrato entre dois divisores,
+ * sem faixa colorida. Até 2 linhas à vista; o resto dentro de "Mais N lembretes". Não existe sem lembrete na janela.
+ */
 export function avisoLembretes(): HTMLElement | null {
   const itens = lembretesAtuais();
   if (itens.length === 0) return null;
+  const visiveis = itens.slice(0, LEMBRETES_VISIVEIS);
+  const resto = itens.slice(LEMBRETES_VISIVEIS);
   return h(
     'section',
-    { class: 'aviso-lembretes', role: 'status', testid: 'lembrete-aviso', 'aria-labelledby': 'titulo-lembretes' },
-    h('h2', { id: 'titulo-lembretes' }, icone('sino'), 'Lembretes'),
-    h(
-      'ul',
-      {},
-      itens.map((i) =>
-        h(
-          'li',
-          {},
-          h(
-            'a',
-            { href: `#/assinatura/${encodeURIComponent(i.assinaturaId)}`, testid: 'lembrete-item', class: i.tipo === 'fim-teste' ? 'fim-teste' : null },
-            i.tipo === 'fim-teste' ? icone('ampulheta') : null,
-            h('span', {}, i.texto),
-          ),
-        ),
-      ),
-    ),
+    { class: 'avisos', role: 'status', testid: 'lembrete-aviso', 'aria-labelledby': 'titulo-lembretes' },
+    h('h2', { id: 'titulo-lembretes', class: 'sr-only' }, 'Lembretes'),
+    h('ul', {}, visiveis.map(linhaLembrete)),
+    resto.length
+      ? h(
+          'details',
+          { class: 'mais-lembretes' },
+          h('summary', {}, `Mais ${resto.length} ${resto.length === 1 ? 'lembrete' : 'lembretes'}`, icone('chevron-baixo', 'ic seta')),
+          h('ul', {}, resto.map(linhaLembrete)),
+        )
+      : null,
     h('p', { class: 'nota', testid: 'lembrete-limite-texto' }, TEXTO_LIMITE_LEMBRETE),
   );
 }

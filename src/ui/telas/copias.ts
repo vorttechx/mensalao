@@ -116,31 +116,26 @@ export function secaoBackupAutomatico(): HTMLElement {
   );
 }
 
-/** Lembrete de exportar arquivo no Início (CA8). */
+/** Lembrete de exportar arquivo no Início (US-14.CA8), como linha discreta do extrato (design 3.11). */
 export function lembreteExportar(): HTMLElement | null {
   const dias = diasSemExportar();
   if (dias === null) return null;
   return h(
     'div',
-    { class: 'banner banner-ok lembrete-backup', role: 'status', testid: 'backup-lembrete' },
-    icone('info', 'ic24'),
+    { class: 'aviso-backup', role: 'status', testid: 'backup-lembrete' },
+    h('p', {}, icone('info'), h('span', {}, `Faz ${dias} dias que você não exporta um arquivo de backup`)),
     h(
       'div',
-      { class: 'texto' },
-      h('p', {}, `Faz ${dias} dias que você não exporta um arquivo de backup`),
-      h(
-        'div',
-        { class: 'acoes-banner' },
-        botao('Exportar agora', 'secundario', () => {
-          const nome = exportarBackup();
-          avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
-          renderizar();
-        }, { testid: 'backup-btn-exportar' }),
-        botao('Lembrar depois', 'texto', () => {
-          lembrarDepois();
-          renderizar();
-        }, { testid: 'backup-btn-depois' }),
-      ),
+      { class: 'acoes' },
+      botao('Exportar agora', 'texto', () => {
+        const nome = exportarBackup();
+        avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
+        renderizar();
+      }, { testid: 'backup-btn-exportar' }),
+      botao('Lembrar depois', 'texto', () => {
+        lembrarDepois();
+        renderizar();
+      }, { testid: 'backup-btn-depois', classe: 'discreto' }),
     ),
   );
 }

@@ -160,3 +160,26 @@ export function posicaoCursorMascara(mascarado: string, digitosAntes: number): n
   }
   return mascarado.length;
 }
+
+const DIAS_SEMANA_CURTOS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+export const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+export const MESES_LONGOS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+/** Dia da semana (0 = domingo … 6 = sábado) de uma data ISO válida. */
+export function diaDaSemana(iso: string): number {
+  const p = lerIso(iso);
+  if (!p) return NaN;
+  return new Date(Date.UTC(p.ano, p.mes - 1, p.dia)).getUTCDay();
+}
+
+/**
+ * Data curta de extrato (sprint 3, design 9.2): "Dom, 18 out". Quando o ano da data é
+ * diferente do ano de `hojeIso`, acrescenta o ano: "Sex, 8 jan 2027".
+ */
+export function formatarDataCurta(iso: string, hojeIso: string): string {
+  const p = lerIso(iso);
+  if (!p) return iso;
+  const h = lerIso(hojeIso);
+  const base = `${DIAS_SEMANA_CURTOS[diaDaSemana(iso)]}, ${p.dia} ${MESES_CURTOS[p.mes - 1]}`;
+  return h && h.ano !== p.ano ? `${base} ${p.ano}` : base;
+}

@@ -55,14 +55,17 @@ export function guardarTelaDeCadastro(): void {
   setTimeout(() => void avisarLimite({ sobreTela: true }), 0);
 }
 
-/** Contador "N de 5 assinaturas ativas" + medidor + apoio (só no plano grátis; no Pro não existe). */
+/**
+ * Contador "N de 5 assinaturas ativas" + medidor + apoio (design 3.9): linha discreta no fim da lista,
+ * sem cor de alerta. Só no plano grátis; no Pro não existe.
+ */
 export function contadorLimite(): HTMLElement | null {
   if (ehPro()) return null;
   const ativas = contarAtivas(obterEstado());
   const medidor = h(
-    'div',
+    'span',
     { class: 'medidor', 'aria-hidden': 'true' },
-    Array.from({ length: LIMITE_GRATIS }, (_, i) => h('i', { class: i < ativas ? 'cheio' : '' })),
+    Array.from({ length: LIMITE_GRATIS }, (_, i) => h('i', { class: i < ativas ? 'cheio' : null })),
   );
   const noLimite = ativas >= LIMITE_GRATIS;
   const apoio =
@@ -72,8 +75,7 @@ export function contadorLimite(): HTMLElement | null {
   return h(
     'div',
     { class: 'limite' },
-    h('p', { class: 'limite-texto', testid: 'limite-contador' }, textoContador(ativas)),
-    medidor,
+    h('div', { class: 'limite-l' }, h('p', { class: 'limite-texto', testid: 'limite-contador' }, textoContador(ativas)), medidor),
     noLimite ? h('p', { class: 'limite-apoio' }, apoio) : null,
     noLimite ? botao('Conhecer o Pro', 'texto', () => navegar('#/pro'), { testid: 'limite-link-pro' }) : null,
   );
