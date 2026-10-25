@@ -24,7 +24,8 @@ import { h } from './dom';
 
 /** Hooks do consentimento (US-27), registrados por ui/consentimento.ts. */
 export interface IntegracaoConsentimento {
-  resolver(): ResolucaoConsentimento;
+  /** Só chamado para o grátis efetivo numa tela com banner, fora da 1ª abertura e com o SDK presente. */
+  resolver(trocou: boolean): ResolucaoConsentimento;
   primeiraAbertura(): boolean;
   /** Aviso do app (sem escolha). `trocou` = acabou de entrar na tela. */
   perguntar(trocou: boolean): void;
@@ -108,8 +109,11 @@ function aplicar(trocou: boolean): void {
     provedorDisponivel: anunciosDisponiveis(),
     online: navigator.onLine !== false,
     cabe: faixaCabe({ alturaJanela: window.innerHeight, alturaAbas: abas.comAreaSegura, alturaBanner: alturaBanner() }),
-    consentimento: consentimento.resolver(),
+    consentimento: { tipo: 'aguardar' } as ResolucaoConsentimento,
   };
+  // O consentimento (e com ele o UMP) só é consultado quando um banner poderia mesmo aparecer (US-27.CA9).
+  const primeiraParte = anunciosPermitidos(entrada);
+  if (primeiraParte.tipo !== 'nao' || primeiraParte.motivo === 'consentimento') entrada.consentimento = consentimento.resolver(trocou);
   // A disponibilidade do SDK só é verificada para quem pode ver anúncio (nunca no Pro, US-26.CA3).
   if (entrada.provedorDisponivel === null && plano === 'gratis' && entrada.tela !== 'outra' && !entrada.primeiraAbertura) {
     void verificarDisponibilidade();
@@ -180,7 +184,7 @@ export function instalarAnuncios(): void {
     if (aberto === dialogoAberto) return;
     dialogoAberto = aberto;
     if (aberto) void pausarBanner();
-    else if (faixa?.isConnected) aplicar(false);
+    else aplicar(false); // a faixa volta, ou o aviso de consentimento que esperava este diálogo fechar
   }).observe(document.body, { childList: true }); // os diálogos entram e saem do <body>
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') void pausarBanner(); // US-25.CA16; a volta remonta a tela

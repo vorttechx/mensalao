@@ -724,3 +724,28 @@ input.radio:checked { box-shadow: inset 0 0 0 2px var(--cor-marca), inset 0 0 0 
 .titulo-recuperacao h1 { font-size: var(--texto-lg); font-weight: var(--peso-numero); letter-spacing: var(--tracking-titulo); }
 .recuperacao-texto { padding-top: 10px; color: var(--cor-texto-2); }
 .recuperacao-acoes { padding-top: var(--espaco-6); }
+
+/* =====================================================================
+   US-27 — Aviso de consentimento (14.2) e Anúncios e privacidade (14.3)
+   ===================================================================== */
+/* O corpo rola e o pé com as duas escolhas fica sempre à vista (texto a 200%, US-27.CA14). Abre sem animação. */
+dialog.dialogo-consent { padding: 0; max-height: calc(100dvh - 32px); overflow: hidden; }
+dialog.dialogo-consent[open] { display: flex; flex-direction: column; }
+.consent-corpo { padding: var(--espaco-6) var(--espaco-6) var(--espaco-3); display: grid; gap: var(--espaco-3); align-content: start; overflow: auto; min-height: 0; flex: 1 1 auto; }
+.dialogo-consent h2 { margin-bottom: 0; }
+.dialogo-consent .consent-corpo p + p { margin-top: 0; }
+.consent-explica { margin: 0; display: grid; gap: 10px; }
+.consent-explica dt { font-weight: var(--peso-forte); }
+.consent-explica dd { margin: 2px 0 0; font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.consent-pe { flex: none; padding: var(--espaco-4) var(--espaco-6) var(--espaco-5); display: grid; gap: var(--espaco-3); box-shadow: inset 0 1px 0 var(--cor-linha); }
+.consent-pe .btn { min-height: 48px; width: 100%; }
+.consent-pe .nota { text-align: center; }
+.link-ext { display: inline-flex; align-items: center; gap: 6px; min-height: var(--toque-min); color: var(--cor-marca); font-weight: var(--peso-forte); justify-self: start; }
+svg.ic-ext { width: 16px; height: 16px; flex: none; color: currentColor; }
+.lin-acao .ic-ext { margin-left: auto; }
+
+fieldset.consent-opcoes { border: 0; min-width: 0; margin: 0; padding: 0; }
+.grupo > fieldset.consent-opcoes > label + label { box-shadow: inset 0 1px 0 var(--cor-linha); }
+.opcao-consent { min-height: 48px; gap: var(--espaco-3); cursor: pointer; }
+.opcao-consent .nome-consent { flex: 1; min-width: 0; }
+.consent-bloco { color: var(--cor-texto); }

@@ -17,6 +17,7 @@ import { secaoLembretes } from './lembretes';
 import { secaoPlanilha } from './planilha';
 import { secaoAparencia } from './aparencia';
 import { secaoTemas } from './temas';
+import { secaoAnunciosPrivacidade } from './anuncios-privacidade';
 import type { Tela } from '../tela';
 
 function secaoAvisos(): HTMLElement {
@@ -122,6 +123,7 @@ export function telaAjustes(): Tela {
       secaoBackup(),
       secaoAparencia(),
       secaoTemas(),
+      secaoAnunciosPrivacidade(),
       h(
         'section',
         { 'aria-labelledby': 'titulo-sobre' },

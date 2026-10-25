@@ -8,6 +8,8 @@ import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
 import { observarAjustes } from './ajuste';
 import { atualizarAnuncio, instalarAnuncios } from './anuncios';
+import { instalarConsentimento } from './consentimento';
+import { registrarAberturaApp } from '../servicos/consentimento';
 import type { TelaAnuncio } from '../domain/anuncios';
 import { adicionar } from './limite';
 import { aplicarTema } from './temas';
@@ -266,6 +268,8 @@ export function iniciarApp(el: HTMLElement): void {
   document.addEventListener('keydown', (ev) => { if (!ev.altKey && !ev.ctrlKey && !ev.metaKey) raizDoc.classList.add('teclado'); }, true);
   document.addEventListener('pointerdown', () => raizDoc.classList.remove('teclado'), true);
   aplicarTema();
+  registrarAberturaApp();
+  instalarConsentimento();
   instalarAnuncios();
   registrarTroca();
   renderizar();
