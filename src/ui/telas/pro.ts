@@ -10,7 +10,7 @@ import {
 } from '../../servicos/pro';
 import { botao } from '../componentes';
 import { h, novoId } from '../dom';
-import { icone, moedaGrande } from '../icones';
+import { icone } from '../icones';
 import { voltar } from '../navegacao';
 import type { Tela } from '../tela';
 
@@ -256,14 +256,13 @@ export function telaPro(entrou: boolean): Tela {
   if (pro) {
     areaCompra = null;
     areaRestaurar = null;
-    conteudo = h('div', { class: 'pro-tela', testid: 'pro-tela' }, h('div', { class: 'pro-moeda' }, moedaGrande()), ...blocoPro());
+    conteudo = h('div', { class: 'pro-tela', testid: 'pro-tela' }, ...blocoPro());
   } else {
     areaCompra = h('div', { class: 'pro-compra pilha' });
     areaRestaurar = h('div', { class: 'pro-restaurar pilha' });
     conteudo = h(
       'div',
       { class: 'pro-tela', testid: 'pro-tela' },
-      h('div', { class: 'pro-moeda' }, moedaGrande()),
       h('p', { class: 'pro-promessa' }, h('strong', {}, 'Pague uma vez, use para sempre.'), ' ', h('span', {}, 'Sem mensalidade e sem anúncios.')),
       h('h2', { class: 'secao' }, 'O que vem no Pro'),
       listaRecursos(),

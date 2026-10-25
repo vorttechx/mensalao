@@ -33,7 +33,6 @@ export async function avisarLimite(op: { reativarNome?: string; sobreTela?: bool
     testidPrincipal: 'limite-btn-pro',
     testidSaida: 'limite-btn-agora-nao',
     alerta: true,
-    icone: 'moeda',
   });
   dialogoAberto = false;
   // Fechado pela troca de rota: a pessoa já está em outra tela, nada a fazer (BUG-01).

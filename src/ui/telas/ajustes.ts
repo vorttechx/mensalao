@@ -101,7 +101,7 @@ function secaoPlano(): HTMLElement {
     ? h(
         'div',
         { class: 'cartao plano-cartao', testid: 'plano-cartao' },
-        h('p', { class: 'plano-nome' }, icone('moeda', 'ic24'), 'Mensalão Pro'),
+        h('p', { class: 'plano-nome' }, 'Mensalão Pro'),
         h('p', { class: 'nota' }, 'Compra ativa. Obrigado!'),
         botao('Ver detalhes', 'texto', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
       )

@@ -53,7 +53,6 @@ async function ligarLembrete(): Promise<void> {
       testid: 'lembrete-dialogo',
       testidPrincipal: 'lembrete-btn-continuar',
       testidSaida: 'lembrete-btn-voltar',
-      icone: 'sino',
     });
     if (continuar === null) return; // fechado pela troca de rota: nada a fazer (BUG-01)
     if (!continuar) {

@@ -21,7 +21,7 @@ export function telaFormulario(m: ModoFormulario): Tela {
     return {
       titulo: 'Assinatura não encontrada',
       voltar: () => voltar('#/'),
-      conteudo: [estadoVazio({ testid: 'nao-encontrada', ilustracao: false, textos: ['Esta assinatura não existe mais.'] })],
+      conteudo: [estadoVazio({ testid: 'nao-encontrada', textos: ['Esta assinatura não existe mais.'] })],
     };
   }
   const servico = m.modo === 'nova' ? servicoPorId(m.catalogoId) : undefined;

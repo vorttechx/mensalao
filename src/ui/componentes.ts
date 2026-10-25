@@ -1,12 +1,13 @@
-// Componentes de interface reutilizáveis (design.md seção 3).
+// Componentes de interface reutilizáveis (design.md seção 3, sprint 3 "Extrato").
 import { anexar, h, novoId, type Filho } from './dom';
-import { icone, ilustracaoCarteira, type NomeIcone } from './icones';
+import { icone, type NomeIcone } from './icones';
 import { mascararDataBR, posicaoCursorMascara } from '../domain/datas';
+import { formatarBRL } from '../domain/dinheiro';
 
 /* ---------- Banner ---------- */
 
 export interface Banner {
-  /** 'info' = banner informativo neutro (design 8.11), mesmo visual do 'ok' com ícone "i". */
+  /** Aviso de status (design 3.12): ✓ sucesso, "i" informativo, "!" erro. */
   tipo: 'ok' | 'erro' | 'info';
   linhas: string[];
   testid?: string;
@@ -21,14 +22,14 @@ export function criarBanner(b: Banner, aoFechar: () => void): HTMLElement {
       tabindex: '-1',
       testid: b.testid ?? (b.tipo === 'erro' ? 'banner-erro' : 'banner'),
     },
-    icone(b.tipo === 'erro' ? 'alerta' : 'info', 'ic24'),
+    icone(b.tipo === 'erro' ? 'alerta' : b.tipo === 'ok' ? 'check' : 'info', 'ic24'),
     h('div', { class: 'texto' }, b.linhas.map((l) => h('p', {}, l))),
     h('button', { type: 'button', class: 'fechar', 'aria-label': 'Fechar aviso', onclick: aoFechar }, icone('fechar', 'ic24')),
   );
   return el;
 }
 
-/* ---------- Selos ---------- */
+/* ---------- Marcas de estado (design 3.3) ---------- */
 
 export type TipoSelo = 'logo' | 'teste' | 'subiu' | 'caiu' | 'neutro' | 'cancelada' | 'danificada';
 const ICONE_SELO: Record<TipoSelo, NomeIcone> = {
@@ -40,9 +41,43 @@ const ICONE_SELO: Record<TipoSelo, NomeIcone> = {
   cancelada: 'x',
   danificada: 'alerta',
 };
+/** Cor da marca: ferrugem (atenção), azul de caneta (teste grátis) ou tinta clara (neutro, inclusive "caiu"). */
+const COR_SELO: Record<TipoSelo, 'alerta' | 'teste' | 'neutro'> = {
+  logo: 'alerta',
+  teste: 'teste',
+  subiu: 'alerta',
+  caiu: 'neutro',
+  neutro: 'neutro',
+  cancelada: 'neutro',
+  danificada: 'alerta',
+};
 
+/** Anotação de extrato: ícone de 14 px + texto 13/600 na cor do estado, sem fundo (antigo "selo"). */
 export function selo(tipo: TipoSelo, texto: string, testid: string): HTMLElement {
-  return h('span', { class: `selo selo-${tipo}`, testid }, icone(ICONE_SELO[tipo]), texto);
+  return h('span', { class: `estado estado-${COR_SELO[tipo]}`, testid }, icone(ICONE_SELO[tipo]), texto);
+}
+
+/* ---------- Dinheiro (design 2.5) ---------- */
+
+/**
+ * Valor em reais com "R$" e centavos tratados só por <span>: o textContent continua exatamente o de
+ * formatarBRL ("R$ 44,90"), seguido do sufixo de ciclo quando houver ("/mês").
+ * `grande`: total de 40 px (R$ e centavos menores e elevados). `lista`: R$ e sufixo menores, centavos do mesmo tamanho.
+ */
+export function dinheiro(centavos: number, estilo: 'grande' | 'lista', extra: { sufixo?: string; testid?: string; tag?: 'span' | 'p' } = {}): HTMLElement {
+  const texto = formatarBRL(centavos);
+  const i = texto.indexOf(' ');
+  const rs = texto.slice(0, i + 1);
+  const numero = texto.slice(i + 1);
+  const el = h(extra.tag ?? 'span', { class: `dinheiro-${estilo}`, testid: extra.testid });
+  if (estilo === 'grande') {
+    const v = numero.lastIndexOf(',');
+    anexar(el, [h('span', { class: 'rs' }, rs), numero.slice(0, v), h('span', { class: 'ct' }, numero.slice(v))]);
+  } else {
+    anexar(el, [h('span', { class: 'rs' }, rs), numero]);
+  }
+  if (extra.sufixo) el.append(h('span', { class: 'sufixo' }, extra.sufixo));
+  return el;
 }
 
 /* ---------- Campos ---------- */
@@ -133,7 +168,7 @@ export function campoSelecao(op: OpcoesCampo & { opcoes: { valor: string; rotulo
     op.opcoes.map((o) => h('option', { value: o.valor }, o.rotulo)),
   );
   controle.value = op.valor ?? '';
-  return montarCampo(op, controle);
+  return montarCampo(op, controle, (c) => h('div', { class: 'selecao' }, c, icone('chevron-baixo')));
 }
 
 /* ---------- Botões ---------- */
@@ -144,13 +179,13 @@ export function botao(
   texto: string,
   variante: VarianteBotao,
   aoClicar: (ev: Event) => void,
-  extra: { testid?: string; larga?: boolean; icone?: NomeIcone; tipo?: 'button' | 'submit'; attrs?: Record<string, string> } = {},
+  extra: { testid?: string; larga?: boolean; icone?: NomeIcone; tipo?: 'button' | 'submit'; attrs?: Record<string, string>; classe?: string } = {},
 ): HTMLButtonElement {
   const b = h(
     'button',
     {
       type: extra.tipo ?? 'button',
-      class: `btn btn-${variante}${extra.larga ? ' btn-larga' : ''}`,
+      class: `btn btn-${variante}${extra.larga ? ' btn-larga' : ''}${extra.classe ? ` ${extra.classe}` : ''}`,
       testid: extra.testid,
       onclick: aoClicar,
     },
@@ -161,19 +196,40 @@ export function botao(
   return b;
 }
 
+/* ---------- Linha de ação de grupo (design 3.1 e 3.7) ---------- */
+
+/**
+ * Linha inteira de um grupo que age (texto na cor da marca) ou navega (com a seta "›").
+ * `perigo`: texto ferrugem centralizado (Excluir). `forte`: peso 600 (Reativar).
+ */
+export function linhaAcao(
+  texto: string,
+  aoClicar: (ev: Event) => void,
+  extra: { testid?: string; seta?: boolean; forte?: boolean; perigo?: boolean; tipo?: 'button' | 'submit'; attrs?: Record<string, string> } = {},
+): HTMLButtonElement {
+  const classes = ['lin', 'lin-acao', extra.forte ? 'forte' : '', extra.perigo ? 'perigo' : ''].filter(Boolean).join(' ');
+  const b = h(
+    'button',
+    { type: extra.tipo ?? 'button', class: classes, testid: extra.testid, onclick: aoClicar },
+    h('span', {}, texto),
+    extra.seta ? icone('seta', 'ic seta') : null,
+  );
+  for (const [k, v] of Object.entries(extra.attrs ?? {})) b.setAttribute(k, v);
+  return b;
+}
+
 /* ---------- Estado vazio ---------- */
 
+/** Estado vazio (design 3.13): alinhado à esquerda, sem ilustração. */
 export function estadoVazio(op: {
   titulo?: string;
   textos: string[];
   botao?: HTMLElement;
-  ilustracao?: boolean;
   testid: string;
 }): HTMLElement {
   return h(
     'div',
     { class: 'vazio', testid: op.testid },
-    op.ilustracao === false ? null : ilustracaoCarteira(),
     op.titulo ? h('h2', {}, op.titulo) : null,
     op.textos.map((t) => h('p', {}, t)),
     op.botao,
@@ -232,7 +288,7 @@ export function paragrafos(textos: Filho[]): HTMLElement[] {
   return textos.filter(Boolean).map((t) => h('p', {}, t));
 }
 
-/* ---------- Diálogo informativo (design 8.10) ---------- */
+/* ---------- Diálogo informativo (design 3.14, sem ícone) ---------- */
 
 /**
  * Diálogo que não destrói nada (limite, permissão de notificação). Ação principal primária à direita,
@@ -248,7 +304,6 @@ export function dialogoInfo(op: {
   testidPrincipal: string;
   testidSaida: string;
   alerta?: boolean;
-  icone?: NomeIcone;
 }): Promise<boolean | null> {
   return new Promise((resolver) => {
     const anterior = document.activeElement as HTMLElement | null;
@@ -268,7 +323,6 @@ export function dialogoInfo(op: {
       dlg.close();
     }, { testid: op.testidPrincipal });
     anexar(dlg, [
-      op.icone ? h('div', { class: 'dialogo-icone' }, icone(op.icone, 'ic24')) : null,
       h('h2', { id: idTitulo }, op.titulo),
       h('div', { id: idTexto }, op.textos.map((t) => h('p', {}, t))),
       h('div', { class: 'acoes' }, sair, ok),
@@ -285,14 +339,20 @@ export function dialogoInfo(op: {
   });
 }
 
-/* ---------- Selo Pro (design 8.1) ---------- */
+/* ---------- Carimbo Pro (design 3.3) ---------- */
 
 export function seloPro(attrs: Record<string, string> = {}): HTMLElement {
-  return h('span', { class: 'selo selo-pro', ...attrs }, icone('moeda'), 'Pro');
+  return h('span', { class: 'carimbo', ...attrs }, 'Pro');
 }
 
-/* ---------- Cartão de recurso Pro (design 8.3) ---------- */
+/* ---------- Recurso Pro no plano grátis (design 3.16) ---------- */
 
+/**
+ * Recurso Pro onde ele estaria, sem cadeado nem tracejado. `formato`:
+ * - 'grupo' (Ajustes): grupo com bloco (título, descrição e carimbo), prévia opcional e linha "Conhecer o Pro ›";
+ *   `tituloOculto` esconde o título quando ele repete o cabeçalho da seção.
+ * - 'linha' (Totais): trecho entre divisores com título + carimbo, descrição, prévia e botão texto.
+ */
 export function cartaoRecursoPro(op: {
   testid: string;
   titulo: string;
@@ -301,21 +361,45 @@ export function cartaoRecursoPro(op: {
   recurso: string;
   previa?: Node | null;
   extra?: Node | null;
+  formato?: 'grupo' | 'linha';
+  tituloOculto?: boolean;
   aoConhecer: () => void;
 }): HTMLElement {
   const idTitulo = novoId('lock-titulo');
+  const rotulo = { 'aria-label': `Conhecer o Pro para ${op.recurso}` };
+  if (op.formato === 'linha') {
+    return h(
+      'section',
+      { class: 'recurso-pro-linha', testid: op.testid, 'aria-labelledby': idTitulo },
+      h('div', { class: 't' }, h('h2', { id: idTitulo }, op.titulo), seloPro()),
+      op.descricao.map((d) => h('p', { class: 'nota' }, d)),
+      op.previa ?? null,
+      op.extra ?? null,
+      botao('Conhecer o Pro', 'texto', op.aoConhecer, { testid: 'lock-btn-pro', attrs: rotulo }),
+    );
+  }
+  const titulo = h('h3', { id: idTitulo, class: op.tituloOculto ? 'sr-only' : 't' }, op.titulo);
   return h(
     'section',
-    { class: 'cartao-pro', testid: op.testid, 'aria-labelledby': idTitulo },
-    h('div', { class: 'cartao-pro-topo' }, h('h3', { id: idTitulo }, op.titulo), seloPro()),
-    op.descricao.map((d) => h('p', { class: 'cartao-pro-desc' }, d)),
-    op.previa ?? null,
-    op.extra ?? null,
-    botao('Conhecer o Pro', 'secundario', op.aoConhecer, { testid: 'lock-btn-pro', attrs: { 'aria-label': `Conhecer o Pro para ${op.recurso}` } }),
+    { class: 'grupo recurso-pro', testid: op.testid, 'aria-labelledby': idTitulo },
+    h(
+      'div',
+      { class: 'lin-bloco' },
+      op.tituloOculto ? titulo : null,
+      h(
+        'div',
+        { class: 'recurso-pro-desc' },
+        h('div', {}, op.tituloOculto ? null : titulo, op.descricao.map((d) => h('p', {}, d))),
+        seloPro(),
+      ),
+    ),
+    op.previa ? h('div', { class: 'lin-bloco recurso-pro-previa' }, op.previa) : null,
+    op.extra ? h('div', { class: 'lin-bloco' }, op.extra) : null,
+    linhaAcao('Conhecer o Pro', op.aoConhecer, { testid: 'lock-btn-pro', seta: true, attrs: rotulo }),
   );
 }
 
-/* ---------- Interruptor (design 8.4) ---------- */
+/* ---------- Interruptor (design 3.8): linha de grupo com o switch à direita ---------- */
 
 export function interruptor(op: { rotulo: string; testid: string; marcado: boolean; aoMudar: (ligado: boolean, input: HTMLInputElement) => void }): HTMLElement {
   const input = h('input', { type: 'checkbox', role: 'switch', class: 'switch-input', testid: op.testid });
@@ -323,7 +407,7 @@ export function interruptor(op: { rotulo: string; testid: string; marcado: boole
   input.addEventListener('change', () => op.aoMudar(input.checked, input));
   return h(
     'label',
-    { class: 'switch' },
+    { class: 'lin switch' },
     h('span', { class: 'switch-rotulo' }, op.rotulo),
     input,
     h('span', { class: 'switch-trilho', 'aria-hidden': 'true' }, h('span', { class: 'switch-botao' }, icone('check'))),

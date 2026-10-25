@@ -3,7 +3,7 @@ import { aoMudarEstado, emRecuperacao, normalizarAgora } from '../loja';
 import { fecharErroEspaco, haErroEspaco, processarCopias } from '../servicos/copias';
 import { processarLembretes } from '../servicos/lembretes';
 import { aoMudarPlano, ehPro, fecharAvisoRevogacao, haAvisoRevogacao, verificarAoAbrir } from '../servicos/pro';
-import { botao, criarBanner, fecharDialogosAbertos, seloPro } from './componentes';
+import { criarBanner, fecharDialogosAbertos, seloPro } from './componentes';
 import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
 import { adicionar } from './limite';
@@ -60,7 +60,7 @@ function montarNav(ativa: Aba): HTMLElement {
           h(
             'a',
             { href: a.hash, 'aria-current': a.aba === ativa ? 'page' : null, testid: `nav-${a.aba}` },
-            h('span', { class: 'pil' }, icone(a.icone, 'ic24')),
+            icone(a.icone, 'ic24'),
             a.rotulo,
           ),
         ),
@@ -79,15 +79,44 @@ export function renderizar(): void {
   const { banner, novo } = consumirBanner(trocou);
 
   const h1 = h('h1', { tabindex: '-1', testid: 'titulo-tela' }, tela.titulo);
-  const topo = h('header', { class: 'topo' });
-  if (tela.voltar) {
-    topo.append(h('button', { type: 'button', class: 'btn-voltar', 'aria-label': 'Voltar', testid: 'btn-voltar', onclick: tela.voltar }, icone('voltar', 'ic24')));
-  }
+  // "+" simples na cor da marca (design 3.1): topo do Início e ao lado do título de Assinaturas.
+  const btnMais = tela.adicionar
+    ? h('button', { type: 'button', class: 'btn-mais', 'aria-label': 'Adicionar assinatura', testid: 'btn-adicionar', onclick: adicionar }, icone('mais'))
+    : null;
+
+  // Três formatos de topo (design 3.15): marca (Início, recuperação), interno (Voltar + h1) e título grande (abas).
+  let topo: HTMLElement | null = null;
+  let cabecalho: HTMLElement;
   if (tela.marca) {
-    topo.append(h('span', { class: 'marca' }, icone('moeda', 'ic24'), 'Mensalão'));
-    // Reconhecimento discreto da compra (design 8.1, decisão S2-5).
-    if (ehPro()) topo.append(seloPro({ testid: 'selo-pro', 'aria-label': 'Mensalão Pro ativo' }));
-  } else topo.append(h1);
+    topo = h(
+      'header',
+      { class: 'topo' },
+      h(
+        'span',
+        { class: 'marca' },
+        'Mensalão',
+        // Reconhecimento discreto da compra (carimbo Pro).
+        ehPro() ? seloPro({ testid: 'selo-pro', 'aria-label': 'Mensalão Pro ativo' }) : null,
+      ),
+      btnMais,
+    );
+    cabecalho = h('div', { class: 'secao-titulo' }, h1, tela.subtitulo ? h('p', { class: 'sub', testid: 'subtitulo' }, tela.subtitulo) : null);
+  } else if (tela.voltar) {
+    topo = h(
+      'header',
+      { class: 'topo topo-interno' },
+      h('button', { type: 'button', class: 'btn-voltar', 'aria-label': 'Voltar', testid: 'btn-voltar', onclick: tela.voltar }, icone('voltar', 'ic24')),
+      h1,
+    );
+    cabecalho = h('div', {}, tela.subtitulo ? h('p', { class: 'sub', testid: 'subtitulo' }, tela.subtitulo) : null);
+  } else {
+    cabecalho = h(
+      'div',
+      {},
+      h('div', { class: 'titulo-grande' }, h1, btnMais),
+      tela.subtitulo ? h('p', { class: 'sub', testid: 'subtitulo' }, tela.subtitulo) : null,
+    );
+  }
 
   const elBanner = banner
     ? criarBanner(banner, () => {
@@ -137,14 +166,14 @@ export function renderizar(): void {
     elRevogacao,
     elBanner,
     elEspaco,
-    tela.marca ? h1 : null,
-    tela.subtitulo ? h('p', { class: 'sub', testid: 'subtitulo' }, tela.subtitulo) : null,
+    tela.antesDoTitulo ?? [],
+    cabecalho,
     tela.conteudo,
   );
 
   const app = h('div', { class: `app${tela.aba ? ' com-nav' : ''}` }, topo, main);
-  if (tela.fab) app.append(botao('Adicionar', 'primario', adicionar, { testid: 'btn-adicionar', icone: 'mais', attrs: { class: 'btn btn-primario fab' } }));
   if (tela.aba) app.append(montarNav(tela.aba));
+  document.body.classList.toggle('agrupado', !!tela.agrupado);
 
   raiz.replaceChildren(app);
   document.title = tela.marca ? 'Mensalão' : `${tela.titulo} — Mensalão`;

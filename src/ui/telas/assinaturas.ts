@@ -42,7 +42,7 @@ export function telaAssinaturas(): Tela {
         estadoVazio({
           testid: 'empty-state-assinaturas',
           textos: ['Você ainda não cadastrou assinaturas.'],
-          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio', icone: 'mais' }),
+          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio' }),
         }),
       ],
     };
@@ -55,7 +55,7 @@ export function telaAssinaturas(): Tela {
   return {
     titulo: 'Assinaturas',
     aba: 'assinaturas',
-    fab: true,
+    adicionar: true,
     subtitulo: resumo || 'Nenhuma assinatura ativa',
     conteudo: [
       contadorLimite(),

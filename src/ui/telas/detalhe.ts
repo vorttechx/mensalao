@@ -123,7 +123,7 @@ export function telaDetalhe(id: string): Tela {
     return {
       titulo: 'Assinatura não encontrada',
       voltar: () => voltar('#/'),
-      conteudo: [estadoVazio({ testid: 'nao-encontrada', ilustracao: false, textos: ['Esta assinatura não existe mais.'] })],
+      conteudo: [estadoVazio({ testid: 'nao-encontrada', textos: ['Esta assinatura não existe mais.'] })],
     };
   }
   const selos = selosReajuste(a);

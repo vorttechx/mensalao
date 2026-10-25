@@ -42,7 +42,7 @@ export function telaInicio(): Tela {
           textos: temOutras
             ? ['Nenhuma assinatura ativa no momento. As pausadas e canceladas ficam em Assinaturas.']
             : ['Cadastre suas assinaturas para ver o que vai ser cobrado e quando.', 'Seus dados ficam só neste celular.'],
-          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio', icone: 'mais' }),
+          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio' }),
         }),
       ],
     };
@@ -52,7 +52,7 @@ export function telaInicio(): Tela {
     titulo: 'Próximas cobranças',
     marca: true,
     aba: 'inicio',
-    fab: true,
+    adicionar: true,
     subtitulo: textoJanelaAviso(n),
     conteudo: [contadorLimite(), avisoLembretes(), lembreteExportar(), h('ul', { class: 'lista', testid: 'upcoming-list', 'aria-label': 'Próximas cobranças' }, itens.map(itemProximo))],
   };

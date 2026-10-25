@@ -44,6 +44,6 @@ export function secaoPlanilha(): HTMLElement {
     { 'aria-labelledby': 'titulo-planilha' },
     h('h3', { class: 'subsecao', id: 'titulo-planilha' }, 'Planilha'),
     h('p', { class: 'nota' }, 'Arquivo CSV para Excel ou Google Planilhas, com todas as assinaturas (ativas, pausadas e canceladas).'),
-    botao('Exportar CSV', 'secundario', exportarCsv, { testid: 'btn-exportar-csv', larga: true, icone: 'tabela' }),
+    botao('Exportar CSV', 'secundario', exportarCsv, { testid: 'btn-exportar-csv', larga: true }),
   );
 }

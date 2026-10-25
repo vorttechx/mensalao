@@ -69,9 +69,8 @@ export function telaTotais(): Tela {
       vazio
         ? estadoVazio({
             testid: 'empty-state-totais',
-            ilustracao: false,
             textos: ['Sem assinaturas ativas. Os totais aparecem quando você cadastrar ou reativar uma.'],
-            botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio', icone: 'mais' }),
+            botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio' }),
           })
         : null,
       vazio ? null : grupo('Por forma de pagamento', 'titulo-por-pagamento', 'total-por-pagamento', t.porPagamento, rotuloPagamento),
