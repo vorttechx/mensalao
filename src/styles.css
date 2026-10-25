@@ -191,11 +191,15 @@ html.teclado h1:focus-visible { outline: 3px solid var(--cor-foco); }
   padding-bottom: env(safe-area-inset-bottom);
 }
 body.agrupado .nav { background: var(--cor-fundo-agrupado); }
-.nav ul { list-style: none; margin: 0 auto; padding: 0; max-width: var(--largura-max); display: grid; grid-template-columns: repeat(4, 1fr); }
+/* BUG-02: cada aba fica com 1/4 da largura mesmo com texto grande (minmax(0, 1fr)). O rótulo cresce com o
+   texto do sistema até 14 px, o maior em que "Assinaturas" (ativa, 600) cabe em 1/4 de 360 px; se ainda faltar espaço
+   (outra fonte), quebra linha em vez de sair da tela. */
+.nav ul { list-style: none; margin: 0 auto; padding: 0; max-width: var(--largura-max); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .nav a {
-  height: var(--altura-nav);
+  min-height: var(--altura-nav); min-width: 0; padding: var(--espaco-1) 2px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  text-decoration: none; color: var(--cor-texto-2); font-size: var(--texto-xs);
+  text-decoration: none; color: var(--cor-texto-2); font-size: min(var(--texto-xs), 14px);
+  line-height: var(--altura-linha-titulo); text-align: center; overflow-wrap: anywhere;
   transition: color var(--duracao-rapida) var(--curva);
 }
 .nav a[aria-current="page"] { color: var(--cor-marca); font-weight: var(--peso-forte); }
