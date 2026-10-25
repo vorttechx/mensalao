@@ -293,12 +293,15 @@ select.controle { appearance: none; -webkit-appearance: none; padding-right: 40p
    ===================================================================== */
 /* BUG-04 / BUG-08: o número grande cresce com o texto do sistema (rem). "R$ n" nunca quebra (.valor); o sufixo
    ("/mês", "/ano") desce para a linha de baixo quando não cabe. O único limite é a largura do próprio bloco: o
-   valor pode ocupar a linha toda ("R$ 99.999,99" ≈ 5,2 em), mas não sai da tela nem cria rolagem horizontal. */
+   valor pode ocupar a linha toda, mas não sai da tela nem cria rolagem horizontal.
+   BUG-10: 17,5cqi é o tamanho em que "R$ 999.999,99" (≈ 5,64 em) cabe no bloco; com 7 dígitos ou mais
+   ("R$ 9.999.999,99" ≈ 6,5 em) a classe .longo baixa para 15cqi. A 100% continua nos 40 px (--texto-2xl). */
 .dinheiro-grande {
-  font-size: min(var(--texto-2xl), 19cqi); font-weight: var(--peso-numero); letter-spacing: var(--tracking-numero);
+  font-size: min(var(--texto-2xl), 17.5cqi); font-weight: var(--peso-numero); letter-spacing: var(--tracking-numero);
   line-height: var(--altura-linha-numero);
 }
 .dinheiro-grande .valor { white-space: nowrap; }
+.dinheiro-grande.longo { font-size: min(var(--texto-2xl), 15cqi); }
 .resumo, .bloco-total, .cabeca-detalhe > div { container-type: inline-size; }
 .dinheiro-grande .rs { font-size: 0.5em; font-weight: var(--peso-forte); color: var(--cor-texto-2); letter-spacing: 0; vertical-align: 0.62em; }
 .dinheiro-grande .ct { font-size: 0.55em; letter-spacing: 0; vertical-align: 0.58em; margin-left: 0.04em; }

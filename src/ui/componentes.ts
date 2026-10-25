@@ -88,7 +88,9 @@ export function dinheiro(centavos: number, estilo: 'grande' | 'lista', extra: { 
   const i = texto.indexOf(' ');
   const rs = texto.slice(0, i + 1);
   const numero = texto.slice(i + 1);
-  const el = h(extra.tag ?? 'span', { class: `dinheiro-${estilo}`, testid: extra.testid });
+  // BUG-10: com 7 dígitos ou mais (R$ 1.000.000,00), o número grande usa um limite de largura menor (.longo).
+  const longo = estilo === 'grande' && Math.abs(centavos) >= 100_000_000 ? ' longo' : '';
+  const el = h(extra.tag ?? 'span', { class: `dinheiro-${estilo}${longo}`, testid: extra.testid });
   if (estilo === 'grande') {
     const v = numero.lastIndexOf(',');
     // BUG-08: "R$ n" fica inteiro num <span class="valor">; com texto grande, só o sufixo desce de linha (<wbr>).
