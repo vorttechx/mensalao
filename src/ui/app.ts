@@ -46,6 +46,22 @@ function resolverTela(rota: string, trocou: boolean): Tela {
   return telaInicio();
 }
 
+let observadorNav: ResizeObserver | null = null;
+
+/**
+ * BUG-08: com texto grande as abas se empilham (2 linhas ou mais) e a barra fica mais alta que os 56 px do design;
+ * a altura real vai para --altura-nav-atual, usada no respiro do fim do conteúdo, para a barra não cobrir nada.
+ */
+function observarAlturaNav(nav: HTMLElement): void {
+  observadorNav?.disconnect();
+  if (typeof ResizeObserver === 'undefined') return;
+  const lista = nav.firstElementChild as HTMLElement;
+  observadorNav = new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--altura-nav-atual', `${Math.ceil(lista.getBoundingClientRect().height)}px`);
+  });
+  observadorNav.observe(lista);
+}
+
 function montarNav(ativa: Aba): HTMLElement {
   return h(
     'nav',
@@ -172,7 +188,11 @@ export function renderizar(): void {
   );
 
   const app = h('div', { class: `app${tela.aba ? ' com-nav' : ''}` }, topo, main);
-  if (tela.aba) app.append(montarNav(tela.aba));
+  if (tela.aba) {
+    const nav = montarNav(tela.aba);
+    app.append(nav);
+    observarAlturaNav(nav);
+  }
   document.body.classList.toggle('agrupado', !!tela.agrupado);
 
   raiz.replaceChildren(app);

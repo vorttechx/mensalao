@@ -91,7 +91,9 @@ export function dinheiro(centavos: number, estilo: 'grande' | 'lista', extra: { 
   const el = h(extra.tag ?? 'span', { class: `dinheiro-${estilo}`, testid: extra.testid });
   if (estilo === 'grande') {
     const v = numero.lastIndexOf(',');
-    anexar(el, [h('span', { class: 'rs' }, rs), numero.slice(0, v), h('span', { class: 'ct' }, numero.slice(v))]);
+    // BUG-08: "R$ n" fica inteiro num <span class="valor">; com texto grande, só o sufixo desce de linha (<wbr>).
+    el.append(h('span', { class: 'valor' }, h('span', { class: 'rs' }, rs), numero.slice(0, v), h('span', { class: 'ct' }, numero.slice(v))));
+    if (extra.sufixo) el.append(document.createElement('wbr'));
   } else {
     anexar(el, [h('span', { class: 'rs' }, rs), numero]);
   }

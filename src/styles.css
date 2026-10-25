@@ -143,7 +143,7 @@ svg.ic24 { width: 24px; height: 24px; flex: none; }
    ===================================================================== */
 .app { max-width: var(--largura-max); margin: 0 auto; min-height: 100vh; }
 .conteudo { padding: 0 0 var(--espaco-7); }
-.app.com-nav .conteudo { padding-bottom: calc(var(--altura-nav) + env(safe-area-inset-bottom) + var(--espaco-7)); }
+.app.com-nav .conteudo { padding-bottom: calc(var(--altura-nav-atual, var(--altura-nav)) + env(safe-area-inset-bottom) + var(--espaco-7)); }
 h1:focus { outline: none; }
 /* BUG-06: o título recebe foco por script para o leitor de tela (5.1); o anel só aparece se o teclado
    estiver em uso (classe "teclado" no <html>), nunca ao abrir o app sem interação (2.1). */
@@ -189,20 +189,24 @@ html.teclado h1:focus-visible { outline: 3px solid var(--cor-foco); }
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
   background: var(--cor-fundo); border-top: 1px solid var(--cor-linha);
   padding-bottom: env(safe-area-inset-bottom);
+  container: nav / inline-size;
 }
 body.agrupado .nav { background: var(--cor-fundo-agrupado); }
-/* BUG-02: cada aba fica com 1/4 da largura mesmo com texto grande (minmax(0, 1fr)). O rótulo cresce com o
-   texto do sistema até 14 px, o maior em que "Assinaturas" (ativa, 600) cabe em 1/4 de 360 px; se ainda faltar espaço
-   (outra fonte), quebra linha em vez de sair da tela. */
+/* BUG-02 / BUG-08: as abas dividem a largura em colunas iguais (minmax(0, 1fr)) e o rótulo cresce com o texto do
+   sistema (rem, sem teto). Quando "Assinaturas" deixa de caber em 1/4 da barra, as abas se empilham em 2 colunas
+   (2 linhas) e, se ainda faltar espaço, em 1 coluna; a palavra só quebra em último caso (outra fonte). A consulta é
+   à largura da própria barra em rem, que acompanha o texto do sistema. */
 .nav ul { list-style: none; margin: 0 auto; padding: 0; max-width: var(--largura-max); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .nav a {
   min-height: var(--altura-nav); min-width: 0; padding: var(--espaco-1) 2px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  text-decoration: none; color: var(--cor-texto-2); font-size: min(var(--texto-xs), 14px);
+  text-decoration: none; color: var(--cor-texto-2); font-size: var(--texto-xs);
   line-height: var(--altura-linha-titulo); text-align: center; overflow-wrap: anywhere;
   transition: color var(--duracao-rapida) var(--curva);
 }
 .nav a[aria-current="page"] { color: var(--cor-marca); font-weight: var(--peso-forte); }
+@container nav (width < 20rem) { .nav ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container nav (width < 10rem) { .nav ul { grid-template-columns: minmax(0, 1fr); } }
 
 /* =====================================================================
    Botões (3.1)
@@ -287,12 +291,15 @@ select.controle { appearance: none; -webkit-appearance: none; padding-right: 40p
 /* =====================================================================
    Dinheiro (2.5): o tratamento é só de <span>; o textContent continua o de formatarBRL
    ===================================================================== */
-/* BUG-04: o número grande cresce com o texto do sistema até 12% da largura da tela (43 px em 360 px),
-   para caber sem quebrar; com o texto normal fica nos 40 px do design. */
+/* BUG-04 / BUG-08: o número grande cresce com o texto do sistema (rem). "R$ n" nunca quebra (.valor); o sufixo
+   ("/mês", "/ano") desce para a linha de baixo quando não cabe. O único limite é a largura do próprio bloco: o
+   valor pode ocupar a linha toda ("R$ 99.999,99" ≈ 5,2 em), mas não sai da tela nem cria rolagem horizontal. */
 .dinheiro-grande {
-  font-size: min(var(--texto-2xl), 12vw); font-weight: var(--peso-numero); letter-spacing: var(--tracking-numero);
-  line-height: var(--altura-linha-numero); white-space: nowrap;
+  font-size: min(var(--texto-2xl), 19cqi); font-weight: var(--peso-numero); letter-spacing: var(--tracking-numero);
+  line-height: var(--altura-linha-numero);
 }
+.dinheiro-grande .valor { white-space: nowrap; }
+.resumo, .bloco-total, .cabeca-detalhe > div { container-type: inline-size; }
 .dinheiro-grande .rs { font-size: 0.5em; font-weight: var(--peso-forte); color: var(--cor-texto-2); letter-spacing: 0; vertical-align: 0.62em; }
 .dinheiro-grande .ct { font-size: 0.55em; letter-spacing: 0; vertical-align: 0.58em; margin-left: 0.04em; }
 .dinheiro-lista { font-weight: var(--peso-forte); white-space: nowrap; }
