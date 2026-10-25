@@ -441,7 +441,7 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 .regua-leg .h-fim { right: 0; }
 
 /* Aviso discreto de lembretes (3.11): trecho do extrato entre dois divisores. */
-.avisos { margin: var(--espaco-4) var(--margem-tela) 0; padding: var(--espaco-1) 0 10px; border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); }
+.avisos { margin: var(--espaco-4) var(--margem-tela) 0; padding: var(--espaco-1) 0 var(--espaco-2); border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); }
 .avisos ul { list-style: none; margin: 0; padding: 0; }
 .avisos a, .avisos summary { display: flex; align-items: center; gap: 10px; min-height: var(--toque-min); color: var(--cor-texto); text-decoration: none; }
 .avisos a > svg:first-child { color: var(--cor-alerta); }
@@ -451,7 +451,8 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 .avisos summary::-webkit-details-marker { display: none; }
 .avisos details[open] > summary .seta { transform: rotate(180deg); }
 .avisos summary .seta { transition: transform var(--duracao-media) var(--curva); }
-.avisos .nota { padding-left: 26px; }
+/* BUG-01: a nota usa a largura toda do trecho para caber em 2 linhas e manter o aviso ≤ 184 px (3.11). */
+.avisos .nota { padding-left: 0; }
 .aviso-backup { margin: var(--espaco-4) var(--margem-tela) 0; padding: 10px 0; border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); display: grid; gap: 2px; }
 .avisos + .aviso-backup { margin-top: 0; border-top: 0; }
 .aviso-backup > p { display: flex; gap: 10px; align-items: flex-start; }
