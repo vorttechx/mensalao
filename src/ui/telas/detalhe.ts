@@ -31,10 +31,11 @@ function secaoHistorico(a: Assinatura): HTMLElement {
               'li',
               { class: 'lin', testid: 'price-history-item' },
               h('span', { class: 'data' }, formatarDataBR(m.data)),
-              h('span', {}, `${formatarBRL(m.deCentavos)} → ${formatarBRL(m.paraCentavos)}`),
+              // Cada valor não quebra; a linha pode quebrar só na seta (BUG-04, texto a 200%).
+              h('span', {}, h('span', { class: 'sem-quebra' }, formatarBRL(m.deCentavos)), ' → ', h('span', { class: 'sem-quebra' }, formatarBRL(m.paraCentavos))),
             ),
           ),
-          h('li', { class: 'lin atual' }, h('span', {}, 'Valor atual'), h('span', {}, formatarBRL(a.valorCentavos))),
+          h('li', { class: 'lin atual' }, h('span', {}, 'Valor atual'), h('span', { class: 'sem-quebra' }, formatarBRL(a.valorCentavos))),
         );
   return h(
     'section',

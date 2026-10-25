@@ -151,7 +151,7 @@ html.teclado h1:focus-visible { outline: 3px solid var(--cor-foco); }
 
 /* Barra de topo do Início e da recuperação: marca "Mensalão" à esquerda, "+" à direita. */
 .topo {
-  height: var(--altura-barra-topo);
+  min-height: var(--altura-barra-topo); /* BUG-04: título longo com texto grande quebra linha sem invadir o conteúdo */
   display: flex; align-items: center; justify-content: space-between; gap: var(--espaco-2);
   padding: 0 var(--espaco-2) 0 var(--margem-tela);
 }
@@ -287,8 +287,10 @@ select.controle { appearance: none; -webkit-appearance: none; padding-right: 40p
 /* =====================================================================
    Dinheiro (2.5): o tratamento é só de <span>; o textContent continua o de formatarBRL
    ===================================================================== */
+/* BUG-04: o número grande cresce com o texto do sistema até 12% da largura da tela (43 px em 360 px),
+   para caber sem quebrar; com o texto normal fica nos 40 px do design. */
 .dinheiro-grande {
-  font-size: var(--texto-2xl); font-weight: var(--peso-numero); letter-spacing: var(--tracking-numero);
+  font-size: min(var(--texto-2xl), 12vw); font-weight: var(--peso-numero); letter-spacing: var(--tracking-numero);
   line-height: var(--altura-linha-numero); white-space: nowrap;
 }
 .dinheiro-grande .rs { font-size: 0.5em; font-weight: var(--peso-forte); color: var(--cor-texto-2); letter-spacing: 0; vertical-align: 0.62em; }
@@ -545,17 +547,26 @@ details.canceladas[open] summary .seta { transform: rotate(180deg); }
 .formulario .btn-salvar { margin-top: 28px; }
 
 /* Detalhe (3.7 e 4.5) */
-.cabeca-detalhe { display: flex; gap: var(--espaco-4); align-items: center; padding: var(--espaco-2) var(--margem-tela) var(--espaco-4); }
+.cabeca-detalhe { display: flex; flex-wrap: wrap; gap: var(--espaco-3) var(--espaco-4); align-items: center; padding: var(--espaco-2) var(--margem-tela) var(--espaco-4); }
+/* BUG-04: com texto grande, o bloco do valor desce para baixo do monograma e usa a largura toda. */
+.cabeca-detalhe > div { flex: 1 1 12rem; min-width: 0; }
 .cabeca-detalhe .dinheiro-grande .sufixo { font-size: var(--texto-base); font-weight: var(--peso-normal); color: var(--cor-texto-2); letter-spacing: 0; margin-left: var(--espaco-1); }
 .cabeca-detalhe .marcas { margin-top: 6px; }
 dl.dados { margin: 0 var(--espaco-4); }
 dl.dados dt { color: var(--cor-texto-2); }
-dl.dados dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+/* BUG-04: rótulo e valor dividem a linha; se o valor não cabe, desce inteiro para a linha de baixo,
+   à direita (datas e palavras não quebram no meio). */
+dl.dados .lin { flex-wrap: wrap; row-gap: 2px; }
+dl.dados dd { margin: 0 0 0 auto; text-align: right; overflow-wrap: break-word; min-width: 0; }
 .guia { padding: var(--espaco-3) var(--espaco-4) var(--espaco-1); display: grid; gap: 10px; }
 .guia h3 { font-size: var(--texto-base); font-weight: var(--peso-forte); letter-spacing: 0; margin-bottom: 2px; }
 .lin-acao .seta { margin-left: auto; flex: none; transition: transform var(--duracao-media) var(--curva); }
 .lin-acao[aria-expanded="true"] .seta { transform: rotate(180deg); }
 ol.historico .data { color: var(--cor-texto-2); }
+/* BUG-04: data e valores dividem a linha; com texto grande, os valores descem à direita sem quebrar. */
+ol.historico .lin { flex-wrap: wrap; row-gap: 2px; }
+ol.historico .lin > span:last-child { margin-left: auto; text-align: right; }
+.sem-quebra { white-space: nowrap; }
 ol.historico .atual span:last-child { font-weight: var(--peso-forte); }
 .historico-vazio { color: var(--cor-texto-2); }
 .grupo.zona-perigo { margin-top: var(--espaco-7); }
