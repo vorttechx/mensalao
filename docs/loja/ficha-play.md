@@ -27,6 +27,11 @@ O plano grátis cobre até 5 assinaturas ativas. O Mensalão Pro é uma compra �
 ## O que há de novo (versão 2.0.0)
 Chegou o Mensalão Pro: compra única com assinaturas ilimitadas, lembretes, backup automático, planilha CSV, gráficos e temas. O grátis continua com até 5 assinaturas ativas.
 
+## Contato do desenvolvedor
+- E-mail: contato@mensalao.app
+- Site: https://mensalao.app
+- Política de privacidade: https://mensalao.app/privacidade.html
+
 ## Categoria sugerida
 Finanças
 
