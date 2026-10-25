@@ -36,7 +36,7 @@ function itemCatalogo(s: ServicoCatalogo): HTMLElement {
 export function telaCatalogo(): Tela {
   const lista = h('ul', { class: 'lista', testid: 'catalog-list', 'aria-labelledby': 'titulo-catalogo' });
   const anuncio = h('p', { class: 'sr-only', 'aria-live': 'polite', testid: 'catalog-contagem' });
-  const semResultado = h('p', { class: 'nota', testid: 'catalog-vazio', hidden: true });
+  const semResultado = h('p', { class: 'catalogo-vazio', testid: 'catalog-vazio', hidden: true });
 
   const busca = h('input', {
     id: 'busca-catalogo',
@@ -68,16 +68,20 @@ export function telaCatalogo(): Tela {
     conteudo: [
       h(
         'div',
-        { class: 'campo' },
-        h('label', { for: 'busca-catalogo' }, 'Buscar serviço'),
-        h('div', { class: 'prefixo busca' }, icone('busca'), busca),
+        { class: 'bloco pilha catalogo-busca' },
+        h(
+          'div',
+          { class: 'campo' },
+          h('label', { for: 'busca-catalogo' }, 'Buscar serviço'),
+          h('div', { class: 'prefixo busca' }, icone('busca'), busca),
+        ),
+        botao('Cadastrar livremente', 'secundario', () => irPara('#/nova/form'), { testid: 'btn-cadastrar-livre', larga: true }),
       ),
-      botao('Cadastrar livremente', 'secundario', () => irPara('#/nova/form'), { testid: 'btn-cadastrar-livre', larga: true }),
-      h('h2', { class: 'secao', id: 'titulo-catalogo' }, 'Serviços conhecidos'),
+      h('div', { class: 'secao-titulo' }, h('h2', { id: 'titulo-catalogo' }, 'Serviços conhecidos')),
       anuncio,
       lista,
       semResultado,
-      h('p', { class: 'nota' }, 'Valores sugeridos podem estar desatualizados. Você confere antes de salvar.'),
+      h('p', { class: 'nota bloco' }, 'Valores sugeridos podem estar desatualizados. Você confere antes de salvar.'),
     ],
   };
 }

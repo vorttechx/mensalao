@@ -1,11 +1,11 @@
-// US-02 / US-07 — Ajustes: dias de aviso e backup (design.md 4.7).
+// US-02 / US-07 / US-22 — Ajustes em listas agrupadas: plano, avisos, backup, temas e sobre (design 4.7).
 import { textoJanelaAviso } from '../../domain/proximas';
 import { alterarDiasAviso } from '../../domain/operacoes';
 import { lerDiasAviso } from '../../domain/validacao';
 import { definirEstado, obterEstado } from '../../loja';
 import { renderizar } from '../app';
 import { exportarBackup, importarArquivo, seletorDeArquivo } from '../backup';
-import { botao } from '../componentes';
+import { linhaAcao } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
 import { avisar, navegar } from '../navegacao';
@@ -53,20 +53,20 @@ function secaoAvisos(): HTMLElement {
   return h(
     'section',
     { 'aria-labelledby': 'titulo-avisos' },
-    h('h2', { class: 'secao', id: 'titulo-avisos' }, 'Avisos'),
+    h('h2', { class: 'g-titulo', id: 'titulo-avisos' }, 'Avisos'),
     h(
       'form',
-      { novalidate: true, onsubmit: salvar, testid: 'form-config' },
+      { class: 'grupo', novalidate: true, onsubmit: salvar, testid: 'form-config' },
       h(
         'div',
-        { class: 'campo' },
+        { class: 'lin-bloco campo-grupo' },
         h('label', { for: 'config-dias' }, 'Destacar cobranças com quantos dias de antecedência?'),
-        h('span', { class: 'ajuda', id: 'ajuda-config-dias' }, 'De 0 a 30 dias. 0 = só no dia.'),
         h('div', { class: 'campo-curto' }, campo, h('span', { 'aria-hidden': 'true' }, 'dias')),
         erro,
       ),
-      botao('Salvar aviso', 'secundario', () => undefined, { testid: 'btn-salvar-config', tipo: 'submit' }),
+      linhaAcao('Salvar aviso', () => undefined, { testid: 'btn-salvar-config', tipo: 'submit' }),
     ),
+    h('p', { class: 'g-rodape', id: 'ajuda-config-dias' }, 'De 0 a 30 dias. 0 = só no dia.'),
   );
 }
 
@@ -75,50 +75,49 @@ function secaoBackup(): HTMLElement {
   return h(
     'section',
     { 'aria-labelledby': 'titulo-backup' },
-    h('h2', { class: 'secao', id: 'titulo-backup' }, 'Backup e exportação'),
-    h('h3', { class: 'subsecao' }, 'Backup em arquivo'),
-    h('p', { class: 'nota' }, 'Seus dados ficam só neste celular. Guarde uma cópia em arquivo para não perder tudo ao trocar de aparelho.'),
+    h('h2', { class: 'g-titulo', id: 'titulo-backup' }, 'Backup e exportação'),
+    // Sem botão primário em Ajustes (UX-S3-07): exportar e importar são linhas de ação.
     h(
       'div',
-      { class: 'pilha' },
-      botao('Exportar backup', 'primario', () => {
+      { class: 'grupo' },
+      linhaAcao('Exportar backup', () => {
         const nome = exportarBackup();
         avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
         renderizar();
-      }, { testid: 'btn-exportar', larga: true }),
-      botao('Importar backup', 'secundario', seletor.abrir, { testid: 'btn-importar', larga: true }),
-      seletor.input,
+      }, { testid: 'btn-exportar' }),
+      linhaAcao('Importar backup', seletor.abrir, { testid: 'btn-importar' }),
     ),
+    seletor.input,
+    h('p', { class: 'g-rodape' }, 'Seus dados ficam só neste celular. Guarde uma cópia em arquivo para não perder tudo ao trocar de aparelho.'),
     secaoPlanilha(),
     secaoBackupAutomatico(),
   );
 }
 
-/** Plano (design 9.8): grátis com acesso à tela Pro, ou Pro com "Ver detalhes". */
+/** Plano: grátis com acesso à tela Pro, ou Pro com "Ver detalhes". */
 function secaoPlano(): HTMLElement {
   const pro = ehPro();
-  const cartao = pro
+  const grupo = pro
     ? h(
         'div',
-        { class: 'cartao plano-cartao', testid: 'plano-cartao' },
-        h('p', { class: 'plano-nome' }, 'Mensalão Pro'),
-        h('p', { class: 'nota' }, 'Compra ativa. Obrigado!'),
-        botao('Ver detalhes', 'texto', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
+        { class: 'grupo', testid: 'plano-cartao' },
+        h('div', { class: 'lin-bloco' }, h('p', { class: 't' }, h('span', {}, 'Mensalão Pro'), seloPro()), h('p', { class: 'd' }, 'Compra ativa. Obrigado!')),
+        linhaAcao('Ver detalhes', () => navegar('#/pro'), { testid: 'plano-btn-pro', seta: true }),
       )
     : h(
         'div',
-        { class: 'cartao plano-cartao', testid: 'plano-cartao' },
-        h('p', { class: 'plano-nome' }, 'Plano grátis'),
-        h('p', { class: 'nota' }, textoContador(contarAtivas(obterEstado()))),
-        botao('Conhecer o Pro', 'secundario', () => navegar('#/pro'), { testid: 'plano-btn-pro' }),
+        { class: 'grupo', testid: 'plano-cartao' },
+        h('div', { class: 'lin-bloco' }, h('p', { class: 't' }, 'Plano grátis'), h('p', { class: 'd' }, textoContador(contarAtivas(obterEstado())))),
+        linhaAcao('Conhecer o Pro', () => navegar('#/pro'), { testid: 'plano-btn-pro', seta: true }),
       );
-  return h('section', { 'aria-labelledby': 'titulo-plano' }, h('h2', { class: 'secao', id: 'titulo-plano' }, 'Plano', pro ? ' ' : null, pro ? seloPro() : null), cartao);
+  return h('section', { 'aria-labelledby': 'titulo-plano' }, h('h2', { class: 'g-titulo g-primeiro', id: 'titulo-plano' }, 'Plano'), grupo);
 }
 
 export function telaAjustes(): Tela {
   return {
     titulo: 'Ajustes',
     aba: 'ajustes',
+    agrupado: true,
     conteudo: [
       secaoPlano(),
       secaoAvisos(),
@@ -128,9 +127,13 @@ export function telaAjustes(): Tela {
       h(
         'section',
         { 'aria-labelledby': 'titulo-sobre' },
-        h('h2', { class: 'secao', id: 'titulo-sobre' }, 'Sobre'),
-        h('p', { class: 'nota' }, 'Mensalão não se conecta a bancos e não envia seus dados para a internet.'),
-        h('a', { class: 'link-privacidade', href: './privacidade.html', testid: 'link-privacidade' }, 'Política de privacidade'),
+        h('h2', { class: 'g-titulo', id: 'titulo-sobre' }, 'Sobre'),
+        h(
+          'div',
+          { class: 'grupo' },
+          h('a', { class: 'lin lin-acao', href: './privacidade.html', testid: 'link-privacidade' }, h('span', {}, 'Política de privacidade'), icone('seta', 'ic seta')),
+        ),
+        h('p', { class: 'g-rodape' }, 'Mensalão não se conecta a bancos e não envia seus dados para a internet.'),
       ),
     ],
   };

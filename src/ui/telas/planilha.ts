@@ -1,9 +1,9 @@
-// US-15 — Exportar planilha CSV (design 9.7). Gerado no aparelho, sem rede.
+// US-15 / US-22 — Exportar planilha CSV (design 4.7 e 4.8). Gerado no aparelho, sem rede.
 import { gerarCsv, nomeArquivoCsv } from '../../domain/csv';
 import { hoje, obterEstado } from '../../loja';
 import { ehPro } from '../../servicos/pro';
 import { renderizar } from '../app';
-import { botao, cartaoRecursoPro } from '../componentes';
+import { cartaoRecursoPro, linhaAcao } from '../componentes';
 import { h } from '../dom';
 import { avisar, navegar } from '../navegacao';
 
@@ -30,20 +30,26 @@ function exportarCsv(): void {
 }
 
 export function secaoPlanilha(): HTMLElement {
+  const titulo = h('h2', { class: 'g-titulo', id: 'titulo-planilha' }, 'Planilha');
   if (!ehPro()) {
-    return cartaoRecursoPro({
-      testid: 'lock-csv',
-      titulo: 'Exportar planilha CSV',
-      descricao: ['Abra suas assinaturas no Excel ou no Google Planilhas.'],
-      recurso: 'exportar planilha CSV',
-      aoConhecer: () => navegar('#/pro'),
-    });
+    return h(
+      'section',
+      { 'aria-labelledby': 'titulo-planilha' },
+      titulo,
+      cartaoRecursoPro({
+        testid: 'lock-csv',
+        titulo: 'Exportar planilha CSV',
+        descricao: ['Abra suas assinaturas no Excel ou no Google Planilhas.'],
+        recurso: 'exportar planilha CSV',
+        aoConhecer: () => navegar('#/pro'),
+      }),
+    );
   }
   return h(
     'section',
     { 'aria-labelledby': 'titulo-planilha' },
-    h('h3', { class: 'subsecao', id: 'titulo-planilha' }, 'Planilha'),
-    h('p', { class: 'nota' }, 'Arquivo CSV para Excel ou Google Planilhas, com todas as assinaturas (ativas, pausadas e canceladas).'),
-    botao('Exportar CSV', 'secundario', exportarCsv, { testid: 'btn-exportar-csv', larga: true }),
+    titulo,
+    h('div', { class: 'grupo' }, linhaAcao('Exportar CSV', exportarCsv, { testid: 'btn-exportar-csv' })),
+    h('p', { class: 'g-rodape' }, 'Arquivo CSV para Excel ou Google Planilhas, com todas as assinaturas (ativas, pausadas e canceladas).'),
   );
 }

@@ -165,7 +165,7 @@ export function telaFormulario(m: ModoFormulario): Tela {
 
   const form = h(
     'form',
-    { novalidate: true, testid: 'form-assinatura', onsubmit: salvar },
+    { class: 'bloco formulario', novalidate: true, testid: 'form-assinatura', onsubmit: salvar },
     campos.nome.raiz,
     campos.valor.raiz,
     campos.ciclo.raiz,
@@ -173,9 +173,9 @@ export function telaFormulario(m: ModoFormulario): Tela {
     campos.pagamento.raiz,
     banco.raiz,
     campos.categoria.raiz,
-    h('div', { class: 'campo' }, h('label', { class: 'check', for: 'campo-teste' }, teste, 'Está em teste grátis')),
+    h('div', { class: 'campo campo-check' }, h('label', { class: 'check', for: 'campo-teste' }, teste, 'Está em teste grátis')),
     blocoFim,
-    botao(existente ? 'Salvar alterações' : 'Salvar assinatura', 'primario', () => undefined, { testid: 'btn-salvar', larga: true, tipo: 'submit' }),
+    botao(existente ? 'Salvar alterações' : 'Salvar assinatura', 'primario', () => undefined, { testid: 'btn-salvar', larga: true, tipo: 'submit', classe: 'btn-salvar' }),
   );
 
   return {

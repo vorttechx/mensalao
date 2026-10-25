@@ -1,4 +1,4 @@
-// US-03 / US-05 / US-06 — Detalhe da assinatura (design.md 4.4).
+// US-03 / US-05 / US-06 / US-22 — Detalhe da assinatura em listas agrupadas (design 4.5).
 import { formatarDataBR } from '../../domain/datas';
 import { formatarBRL } from '../../domain/dinheiro';
 import { rotuloCiclo, rotuloPagamento, sufixoCiclo, type Assinatura } from '../../domain/tipos';
@@ -6,7 +6,7 @@ import { montarGuia } from '../../domain/guia';
 import { excluirAssinatura, marcarCancelada, pausar, reativar, substituirAssinatura } from '../../domain/operacoes';
 import { definirEstado, hoje, obterEstado } from '../../loja';
 import { renderizar } from '../app';
-import { botao, confirmar, estadoVazio, selo } from '../componentes';
+import { confirmar, dinheiro, estadoVazio, linhaAcao, monogramaEl, selo } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
 import { avisarLimite, podeAdicionar } from '../limite';
@@ -15,32 +15,32 @@ import type { Tela } from '../tela';
 import { hrefDetalhe, selosReajuste } from './comum';
 
 function linha(rotulo: string, valor: string | Node, testid?: string): HTMLElement {
-  return h('div', {}, h('dt', {}, rotulo), h('dd', { testid }, valor));
+  return h('div', { class: 'lin' }, h('dt', {}, rotulo), h('dd', { testid }, valor));
 }
 
 /** Histórico de preços em ordem cronológica (US-03.CA5). */
 function secaoHistorico(a: Assinatura): HTMLElement {
   const corpo =
     a.historico.length === 0
-      ? h('p', { class: 'nota', testid: 'price-history-vazio' }, 'Sem alterações de preço desde o cadastro.')
+      ? h('div', { class: 'grupo' }, h('p', { class: 'lin historico-vazio', testid: 'price-history-vazio' }, 'Sem alterações de preço desde o cadastro.'))
       : h(
           'ol',
-          { class: 'historico', testid: 'price-history' },
+          { class: 'grupo historico', testid: 'price-history' },
           a.historico.map((m) =>
             h(
               'li',
-              { testid: 'price-history-item' },
-              h('span', {}, formatarDataBR(m.data)),
+              { class: 'lin', testid: 'price-history-item' },
+              h('span', { class: 'data' }, formatarDataBR(m.data)),
               h('span', {}, `${formatarBRL(m.deCentavos)} → ${formatarBRL(m.paraCentavos)}`),
             ),
           ),
-          h('li', { class: 'atual' }, h('span', {}, 'Valor atual'), h('span', {}, formatarBRL(a.valorCentavos))),
+          h('li', { class: 'lin atual' }, h('span', {}, 'Valor atual'), h('span', {}, formatarBRL(a.valorCentavos))),
         );
   return h(
     'section',
     { 'aria-labelledby': 'titulo-historico' },
-    h('h2', { class: 'secao', id: 'titulo-historico' }, 'Histórico de preços'),
-    h('div', { class: 'cartao' }, corpo),
+    h('h2', { class: 'g-titulo', id: 'titulo-historico' }, 'Histórico de preços'),
+    corpo,
   );
 }
 
@@ -77,26 +77,30 @@ async function acaoExcluir(a: Assinatura): Promise<void> {
   substituir('#/');
 }
 
-/** Guia "Como cancelar" (US-06): botão disclosure + painel com os textos. */
-function guiaCancelamento(a: Assinatura): { botao: HTMLButtonElement; painel: HTMLElement } {
+/** Guia "Como cancelar" (US-06): linha disclosure + painel dentro do mesmo grupo. */
+function guiaCancelamento(a: Assinatura): { botao: HTMLButtonElement; painel: HTMLElement; marcar: HTMLElement | null } {
   const g = montarGuia(a);
   const painel = h(
     'div',
     { class: 'guia', id: 'guia', testid: 'cancel-guide', hidden: true, role: 'region', 'aria-label': 'Como cancelar' },
     g.servico ? h('p', { testid: 'guia-servico' }, g.servico) : null,
-    g.lojaApps ? h('p', { testid: 'guia-loja' }, g.lojaApps) : null,
+    g.lojaApps ? h('p', { class: 'nota', testid: 'guia-loja' }, g.lojaApps) : null,
     g.pix ? h('div', { testid: 'guia-pix' }, h('h3', {}, 'Pix Automático'), h('p', {}, g.pix)) : null,
-    h('p', { class: 'aviso-guia' }, icone('info'), h('span', {}, g.avisoFinal)),
-    a.status !== 'cancelada'
-      ? botao('Marcar como cancelada', 'secundario', () => acaoMarcarCancelada(a), { testid: 'btn-guia-marcar-cancelada', larga: true })
-      : null,
+    h('p', { class: 'nota com-icone' }, icone('info'), h('span', {}, g.avisoFinal)),
   );
-  const b = botao('Como cancelar', 'secundario', () => {
+  // "Marcar como cancelada" fecha o guia, para quem acabou de ler (só aparece com o guia aberto).
+  const marcar =
+    a.status !== 'cancelada' ? linhaAcao('Marcar como cancelada', () => acaoMarcarCancelada(a), { testid: 'btn-guia-marcar-cancelada' }) : null;
+  if (marcar) marcar.hidden = true;
+  const seta = icone('chevron-baixo', 'ic seta');
+  const b = linhaAcao('Como cancelar', () => {
     const abrir = painel.hidden;
     painel.hidden = !abrir;
+    if (marcar) marcar.hidden = !abrir;
     b.setAttribute('aria-expanded', String(abrir));
   }, { testid: 'btn-como-cancelar', attrs: { 'aria-expanded': 'false', 'aria-controls': 'guia' } });
-  return { botao: b, painel };
+  b.append(seta);
+  return { botao: b, painel, marcar };
 }
 
 function situacao(a: Assinatura): Node {
@@ -105,16 +109,14 @@ function situacao(a: Assinatura): Node {
   return document.createTextNode('Ativa');
 }
 
-/** Ações de mudança de situação e exclusão, conforme o status (design.md 4.4). */
+/** Ações de mudança de situação e, isolada no fim, a exclusão (design 4.5). */
 function acoesSituacao(a: Assinatura): HTMLElement[] {
-  const pilha = h('div', { class: 'pilha acoes-detalhe' });
-  if (a.status === 'ativa') pilha.append(botao('Pausar', 'secundario', () => acaoPausar(a), { testid: 'btn-pausar', larga: true }));
-  else pilha.append(botao('Reativar', 'primario', () => acaoReativar(a), { testid: 'btn-reativar', larga: true }));
-  if (a.status !== 'cancelada') {
-    pilha.append(botao('Marcar como cancelada', 'secundario', () => acaoMarcarCancelada(a), { testid: 'btn-cancelar', larga: true }));
-  }
-  const perigo = h('div', { class: 'zona-perigo' }, botao('Excluir assinatura', 'perigo', () => void acaoExcluir(a), { testid: 'btn-excluir', larga: true }));
-  return [pilha, perigo];
+  const grupo = h('div', { class: 'grupo grupo-espaco' });
+  if (a.status === 'ativa') grupo.append(linhaAcao('Pausar', () => acaoPausar(a), { testid: 'btn-pausar' }));
+  else grupo.append(linhaAcao('Reativar', () => acaoReativar(a), { testid: 'btn-reativar', forte: true }));
+  if (a.status !== 'cancelada') grupo.append(linhaAcao('Marcar como cancelada', () => acaoMarcarCancelada(a), { testid: 'btn-cancelar' }));
+  const perigo = h('div', { class: 'grupo zona-perigo' }, linhaAcao('Excluir assinatura', () => void acaoExcluir(a), { testid: 'btn-excluir', perigo: true }));
+  return [grupo, perigo];
 }
 
 export function telaDetalhe(id: string): Tela {
@@ -132,32 +134,39 @@ export function telaDetalhe(id: string): Tela {
   return {
     titulo: a.nome,
     voltar: () => voltar('#/'),
+    agrupado: true,
     conteudo: [
-      h('p', { class: 'valor-detalhe', testid: 'detalhe-valor' }, formatarBRL(a.valorCentavos), ' ', h('small', {}, sufixoCiclo(a.ciclo))),
-      selos.length ? h('div', { class: 'selos' }, selos) : null,
       h(
         'div',
-        { class: 'cartao cartao-dados' },
+        { class: 'cabeca-detalhe' },
+        monogramaEl(a.nome, a.catalogoId, true),
         h(
-          'dl',
-          { class: 'dados', testid: 'detalhe-dados' },
-          linha('Próxima cobrança', formatarDataBR(a.proxima), 'detalhe-proxima'),
-          linha('Ciclo', rotuloCiclo(a.ciclo)),
-          linha('Pagamento', rotuloPagamento(a.pagamento)),
-          a.banco ? linha('Banco ou cartão', a.banco) : null,
-          linha('Categoria', a.categoria),
-          a.emTeste && a.fimTeste ? linha('Fim do teste grátis', formatarDataBR(a.fimTeste)) : null,
-          linha('Situação', situacao(a), 'detalhe-situacao'),
-          a.status === 'cancelada' && a.canceladaEm ? linha('Cancelada em', formatarDataBR(a.canceladaEm), 'detalhe-cancelada-em') : null,
+          'div',
+          {},
+          dinheiro(a.valorCentavos, 'grande', { sufixo: sufixoCiclo(a.ciclo), testid: 'detalhe-valor', tag: 'p' }),
+          selos.length ? h('div', { class: 'marcas' }, selos) : null,
         ),
       ),
       h(
-        'div',
-        { class: 'duas acoes-detalhe' },
-        botao('Editar', 'secundario', () => navegar(`${hrefDetalhe(a)}/editar`), { testid: 'btn-editar' }),
-        guia.botao,
+        'dl',
+        { class: 'grupo dados', testid: 'detalhe-dados' },
+        linha('Próxima cobrança', formatarDataBR(a.proxima), 'detalhe-proxima'),
+        linha('Ciclo', rotuloCiclo(a.ciclo)),
+        linha('Pagamento', rotuloPagamento(a.pagamento)),
+        a.banco ? linha('Banco ou cartão', a.banco) : null,
+        linha('Categoria', a.categoria),
+        a.emTeste && a.fimTeste ? linha('Fim do teste grátis', formatarDataBR(a.fimTeste)) : null,
+        linha('Situação', situacao(a), 'detalhe-situacao'),
+        a.status === 'cancelada' && a.canceladaEm ? linha('Cancelada em', formatarDataBR(a.canceladaEm), 'detalhe-cancelada-em') : null,
       ),
-      guia.painel,
+      h(
+        'div',
+        { class: 'grupo grupo-espaco' },
+        linhaAcao('Editar', () => navegar(`${hrefDetalhe(a)}/editar`), { testid: 'btn-editar', seta: true }),
+        guia.botao,
+        guia.painel,
+        guia.marcar,
+      ),
       secaoHistorico(a),
       ...acoesSituacao(a),
     ],

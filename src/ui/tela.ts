@@ -10,6 +10,8 @@ export interface Tela {
   voltar?: () => void;
   /** Barra de topo com a marca "Mensalão"; o h1 vira cabeçalho de seção dentro do conteúdo (Início). */
   marca?: boolean;
+  /** Classe extra do cabeçalho com o h1 (ex.: título grande da recuperação). */
+  classeTitulo?: string;
   /** Subtítulo logo abaixo do h1. */
   subtitulo?: string;
   /** Mostra o "+" (Adicionar assinatura): na barra de topo (Início) ou ao lado do título grande (Assinaturas). */

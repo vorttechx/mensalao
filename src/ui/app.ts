@@ -100,7 +100,7 @@ export function renderizar(): void {
       ),
       btnMais,
     );
-    cabecalho = h('div', { class: 'secao-titulo' }, h1, tela.subtitulo ? h('p', { class: 'sub', testid: 'subtitulo' }, tela.subtitulo) : null);
+    cabecalho = h('div', { class: `secao-titulo${tela.classeTitulo ? ` ${tela.classeTitulo}` : ''}` }, h1, tela.subtitulo ? h('p', { class: 'sub', testid: 'subtitulo' }, tela.subtitulo) : null);
   } else if (tela.voltar) {
     topo = h(
       'header',

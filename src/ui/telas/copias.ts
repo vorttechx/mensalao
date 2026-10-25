@@ -1,4 +1,4 @@
-// US-14 — Backup automático: seção de Ajustes (design 9.5), lembrete de exportar no Início e erro sem espaço.
+// US-14 / US-22 — Backup automático: seção de Ajustes (design 4.8), lembrete de exportar no Início e erro sem espaço.
 import { formatarDataHora, type Copia } from '../../domain/copias';
 import { alterarBackupAutomatico, conferirCopia, diasSemExportar, lembrarDepois, listarCopias, restaurarCopia } from '../../servicos/copias';
 import { obterPrefs } from '../../servicos/preferencias';
@@ -44,39 +44,42 @@ function itemCopia(c: Copia, comRestaurar: boolean): HTMLElement {
   const quando = formatarDataHora(c.criadaEm);
   return h(
     'li',
-    { class: 'copia', testid: 'copia-item' },
-    h('div', { class: 'copia-info' }, h('b', {}, quando), h('span', {}, plural(c.quantidade))),
+    { class: 'lin copia', testid: 'copia-item' },
+    h('div', { class: 'copia-info' }, h('span', {}, quando), h('span', { class: 'nota' }, plural(c.quantidade), c.inutilizavel ? ' · Não pode ser restaurada.' : null)),
     c.inutilizavel
-      ? h('div', { class: 'copia-danificada', testid: 'copia-inutilizavel' }, selo('danificada', 'Danificada', 'badge-danificada'), h('span', { class: 'nota' }, 'Não pode ser restaurada.'))
+      ? h('div', { class: 'copia-danificada', testid: 'copia-inutilizavel' }, selo('danificada', 'Danificada', 'badge-danificada'))
       : comRestaurar
-        ? botao('Restaurar', 'secundario', () => void acaoRestaurar(c.id), { testid: 'copia-restaurar', attrs: { 'aria-label': `Restaurar cópia de ${quando}` } })
+        ? botao('Restaurar', 'texto', () => void acaoRestaurar(c.id), { testid: 'copia-restaurar', attrs: { 'aria-label': `Restaurar cópia de ${quando}` } })
         : null,
   );
 }
 
 function listaCopias(copias: Copia[], comRestaurar: boolean): HTMLElement {
-  return h('ul', { class: 'cartao-lista lista-copias', testid: 'copias-lista', 'aria-label': 'Cópias guardadas' }, copias.map((c) => itemCopia(c, comRestaurar)));
+  return h('ul', { class: 'grupo lista-copias', testid: 'copias-lista', 'aria-label': 'Cópias guardadas' }, copias.map((c) => itemCopia(c, comRestaurar)));
 }
 
-/** Subseção "Backup automático" dentro de "Backup e exportação". */
+/** Seção "Backup automático" dos Ajustes (design 4.8): interruptor, aviso como rodapé e cópias em grupo. */
 export function secaoBackupAutomatico(): HTMLElement {
   const copias = listarCopias();
-  const titulo = h('h3', { class: 'subsecao', id: 'titulo-backup-auto' }, 'Backup automático');
+  const titulo = h('h2', { class: 'g-titulo', id: 'titulo-backup-auto' }, 'Backup automático');
   if (!ehPro()) {
     return h(
       'section',
       { 'aria-labelledby': 'titulo-backup-auto' },
+      titulo,
       cartaoRecursoPro({
         testid: 'lock-backup',
         titulo: 'Backup automático',
+        tituloOculto: true,
         descricao: ['O app guarda sozinho até 3 cópias neste aparelho e lembra você de exportar um arquivo. Exportar e importar backup em arquivo continuam grátis, logo acima.'],
         recurso: 'backup automático',
         extra:
           copias.length > 0
-            ? h('p', { class: 'cartao-pro-desc' }, `Suas ${copias.length} ${copias.length === 1 ? 'cópia continua guardada' : 'cópias continuam guardadas'} neste aparelho. Restaurar uma cópia faz parte do Pro.`)
+            ? h('p', { class: 'd' }, `Suas ${copias.length} ${copias.length === 1 ? 'cópia continua guardada' : 'cópias continuam guardadas'} neste aparelho. Restaurar uma cópia faz parte do Pro.`)
             : null,
         aoConhecer: () => navegar('#/pro'),
       }),
+      copias.length > 0 ? h('h3', { class: 'g-titulo' }, 'Cópias guardadas') : null,
       copias.length > 0 ? listaCopias(copias, false) : null,
     );
   }
@@ -86,7 +89,7 @@ export function secaoBackupAutomatico(): HTMLElement {
     titulo,
     h(
       'div',
-      { class: 'cartao cartao-switch' },
+      { class: 'grupo' },
       interruptor({
         rotulo: 'Fazer cópias automáticas',
         testid: 'backup-ativar',
@@ -98,21 +101,22 @@ export function secaoBackupAutomatico(): HTMLElement {
         },
       }),
     ),
+    // Deixa de ser caixa âmbar: rodapé com ícone ferrugem, mesmo texto (design 4.8).
     h(
-      'div',
-      { class: 'aviso-caixa', testid: 'backup-aviso-limite' },
-      icone('info', 'ic24'),
+      'p',
+      { class: 'g-rodape com-icone alerta', testid: 'backup-aviso-limite' },
+      icone('info'),
       h(
-        'p',
+        'span',
         {},
         'As cópias automáticas ficam neste aparelho. Se você limpar os dados do navegador, desinstalar o app ou perder o celular, elas se vão. Exporte um arquivo e guarde onde quiser.',
       ),
     ),
-    h('p', { class: 'rotulo-lista' }, 'Cópias guardadas'),
+    h('h3', { class: 'g-titulo' }, 'Cópias guardadas'),
     copias.length > 0
       ? listaCopias(copias, true)
-      : h('p', { class: 'nota', testid: 'copias-vazia' }, 'Nenhuma cópia ainda. A primeira é criada quando você tiver assinaturas e algo mudar.'),
-    h('p', { class: 'nota' }, 'Até 3 cópias, no máximo uma por dia, só quando algo mudou.'),
+      : h('div', { class: 'grupo' }, h('p', { class: 'lin copias-vazia', testid: 'copias-vazia' }, 'Nenhuma cópia ainda. A primeira é criada quando você tiver assinaturas e algo mudar.')),
+    h('p', { class: 'g-rodape' }, 'Até 3 cópias, no máximo uma por dia, só quando algo mudou.'),
   );
 }
 

@@ -5,6 +5,7 @@ import { renderizar } from '../app';
 import { importarArquivo, seletorDeArquivo } from '../backup';
 import { botao, confirmar } from '../componentes';
 import { h } from '../dom';
+import { icone } from '../icones';
 import { avisar, substituir } from '../navegacao';
 import type { Tela } from '../tela';
 
@@ -36,15 +37,18 @@ export function telaRecuperacao(): Tela {
   return {
     titulo: 'Não conseguimos ler seus dados salvos',
     marca: true,
+    classeTitulo: 'titulo-recuperacao',
+    antesDoTitulo: [h('div', { class: 'bloco icone-recuperacao' }, icone('alerta', 'ic24'))],
     conteudo: [
+      // Erro dito com calma, sem caixa rosa (design 4.11).
       h(
         'div',
-        { class: 'banner banner-erro', role: 'alert', testid: 'corrupt-warning' },
-        h('div', { class: 'texto' }, h('p', {}, 'Os dados deste aparelho parecem danificados. Nada foi apagado. Você pode restaurar um backup ou começar do zero.')),
+        { class: 'bloco recuperacao-texto', role: 'alert', testid: 'corrupt-warning' },
+        h('p', {}, 'Os dados deste aparelho parecem danificados. Nada foi apagado. Você pode restaurar um backup ou começar do zero.'),
       ),
       h(
         'div',
-        { class: 'pilha' },
+        { class: 'bloco pilha recuperacao-acoes' },
         botao('Importar backup', 'primario', seletor.abrir, { testid: 'btn-importar', larga: true }),
         seletor.input,
         botao('Começar do zero', 'perigo', () => void comecarDoZero(), { testid: 'btn-comecar-zero', larga: true }),
