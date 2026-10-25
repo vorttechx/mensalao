@@ -30,4 +30,4 @@ Como os dados ficam só com você, você pode apagá-los quando quiser excluindo
 
 ## Contato
 
-Dúvidas sobre esta política: pelo e-mail de contato informado na ficha do app na Google Play. (Renato: definir o e-mail de contato.)
+Dúvidas sobre esta política ou sobre seus dados: contato@mensalao.app.

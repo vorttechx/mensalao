@@ -148,7 +148,7 @@ Os 82 unitários e os 64 E2E passam sem alteração (os E2E agora rodam contra o
 - **Fingerprint SHA-256 (R-03):** marcador `SHA256_DA_CHAVE_DE_ASSINATURA_A_PREENCHER` em `twa/twa-manifest.json` e `public/.well-known/assetlinks.json`.
 - **Id do pacote (R-10):** `br.com.mensalao.app` usado nos dois arquivos, confirmado pelo Renato em 25/10/2026.
 - **Ficha publicada:** `URL_FICHA_PLAY` em `src/ui/telas/pro.ts` está vazio; com ele preenchido aparece "Abrir na Google Play".
-- **E-mail de contato** da política de privacidade; revisão dos textos de `docs/loja/`.
+- **E-mail de contato:** `contato@mensalao.app` (definido pelo Renato em 25/10/2026), em `privacidade.html` e na ficha. Falta a revisão dos textos de `docs/loja/` pelo Renato.
 - Gerar o `.aab` (Bubblewrap, JDK e Android SDK) e o gráfico de destaque 1024×500 não foram feitos aqui.
 
 ## Limitações conhecidas
