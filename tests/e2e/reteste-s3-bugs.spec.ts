@@ -156,7 +156,7 @@ test.describe('Reteste sprint 3 — BUG-01 a BUG-06', () => {
   });
 });
 
-// BUG-07 (aberto no reteste): a 200%, "R$" e o número se separam na marca de reajuste e no lembrete do Início.
+// BUG-07 (aberto no reteste 1, fechado no reteste 2 — `59bc880`): a 200%, "R$" e o número se separam na marca de reajuste e no lembrete do Início.
 test.describe('Reteste sprint 3 — design 2.5 / 6: valores, "R$" e % não quebram a 200%', () => {
   test('BUG-07 / design 2.5 + 6: nenhum valor "R$ n" nem percentual quebra de linha em nenhuma tela a 200%', async ({ page }) => {
     const reaj = [...dados, sub({ id: 'dz', nome: 'Deezer com nome comprido de verdade', valorCentavos: 4500, proxima: '2026-10-21', diaRef: 21, historico: [{ data: '2026-09-01', deCentavos: 4000, paraCentavos: 4500 }] })];
