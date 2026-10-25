@@ -131,7 +131,14 @@ export function telaAjustes(): Tela {
           { class: 'grupo' },
           h('a', { class: 'lin lin-acao', href: './privacidade.html', testid: 'link-privacidade' }, h('span', {}, 'Política de privacidade'), icone('seta', 'ic seta')),
         ),
-        h('p', { class: 'g-rodape' }, 'Mensalão não se conecta a bancos e não envia seus dados para a internet.'),
+        // US-26.CA10 / design 17: a verdade nos dois planos.
+        h(
+          'p',
+          { class: 'g-rodape', testid: 'sobre-anuncios' },
+          ehPro()
+            ? 'Mensalão não se conecta a bancos e suas assinaturas nunca saem deste celular. Sem anúncios.'
+            : 'Mensalão não se conecta a bancos e suas assinaturas nunca saem deste celular. A versão grátis mostra anúncios do Google.',
+        ),
       ),
     ],
   };

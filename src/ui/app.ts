@@ -151,13 +151,13 @@ export function renderizar(): void {
       })
     : null;
 
-  // Aviso único de revogação do Pro (US-12.CA6), neutro, no topo do conteúdo.
+  // Aviso único de revogação do Pro (US-12.CA6, US-26.CA4: os anúncios voltam), neutro, no topo do conteúdo.
   const elRevogacao =
     haAvisoRevogacao() && !emRecuperacao()
       ? criarBanner(
           {
             tipo: 'info',
-            linhas: ['Seu Mensalão Pro não foi encontrado na Google Play. Você voltou ao plano grátis; seus dados continuam todos aqui.'],
+            linhas: ['Seu Mensalão Pro não foi encontrado na Google Play. Você voltou ao plano grátis e os anúncios voltam. Seus dados continuam todos aqui.'],
             testid: 'pro-revogado-aviso',
           },
           () => {
