@@ -12,8 +12,9 @@ function arquivosPublicos(dir: string, raiz = dir): string[] {
 }
 
 /**
- * Gera o service worker (sw.js) no build com a lista de todos os arquivos do app,
- * para funcionar offline após o primeiro acesso (US-08). Sem dependências externas.
+ * Gera o service worker (sw.js) no build com a lista de todos os arquivos do app, para o app aberto no
+ * navegador (build de teste e desenvolvimento) funcionar offline (US-08). No app Android ele não é registrado
+ * (main.ts): os arquivos já estão no pacote. O sw.js do site público é outro (site/sw.js, de autodestruição).
  */
 function serviceWorker(): Plugin {
   return {
@@ -21,9 +22,8 @@ function serviceWorker(): Plugin {
     apply: 'build',
     // writeBundle: o bundle já está completo (inclui as páginas HTML e sem os chunks vazios removidos pelo Vite).
     writeBundle(opcoes, bundle) {
-      // .well-known/assetlinks.json e CNAME são para a TWA e o Pages, não para o cache offline.
       const arquivos = ['./', 'index.html', ...Object.keys(bundle), ...arquivosPublicos('public')]
-        .filter((f) => f !== 'sw.js' && f !== 'CNAME' && !f.startsWith('.well-known/'))
+        .filter((f) => f !== 'sw.js')
         .filter((f, i, todos) => todos.indexOf(f) === i);
       const versao = createHash('sha256').update(arquivos.join('|')).digest('hex').slice(0, 12);
       const codigo = `// Gerado no build (vite.config.ts). Cache do app para uso offline.
@@ -91,10 +91,11 @@ function cname(): Plugin {
   };
 }
 
-// base relativa: o build funciona em qualquer subdiretório (ex.: /apps/mensalao/).
+// base relativa: o build funciona dentro do app (Capacitor serve dist/ a partir da raiz) e em qualquer subdiretório.
 // Build de teste (US-12.CA14 a CA16): `vite build --mode teste` (VITE_MODO=teste em .env.teste) troca o
 // alias "@ambiente" para o ambiente de teste, com o provedor falso, e grava em dist-teste/. O build de
-// produção usa ambiente.producao.ts, que não importa o provedor falso: ele não chega ao bundle.
+// produção (dist/, que o Capacitor copia para o app Android) usa ambiente.android.ts, que não importa o
+// provedor falso: ele não chega ao bundle. O dist/ não é publicado na web (US-31).
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
   const teste = (process.env.VITE_MODO ?? env.VITE_MODO) === 'teste';
@@ -102,7 +103,7 @@ export default defineConfig(({ mode }) => {
     base: './',
     resolve: {
       alias: {
-        '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'producao'}.ts`),
+        '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'android'}.ts`),
       },
     },
     build: {

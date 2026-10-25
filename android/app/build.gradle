@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+
+// Mensalão (US-24, US-30). Variáveis de build (nunca no repositório):
+//   MENSALAO_VERSION_CODE / MENSALAO_VERSION_NAME   versão do .aab (padrão 1 / 1.0.0)
+//   MENSALAO_ADMOB_APP_ID                           ID REAL do app no AdMob (obrigatório no release)
+//   MENSALAO_KEYSTORE, MENSALAO_KEYSTORE_SENHA,
+//   MENSALAO_KEY_ALIAS, MENSALAO_KEY_SENHA          chave de upload da Play (release)
+// O debug usa sempre o ID de TESTE oficial do Google e a chave de debug do Android.
+
+def ADMOB_APP_ID_TESTE = 'ca-app-pub-3940256099942544~3347511713'
+def env = { String nome -> (System.getenv(nome) ?: project.findProperty(nome))?.toString()?.trim() }
+def admobAppIdReal = env('MENSALAO_ADMOB_APP_ID')
+def pediuRelease = gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') }
+
+if (pediuRelease) {
+    // US-30.CA2: o .aab/.apk de produção não sai sem o ID real nem com o ID de teste.
+    if (!admobAppIdReal || !(admobAppIdReal ==~ /ca-app-pub-\d{16}~\d{10}/)) {
+        throw new GradleException('Release sem MENSALAO_ADMOB_APP_ID válido (ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY). Veja docs/loja/guia-publicacao.md.')
+    }
+    if (admobAppIdReal.contains('3940256099942544')) {
+        throw new GradleException('Release com o ID de TESTE do AdMob. Use o ID real do app (MENSALAO_ADMOB_APP_ID).')
+    }
+}
+
+android {
+    namespace = "br.com.mensalao.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "br.com.mensalao.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode((env('MENSALAO_VERSION_CODE') ?: '1') as Integer)
+        versionName(env('MENSALAO_VERSION_NAME') ?: '1.0.0')
+        manifestPlaceholders = [admobAppId: ADMOB_APP_ID_TESTE]
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (env('MENSALAO_KEYSTORE')) {
+                storeFile file(env('MENSALAO_KEYSTORE'))
+                storePassword env('MENSALAO_KEYSTORE_SENHA')
+                keyAlias env('MENSALAO_KEY_ALIAS')
+                keyPassword env('MENSALAO_KEY_SENHA')
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            manifestPlaceholders = [admobAppId: ADMOB_APP_ID_TESTE]
+        }
+        release {
+            manifestPlaceholders = [admobAppId: admobAppIdReal ?: 'definir-MENSALAO_ADMOB_APP_ID']
+            if (env('MENSALAO_KEYSTORE')) signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'

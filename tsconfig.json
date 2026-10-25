@@ -20,7 +20,7 @@
     ],
     "paths": {
       "@ambiente": [
-        "./src/plataforma/ambiente.producao.ts"
+        "./src/plataforma/ambiente.android.ts"
       ]
     }
   },

@@ -1,0 +1,19 @@
+{
+  "appId": "br.com.mensalao.app",
+  "appName": "Mensalão",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": false
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_mensalao",
+      "iconColor": "#1D5C3F"
+    }
+  }
+}

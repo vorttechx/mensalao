@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Abertura antes do Android 12: papel e o ícone (fundo verde + marcas) centralizado, 96 dp. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/papel" />
+    <item android:width="96dp" android:height="96dp" android:gravity="center">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/ic_launcher_background" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+    <item android:width="96dp" android:height="96dp" android:gravity="center" android:drawable="@drawable/ic_marcas" />
+</layer-list>

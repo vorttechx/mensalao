@@ -4,7 +4,7 @@ import { alterarDiasAviso } from '../../domain/operacoes';
 import { lerDiasAviso } from '../../domain/validacao';
 import { definirEstado, obterEstado } from '../../loja';
 import { renderizar } from '../app';
-import { exportarBackup, importarArquivo, seletorDeArquivo } from '../backup';
+import { exportarBackupComAviso, importarArquivo, seletorDeArquivo } from '../backup';
 import { linhaAcao } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
@@ -81,11 +81,7 @@ function secaoBackup(): HTMLElement {
     h(
       'div',
       { class: 'grupo' },
-      linhaAcao('Exportar backup', () => {
-        const nome = exportarBackup();
-        avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
-        renderizar();
-      }, { testid: 'btn-exportar' }),
+      linhaAcao('Exportar backup', () => void exportarBackupComAviso(renderizar), { testid: 'btn-exportar' }),
       linhaAcao('Importar backup', seletor.abrir, { testid: 'btn-importar' }),
     ),
     seletor.input,

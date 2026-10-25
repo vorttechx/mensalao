@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Papel do tema (design 2.3 e 15.6): abertura e fundo antes da WebView pintar. -->
+    <color name="papel">#FFFFFF</color>
+    <color name="marca">#1D5C3F</color>
+    <color name="colorPrimary">#1D5C3F</color>
+    <color name="colorPrimaryDark">#1D5C3F</color>
+    <color name="colorAccent">#1D5C3F</color>
+</resources>

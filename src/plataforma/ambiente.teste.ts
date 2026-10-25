@@ -9,7 +9,8 @@ import {
   notificacoesEnviadas,
   type ControleNotificacao,
 } from './notificador-falso';
-import type { Notificador, ProvedorCompra } from './provedor';
+import { SalvadorNavegador } from './arquivos';
+import type { Notificador, ProvedorCompra, SalvadorArquivos } from './provedor';
 
 export const MODO_BUILD = 'teste' as const;
 
@@ -19,6 +20,24 @@ export function criarProvedor(): ProvedorCompra {
 
 export function criarNotificador(): Notificador {
   return new NotificadorFalso();
+}
+
+/** No build de teste os arquivos saem pelo download do navegador (o Playwright espera o evento de download). */
+export function criarSalvadorArquivos(): SalvadorArquivos {
+  return new SalvadorNavegador();
+}
+
+/** Sem integração nativa no navegador do teste. */
+export function instalarPlataforma(): void {
+  // vazio de propósito
+}
+
+export function aplicarBarrasSistema(_escuro: boolean | null): void {
+  // sem barras nativas no navegador
+}
+
+export function usarServiceWorker(): boolean {
+  return true;
 }
 
 /** Expõe os controles do provedor falso no console/Playwright (só existe no build de teste). */

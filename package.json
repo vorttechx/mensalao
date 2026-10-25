@@ -12,13 +12,27 @@
     "verificar:bundle": "npm run build && npm run build:teste && node scripts/verificar-provedor-falso.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "capturas": "node scripts/capturas.mjs"
+    "capturas": "node scripts/capturas.mjs",
+    "android:sync": "node scripts/android.mjs sync",
+    "android:apk": "node scripts/android.mjs apk",
+    "android:aab": "node scripts/android.mjs aab"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.3",
     "@playwright/test": "1.56.1",
-    "@types/node": "^22.20.5",
-    "typescript": "~5.8",
-    "vite": "^6.4.4",
-    "vitest": "^3.2.7"
+    "@types/node": "22.20.5",
+    "typescript": "5.8.3",
+    "vite": "6.4.4",
+    "vitest": "5.0.4"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/filesystem": "8.1.4",
+    "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/share": "8.0.3",
+    "@capgo/native-purchases": "8.9.2"
   }
 }
