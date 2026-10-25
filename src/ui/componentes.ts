@@ -55,7 +55,25 @@ const COR_SELO: Record<TipoSelo, 'alerta' | 'teste' | 'neutro'> = {
 
 /** Anotação de extrato: ícone de 14 px + texto 13/600 na cor do estado, sem fundo (antigo "selo"). */
 export function selo(tipo: TipoSelo, texto: string, testid: string): HTMLElement {
-  return h('span', { class: `estado estado-${COR_SELO[tipo]}`, testid }, icone(ICONE_SELO[tipo]), texto);
+  return h('span', { class: `estado estado-${COR_SELO[tipo]}`, testid }, icone(ICONE_SELO[tipo]), textoSemQuebrarValores(texto));
+}
+
+/**
+ * BUG-07 (design 2.5 / 6): texto corrido em que cada valor "R$ n" e cada percentual fica num <span> que não quebra
+ * linha, para "R$" e o número nunca se separarem com texto grande. O textContent continua igual ao texto recebido.
+ */
+export function textoSemQuebrarValores(texto: string): HTMLElement {
+  const el = h('span', {});
+  const re = /R\$\s?[\d.]+,\d{2}|\d+(?:,\d+)?\s?%/g;
+  let ini = 0;
+  for (const m of texto.matchAll(re)) {
+    const i = m.index ?? 0;
+    if (i > ini) el.append(texto.slice(ini, i));
+    el.append(h('span', { class: 'sem-quebra' }, m[0]));
+    ini = i + m[0].length;
+  }
+  if (ini < texto.length) el.append(texto.slice(ini));
+  return el;
 }
 
 /* ---------- Dinheiro (design 2.5) ---------- */

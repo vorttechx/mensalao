@@ -4,7 +4,7 @@ import { notificador, lembretesAtuais, processarLembretes } from '../../servicos
 import { alterarPrefs, obterPrefs } from '../../servicos/preferencias';
 import { ehPro } from '../../servicos/pro';
 import { renderizar } from '../app';
-import { cartaoRecursoPro, dialogoInfo, interruptor, linhaAcao } from '../componentes';
+import { cartaoRecursoPro, dialogoInfo, interruptor, linhaAcao, textoSemQuebrarValores } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
 import { avisar, navegar } from '../navegacao';
@@ -23,7 +23,7 @@ function linhaLembrete(i: ReturnType<typeof lembretesAtuais>[number]): HTMLEleme
       'a',
       { href: `#/assinatura/${encodeURIComponent(i.assinaturaId)}`, testid: 'lembrete-item', class: teste ? 'fim-teste' : null },
       icone(teste ? 'ampulheta' : 'sino'),
-      h('span', {}, i.texto),
+      textoSemQuebrarValores(i.texto),
       icone('seta', 'ic seta'),
     ),
   );
