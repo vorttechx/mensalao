@@ -618,6 +618,10 @@ p.nota.bloco { padding-top: var(--espaco-3); }
 .campo-linha { display: flex; justify-content: space-between; align-items: center; gap: var(--espaco-3); }
 .copia-info { display: grid; min-width: 0; }
 .copia { padding-top: var(--espaco-2); padding-bottom: var(--espaco-2); }
+/* BUG-05: com texto grande, "Restaurar" (ou a marca de danificada) desce para a linha de baixo, à direita, em vez de ser cortado. */
+.copia { flex-wrap: wrap; row-gap: 0; }
+.copia > .copia-info { flex: 1 1 auto; }
+.copia > :last-child:not(.copia-info) { margin-left: auto; }
 .copias-vazia { color: var(--cor-texto-2); }
 fieldset.temas { border: 0; min-width: 0; }
 /* Aparência (3.10a): rádios em lista, sem amostras; a linha inteira é o label (min 48 px). */
