@@ -12,7 +12,7 @@ export const CHAVE_CHAMADAS_PROVEDOR = 'mensalao:teste:provedor-chamadas';
 export interface ControleProvedorFalso {
   /** Provedor disponível (como dentro da TWA). Padrão: true. Use false para simular o navegador comum. */
   disponivel: boolean;
-  /** Preço devolvido por detalhes(); null = loja não devolveu o produto. Padrão: "R$ 16,90". */
+  /** Preço devolvido por detalhes(); null = loja não devolveu o produto. Padrão: "R$ 19,99". */
   preco: string | null;
   /** 'erro' faz detalhes() falhar (US-11.CA3). Padrão: 'ok'. */
   detalhes: 'ok' | 'erro';
@@ -30,7 +30,7 @@ export interface ControleProvedorFalso {
 
 export const CONTROLE_PADRAO: ControleProvedorFalso = {
   disponivel: true,
-  preco: 'R$ 16,90',
+  preco: 'R$ 19,99',
   detalhes: 'ok',
   compra: 'ok',
   compras: [],

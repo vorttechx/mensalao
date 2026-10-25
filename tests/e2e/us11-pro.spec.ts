@@ -26,7 +26,7 @@ test.describe('US-11 Tela Mensalão Pro e compra única', () => {
 
   test('US-11.CA2: o botão mostra o preço devolvido pelo provedor (padrão e outro valor)', async ({ page }) => {
     await abrirS2(page, { hash: '#/pro' });
-    await expect(page.getByTestId('pro-btn-comprar')).toHaveText('Comprar Pro por R$ 16,90');
+    await expect(page.getByTestId('pro-btn-comprar')).toHaveText('Comprar Pro por R$ 19,99');
     await abrirS2(page, { hash: '#/pro', provedor: { preco: 'R$ 19,90' } });
     await expect(page.getByTestId('pro-btn-comprar')).toHaveText('Comprar Pro por R$ 19,90');
   });
@@ -35,7 +35,7 @@ test.describe('US-11 Tela Mensalão Pro e compra única', () => {
     await abrirS2(page, { hash: '#/pro', provedor: { atrasoMs: 1500 } });
     await expect(page.getByTestId('pro-carregando')).toContainText('Carregando preço…');
     await expect(page.getByTestId('pro-btn-comprar')).toBeDisabled();
-    await expect(page.getByTestId('pro-btn-comprar')).toHaveText('Comprar Pro por R$ 16,90', { timeout: 6000 });
+    await expect(page.getByTestId('pro-btn-comprar')).toHaveText('Comprar Pro por R$ 19,99', { timeout: 6000 });
   });
 
   test('US-11.CA3: falha ao consultar o preço mostra erro e "Tentar de novo" recupera', async ({ page }) => {
@@ -45,7 +45,7 @@ test.describe('US-11 Tela Mensalão Pro e compra única', () => {
     await configurarProvedor(page, { detalhes: 'ok' });
     await page.getByTestId('pro-btn-recarregar').click();
     await expect(page.getByTestId('pro-btn-comprar')).toBeEnabled();
-    await expect(page.getByTestId('pro-btn-comprar')).toContainText('R$ 16,90');
+    await expect(page.getByTestId('pro-btn-comprar')).toContainText('R$ 19,99');
   });
 
   test('US-11.CA3: loja sem o produto (preço null) também mostra o erro, nunca tela em branco', async ({ page }) => {
