@@ -48,3 +48,60 @@ dl.resumo dd { margin: 2px 0 0; color: var(--cor-texto-2); }
 ul.lista { margin: 0 0 12px; padding-left: 20px; }
 ul.lista li + li { margin-top: 4px; }
 .contato a { display: inline-flex; align-items: center; min-height: var(--toque-min); font-weight: 600; }
+
+/* =====================================================================
+   Site público mensalao.app (design 15.8 e 14.7, US-31): apresentação e 404
+   ===================================================================== */
+.site-topo { height: var(--altura-barra-topo); display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.01em; }
+.site-topo svg { width: 28px; height: 28px; border-radius: 7px; flex: none; }
+.site-lead { color: var(--cor-texto-2); margin-top: 10px; }
+.site-acao { padding-top: 8px; display: grid; gap: 10px; }
+.site-acao .nota { margin: 0; }
+.site-play {
+  min-height: var(--altura-botao); display: flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: var(--raio-campo); box-shadow: inset 0 0 0 1px var(--cor-borda);
+  color: var(--cor-texto); font-weight: 600; text-decoration: none; padding: 0 16px; text-align: center;
+}
+.site-play svg { width: 16px; height: 16px; flex: none; color: var(--cor-texto-2); }
+.site-embreve {
+  min-height: var(--altura-botao); display: grid; place-items: center; margin: 0; padding: 0 16px; text-align: center;
+  border-radius: var(--raio-campo); box-shadow: inset 0 0 0 1px var(--cor-linha); color: var(--cor-texto-2); font-weight: 600;
+}
+.site-aviso { margin: 20px 0 0; padding: 12px 0; border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); display: flex; gap: 10px; }
+.site-aviso svg { width: 16px; height: 16px; flex: none; margin-top: 4px; color: var(--cor-texto-2); }
+
+/* Exemplo do extrato desenhado em HTML/CSS (sem imagem e sem style inline: as marcas têm classes fixas) */
+.site-exemplo { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--cor-linha); }
+.site-exemplo .rotulo { margin: 0; font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.site-exemplo .total { margin: 2px 0 0; font-size: 2.5rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.05; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.site-exemplo .total .rs, .site-exemplo .total .ct { font-size: 0.55em; letter-spacing: 0; }
+.ex-regua { position: relative; height: 36px; margin-top: 12px; display: grid; grid-template-columns: repeat(31, 1fr); align-items: end; border-bottom: 1px solid var(--cor-borda); }
+.ex-regua b { display: block; width: 5px; margin: 0 auto; grid-row: 1; background: var(--cor-texto); border-radius: 1px 1px 0 0; }
+.ex-regua b.pago { background: transparent; box-shadow: inset 0 0 0 1.5px var(--cor-texto-2); }
+.ex-regua .d5 { grid-column: 5; height: 100%; }
+.ex-regua .d18 { grid-column: 18; height: 22%; }
+.ex-regua .d19 { grid-column: 19; height: 45%; }
+.ex-regua .d21 { grid-column: 21; height: 40%; }
+.ex-regua .d25 { grid-column: 25; height: 18%; }
+.ex-regua .hoje { position: absolute; top: -6px; bottom: -6px; left: 56.45%; width: 2px; margin-left: -1px; background: var(--cor-marca); }
+.ex-item { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.ex-item + .ex-item { margin-top: 0; }
+.ex-mono { width: 36px; height: 36px; flex: none; border-radius: 8px; display: grid; place-items: center; color: #FFFFFF; font-size: 14px; font-weight: 700; }
+.ex-mono.sp { background: #147A3D; }
+.ex-mono.n { background: #B1060F; }
+.ex-corpo { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr auto; column-gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--cor-linha); }
+.ex-item:last-of-type .ex-corpo { border-bottom: 0; }
+.ex-corpo .nome { font-weight: 600; }
+.ex-corpo .valor { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ex-corpo .meta { grid-column: 1 / -1; font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.site-exemplo figcaption { font-size: var(--texto-xs); color: var(--cor-texto-2); padding-top: 10px; }
+/* Texto grande: o total do exemplo encolhe em vez de vazar (como o observarAjustes do app). */
+@media (max-width: 400px) { .site-exemplo .total { font-size: clamp(1.75rem, 11vw, 2.5rem); } }
+
+dl.site-fatos { margin: 24px 0 0; border-top: 1px solid var(--cor-linha); }
+dl.site-fatos > div { padding: 12px 0; border-bottom: 1px solid var(--cor-linha); }
+dl.site-fatos dt { font-weight: 600; }
+dl.site-fatos dd { margin: 2px 0 0; color: var(--cor-texto-2); }
+.site-rodape { padding-top: 16px; display: grid; justify-items: start; }
+.site-rodape a { display: inline-flex; align-items: center; min-height: var(--toque-min); font-weight: 600; }
+.site-rodape small { font-size: var(--texto-xs); color: var(--cor-texto-2); margin-top: 8px; }

@@ -77,21 +77,6 @@ self.addEventListener('notificationclick', (ev) => {
 }
 
 /**
- * Domínio próprio no GitHub Pages (D-05, E-02): com MENSALAO_DOMINIO definido (ex.: mensalao.com.br),
- * o build grava o arquivo CNAME. Sem a variável, nada muda (o Pages atual continua funcionando).
- */
-function cname(): Plugin {
-  return {
-    name: 'mensalao-cname',
-    apply: 'build',
-    generateBundle() {
-      const dominio = process.env.MENSALAO_DOMINIO?.trim();
-      if (dominio) this.emitFile({ type: 'asset', fileName: 'CNAME', source: `${dominio}\n` });
-    },
-  };
-}
-
-/**
  * US-29.CA8 / SUG-SEC-02: CSP por <meta> no index.html do app (WebView do Capacitor e build de teste), sem
  * 'unsafe-inline' e sem nenhum domínio de anúncio: o SDK do AdMob roda na camada nativa, fora da página.
  * Só no build (o servidor de desenvolvimento do Vite injeta script inline para o recarregamento).
@@ -171,6 +156,6 @@ export default defineConfig(({ mode }) => {
       // no pacote do app (aberta sem rede) e no site público (US-29.CA3, US-31).
       rollupOptions: { input: { main: resolve(__dirname, 'index.html') } },
     },
-    plugins: [csp(), serviceWorker(), cname()],
+    plugins: [csp(), serviceWorker()],
   };
 });
