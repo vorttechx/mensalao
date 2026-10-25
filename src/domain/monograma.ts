@@ -59,11 +59,14 @@ export function iniciaisDe(nome: string): string {
 }
 
 /** Id do catálogo da assinatura: o informado ou o do serviço com o mesmo nome (sem caixa nem acento). */
+// SEC-01: só chave própria do catálogo (nunca "constructor", "__proto__" etc. herdadas do protótipo).
+const ehDoCatalogo = (id: string): boolean => Object.prototype.hasOwnProperty.call(MONOGRAMAS_CATALOGO, id);
+
 function idDoCatalogo(nome: string, catalogoId?: string | null): string | null {
-  if (catalogoId && MONOGRAMAS_CATALOGO[catalogoId]) return catalogoId;
+  if (catalogoId && ehDoCatalogo(catalogoId)) return catalogoId;
   const n = normalizarBusca(nome);
   const s = CATALOGO.find((x) => normalizarBusca(x.nome) === n);
-  return s && MONOGRAMAS_CATALOGO[s.id] ? s.id : null;
+  return s && ehDoCatalogo(s.id) ? s.id : null;
 }
 
 /** Monograma de uma assinatura ou serviço (US-21.CA1 a CA3). */
