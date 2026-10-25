@@ -1264,7 +1264,7 @@ Totais, próximas cobranças, editar, pausar, cancelar, excluir e exportar segue
 │ │   Azul-noite, Grafite e Ameixa.  │ │
 │ └──────────────────────────────────┘ │
 │                                      │
-│ [   Comprar Pro por R$ 16,90       ] │ pro-btn-comprar (primário, largura total, 56 px)
+│ [   Comprar Pro por R$ 19,99       ] │ pro-btn-comprar (primário, largura total, 56 px)
 │ Compra única pela Google Play.       │ 14 texto-2, centralizado
 │ Sem renovação e sem cobrança mensal. │
 │                                      │
@@ -1617,7 +1617,7 @@ Os subtítulos dentro de "Backup e exportação" são `h3` (16/600).
 - Mudanças assíncronas da tela Pro (preço carregado, compra concluída, erro) anunciadas por `aria-live="polite"` (sucesso/estado) ou `role="alert"` (erro).
 - Interruptores com `role="switch"`; temas como grupo de rádio com `legend`.
 - Gráfico: `role="img"` + tabela visível com todos os valores.
-- 360 px e zoom 200%: botões de largura total quebram texto; "Comprar Pro por R$ 16,90" cabe em 328 px a 16 px; o banner do lembrete de backup empilha os botões.
+- 360 px e zoom 200%: botões de largura total quebram texto; "Comprar Pro por R$ 19,99" cabe em 328 px a 16 px; o banner do lembrete de backup empilha os botões.
 - Todos os temas com pares conferidos na seção 7.3.1.
 
 ---

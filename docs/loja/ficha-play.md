@@ -34,7 +34,7 @@ Finanças
 - SKU: `mensalao_pro` (não consumível)
 - Título: Mensalão Pro
 - Descrição: Compra única: assinaturas ilimitadas, lembretes, backup automático, planilha CSV, gráficos e temas.
-- Preço: proposto R$ 16,90 (D-04, a confirmar)
+- Preço: R$ 19,99 (D-04, confirmado pelo Renato em 25/10/2026)
 
 ## Segurança dos dados (respostas sugeridas)
 - O app coleta ou compartilha dados do usuário? **Não.** Os dados ficam só no aparelho; não há servidor.

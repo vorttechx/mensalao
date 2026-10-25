@@ -40,7 +40,7 @@ O provedor é **sempre** o falso no build de teste (US-12.CA16). Ele lê o contr
 | Campo | Padrão | Efeito |
 | --- | --- | --- |
 | `disponivel` | `true` | `false` simula o navegador comum: tela Pro com `pro-indisponivel`, restaurar desabilitado, cache Pro não honrado. |
-| `preco` | `"R$ 16,90"` | Texto do botão "Comprar Pro por …". `null` = loja não devolveu o produto (mostra o erro de preço). |
+| `preco` | `"R$ 19,99"` | Texto do botão "Comprar Pro por …". `null` = loja não devolveu o produto (mostra o erro de preço). |
 | `detalhes` | `"ok"` | `"erro"` faz a consulta de preço falhar (`pro-erro-preco`, `pro-btn-recarregar`). |
 | `compra` | `"ok"` | Resultado de comprar: `"ok"`, `"cancelado"` ou `"erro"`. Com `"ok"`, o falso acrescenta `mensalao_pro` em `compras` (a "conta da Play" passa a ter a compra). |
 | `compras` | `[]` | SKUs da conta. `["mensalao_pro"]` = já comprou (verificação ao abrir ativa o Pro; restaurar encontra). |
