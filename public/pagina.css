@@ -1,0 +1,50 @@
+/* Páginas estáticas do Mensalão (política de privacidade e, no site público, apresentação e 404).
+   Os tokens da Parte 2 do design (claro e escuro pelo sistema, sem os temas do Pro), a fonte do sistema e
+   nenhum recurso de fora. Sem style inline (US-31.CA11): tudo o que a página precisa está aqui. */
+:root {
+  --cor-fundo: #FFFFFF; --cor-fundo-agrupado: #F3F5F2; --cor-superficie: #FFFFFF;
+  --cor-texto: #14201A; --cor-texto-2: #5A6760; --cor-linha: #E3E8E4; --cor-borda: #7E8A84;
+  --cor-marca: #1D5C3F; --cor-foco: #1D5C3F;
+  --fonte: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --texto-xs: 0.8125rem; --texto-base: 1rem; --texto-xl: 1.75rem;
+  --margem-tela: 20px; --largura-max: 560px; --toque-min: 44px; --altura-botao: 48px; --altura-barra-topo: 52px;
+  --raio-campo: 8px;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-fundo: #0F1512; --cor-fundo-agrupado: #0F1512; --cor-superficie: #18201B;
+    --cor-texto: #E5ECE7; --cor-texto-2: #A0ADA6; --cor-linha: #27312B; --cor-borda: #6E7B74;
+    --cor-marca: #7FCBA2; --cor-foco: #7FCBA2;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--cor-fundo); color: var(--cor-texto);
+  font: 400 var(--texto-base)/1.5 var(--fonte); overflow-wrap: anywhere;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+a { color: var(--cor-marca); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 2px; border-radius: 4px; }
+.pagina { max-width: var(--largura-max); margin: 0 auto; padding: 0 var(--margem-tela) 40px; }
+h1 { font-size: var(--texto-xl); font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; margin: 8px 0 4px; }
+h2 { font-size: var(--texto-base); font-weight: 600; line-height: 1.3; margin: 28px 0 8px; }
+p { margin: 0 0 12px; }
+.nota { color: var(--cor-texto-2); font-size: var(--texto-xs); }
+
+/* Topo: link de volta com 44 px */
+.voltar {
+  display: inline-flex; align-items: center; gap: 4px; min-height: var(--toque-min);
+  margin-left: -4px; padding: 0 4px; font-weight: 600; text-decoration: none;
+}
+.voltar svg { width: 20px; height: 20px; flex: none; }
+
+/* Resumo em lista com fios, como em Totais */
+dl.resumo { margin: 0; border-top: 1px solid var(--cor-linha); }
+dl.resumo > div { padding: 12px 0; border-bottom: 1px solid var(--cor-linha); }
+dl.resumo dt { font-weight: 600; }
+dl.resumo dd { margin: 2px 0 0; color: var(--cor-texto-2); }
+ul.lista { margin: 0 0 12px; padding-left: 20px; }
+ul.lista li + li { margin-top: 4px; }
+.contato a { display: inline-flex; align-items: center; min-height: var(--toque-min); font-weight: 600; }

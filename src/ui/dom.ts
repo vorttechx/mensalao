@@ -17,6 +17,8 @@ export function h<K extends keyof HTMLElementTagNameMap>(
     if (valor === null || valor === undefined || valor === false) continue;
     if (typeof valor === 'function') {
       el.addEventListener(chave.slice(2).toLowerCase(), valor);
+    } else if (chave === 'style') {
+      aplicarEstilo(el, String(valor));
     } else if (chave === 'testid') {
       el.dataset.testid = String(valor);
     } else if (valor === true) {
@@ -27,6 +29,21 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   }
   anexar(el, filhos);
   return el;
+}
+
+/**
+ * US-29.CA8 / SUG-SEC-02: a CSP do app não tem 'unsafe-inline' em style-src, então o atributo `style="..."`
+ * escrito como texto seria bloqueado. As declarações viram `el.style.setProperty(...)` (CSSOM), que a CSP
+ * permite. Os valores vêm só do próprio app (números, cores do catálogo), nunca de texto digitado.
+ */
+function aplicarEstilo(el: HTMLElement, declaracoes: string): void {
+  for (const d of declaracoes.split(';')) {
+    const i = d.indexOf(':');
+    if (i <= 0) continue;
+    const prop = d.slice(0, i).trim();
+    const valor = d.slice(i + 1).trim();
+    if (prop && valor) el.style.setProperty(prop, valor);
+  }
 }
 
 export function anexar(el: Element, filhos: (Filho | Filho[])[]): void {

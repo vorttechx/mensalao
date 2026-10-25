@@ -91,6 +91,36 @@ function cname(): Plugin {
   };
 }
 
+/**
+ * US-29.CA8 / SUG-SEC-02: CSP por <meta> no index.html do app (WebView do Capacitor e build de teste), sem
+ * 'unsafe-inline' e sem nenhum domínio de anúncio: o SDK do AdMob roda na camada nativa, fora da página.
+ * Só no build (o servidor de desenvolvimento do Vite injeta script inline para o recarregamento).
+ */
+export const CSP_APP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ');
+
+function csp(): Plugin {
+  return {
+    name: 'mensalao-csp',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html) {
+        const metas = `<meta http-equiv="Content-Security-Policy" content="${CSP_APP}" />\n    <meta name="referrer" content="no-referrer" />\n    `;
+        return html.replace('<meta name="viewport"', `${metas}<meta name="viewport"`);
+      },
+    },
+  };
+}
+
 /** IDs de teste oficiais do Google (iguais a src/plataforma/ids-anuncios.ts). */
 const IDS_TESTE = { banner: 'ca-app-pub-3940256099942544/9214589741', premiado: 'ca-app-pub-3940256099942544/5224354917' };
 
@@ -118,9 +148,10 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'es2022',
       outDir: teste ? 'dist-teste' : 'dist',
-      // Duas páginas: o app e a política de privacidade (E-05), ambas no cache offline.
-      rollupOptions: { input: { main: resolve(__dirname, 'index.html'), privacidade: resolve(__dirname, 'privacidade.html') } },
+      // A política (public/privacidade.html + public/pagina.css) é estática e vai como está: a mesma página
+      // no pacote do app (aberta sem rede) e no site público (US-29.CA3, US-31).
+      rollupOptions: { input: { main: resolve(__dirname, 'index.html') } },
     },
-    plugins: [serviceWorker(), cname()],
+    plugins: [csp(), serviceWorker(), cname()],
   };
 });

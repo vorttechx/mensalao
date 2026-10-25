@@ -457,15 +457,6 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 @media (prefers-reduced-motion: reduce) { .carregando svg { animation: none; } }
 
 /* =====================================================================
-   Página de política de privacidade (privacidade.html)
-   ===================================================================== */
-.privacidade { padding: 0 var(--margem-tela) var(--espaco-7); }
-.privacidade .titulo-tela { font-size: var(--texto-xl); font-weight: var(--peso-numero); margin-top: var(--espaco-3); }
-.privacidade h2.secao { font-size: var(--texto-base); font-weight: var(--peso-forte); letter-spacing: 0; margin: var(--espaco-6) 0 var(--espaco-2); }
-.privacidade p + p, .privacidade ul { margin-top: var(--espaco-2); }
-.privacidade .nota { margin-top: var(--espaco-1); }
-
-/* =====================================================================
    US-20 — Início: total, régua do mês, avisos discretos e contador de limite
    ===================================================================== */
 .resumo { padding: var(--espaco-1) var(--margem-tela) 0; }
@@ -755,3 +746,5 @@ fieldset.consent-opcoes { border: 0; min-width: 0; margin: 0; padding: 0; }
 .lin-acao.premiado-carregando svg { animation: girar 1s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .lin-acao.premiado-carregando svg { animation: none; } }
 .banner.status-perto { margin: var(--espaco-2) var(--espaco-4) 0; }
+.lin-contato { justify-content: space-between; gap: var(--espaco-3); flex-wrap: wrap; text-decoration: none; color: var(--cor-texto); }
+.lin .dado-ext { display: inline-flex; align-items: center; gap: 6px; color: var(--cor-marca); min-width: 0; overflow-wrap: anywhere; }

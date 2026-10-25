@@ -18,6 +18,7 @@ import { secaoPlanilha } from './planilha';
 import { secaoAparencia } from './aparencia';
 import { secaoTemas } from './temas';
 import { secaoAnunciosPrivacidade } from './anuncios-privacidade';
+import { linhaPolitica } from '../politica';
 import type { Tela } from '../tela';
 
 function secaoAvisos(): HTMLElement {
@@ -131,7 +132,14 @@ export function telaAjustes(): Tela {
         h(
           'div',
           { class: 'grupo' },
-          h('a', { class: 'lin lin-acao', href: './privacidade.html', testid: 'link-privacidade' }, h('span', {}, 'Política de privacidade'), icone('seta', 'ic seta')),
+          // US-29.CA3 / design 14.6 e 17: URL pública (sem rede, a cópia do pacote) e o contato, os dois com "↗".
+          linhaPolitica('link-privacidade'),
+          h(
+            'a',
+            { class: 'lin lin-contato', href: 'mailto:contato@mensalao.app', testid: 'link-contato' },
+            h('span', {}, 'Contato'),
+            h('span', { class: 'dado-ext' }, 'contato@mensalao.app', icone('externo', 'ic ic-ext')),
+          ),
         ),
         // US-26.CA10 / design 17: a verdade nos dois planos.
         h(
