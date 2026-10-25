@@ -3,9 +3,11 @@
 // 150%, 200% e 300%, em 360 px; quando não cabe ao lado do rótulo, desce inteiro e fica alinhado à direita.
 // Inclui o BUG-10 (aberto neste reteste; falha hoje): o número grande com 6 dígitos (R$ 100.000,00/mês ou mais)
 // passa 3 px da borda a 200% em Início, Totais e Detalhe.
+// Reteste 5 (dev-notes §14): o teto min(19 px × escala, 12cqi) é do CSS; a fonte real fica nele quando "R$ n" cabe
+// (com Inter, sempre) e, com fontes largas (DejaVu Sans no CI), abaixo dele, em ≥ 16 px e o maior tamanho que cabe.
 import { expect, test, type Page } from '@playwright/test';
 import { abrirS2, sub } from './helpers2';
-import { transbordos } from './helpers3';
+import { conferirAjuste, medirAjuste, transbordos } from './helpers3';
 
 const RELOGIO = '2026-10-18T12:00:00-03:00';
 
@@ -51,7 +53,7 @@ const escalas = [100, 125, 150, 200, 300];
 
 test.describe('Reteste 3 sprint 3 — BUG-09: "Por ano" dos Totais com texto grande', () => {
   for (const pct of escalas) {
-    test(`BUG-09 / US-22.CA4 + design 2.5: a ${pct}%, "Por ano" dentro da tela, "R$ n" numa linha, à direita, fonte min(19 px × escala, 12cqi)`, async ({ page }) => {
+    test(`BUG-09 / US-22.CA4 + design 2.5: a ${pct}%, "Por ano" dentro da tela, "R$ n" numa linha, à direita, fonte ≤ teto min(19 px × escala, 12cqi), no teto quando cabe, ≥ 16 px`, async ({ page }) => {
       const falhas: string[] = [];
       for (const v of valores) {
         await abrirS2(page, { relogio: RELOGIO, assinaturas: [sub({ id: 't', nome: 'T', valorCentavos: v.mes, proxima: '2026-10-19', diaRef: 19 })] });
@@ -65,8 +67,12 @@ test.describe('Reteste 3 sprint 3 — BUG-09: "Por ano" dos Totais com texto gra
         if (m.linhasValor !== 1) falhas.push(`${id}: valor em ${m.linhasValor} linhas`);
         if (m.linhasRotulo !== 1) falhas.push(`${id}: rótulo em ${m.linhasRotulo} linhas`);
         if (Math.abs(m.direita - m.direitaPar) > 1) falhas.push(`${id}: valor não alinhado à direita (${m.direita} vs ${m.direitaPar})`);
-        const esperada = Math.min(19 * pct / 100, 0.12 * 320);
-        if (Math.abs(m.fonte - esperada) > 0.2) falhas.push(`${id}: fonte ${m.fonte} px, esperado ${esperada}`);
+        const teto = Math.min(19 * pct / 100, 0.12 * 320);
+        const a = await medirAjuste(page, 'total-anual');
+        if (Math.abs(a.teto - teto) > 0.2) falhas.push(`${id}: teto do CSS ${a.teto} px, esperado ${teto}`);
+        falhas.push(...conferirAjuste(a, id));
+        // A 100% fica nos 19 px do design (4.6) sempre que couber (com Inter, sempre).
+        if (pct === 100 && a.cabeNoTeto && Math.abs(m.fonte - 19) > 0.2) falhas.push(`${id}: a 100% a fonte é ${m.fonte} px, não 19`);
         // A 100% fica como no design 4.6: ao lado do rótulo, em 19 px.
         if (pct === 100 && m.desceu) falhas.push(`${id}: desceu a 100%`);
         // Até 200% (US-22.CA4) nada da tela de Totais transborda.

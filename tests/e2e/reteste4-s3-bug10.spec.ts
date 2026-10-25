@@ -2,11 +2,14 @@
 // O número grande (`.dinheiro-grande`) de Início (total do mês), Totais (total por mês) e Detalhe (valor da
 // assinatura) fica dentro da tela, sem rolagem horizontal e sem partir "R$ n", em 360 px, com o texto do sistema
 // a 100%, 150% e 200% e valores de 5, 6 e 7 dígitos (incluindo os limiares R$ 100.000,00 e R$ 1.000.000,00).
-// Fonte esperada: min(40 px × escala, k × largura do bloco), com k = 17,5cqi, ou 15cqi com 7 dígitos ou mais.
+// Teto da fonte (CSS do design): min(40 px × escala, k × largura do bloco), com k = 17,5cqi, ou 15cqi com 7 dígitos
+// ou mais. Reteste 5 (dev-notes §14, ajuste ao espaço real): a fonte real depende da fonte do sistema (Inter aqui,
+// DejaVu Sans no CI). O teste confere o teto, e que a fonte fica no teto quando o texto cabe nele (com Inter, a
+// fórmula exata; a 100%, os 40 px do design), ou abaixo, em ≥ 16 px e o maior tamanho que cabe, quando não cabe.
 import { expect, test, type Page } from '@playwright/test';
 import { formatarBRL } from '../../src/domain/dinheiro';
 import { abrirS2, sub } from './helpers2';
-import { transbordos } from './helpers3';
+import { conferirAjuste, medirAjuste, transbordos } from './helpers3';
 
 const RELOGIO = '2026-10-18T12:00:00-03:00';
 
@@ -27,7 +30,7 @@ const escalas = [100, 150, 200];
 test.describe('Reteste 4 sprint 3 — BUG-10: número grande com 5, 6 e 7 dígitos', () => {
   for (const t of telas) {
     for (const pct of escalas) {
-      test(`BUG-10 / US-22.CA4 + design 2.5: ${t.nome} a ${pct}%, número grande dentro da tela, "R$ n" numa linha, fonte min(40 px × escala, 17,5cqi | 15cqi)`, async ({ page }) => {
+      test(`BUG-10 / US-22.CA4 + design 2.5: ${t.nome} a ${pct}%, número grande dentro da tela, "R$ n" numa linha, fonte ≤ teto min(40 px × escala, 17,5cqi | 15cqi), no teto quando cabe, ≥ 16 px`, async ({ page }) => {
         const falhas: string[] = [];
         for (const c of valores) {
           await abrirS2(page, { relogio: RELOGIO, assinaturas: [sub({ id: 't', nome: 'T', valorCentavos: c, proxima: '2026-10-19', diaRef: 19 })] });
@@ -73,11 +76,14 @@ test.describe('Reteste 4 sprint 3 — BUG-10: número grande com 5, 6 e 7 dígit
           if (m.linhas !== 1) falhas.push(`${id}: "R$ n" em ${m.linhas} linhas`);
           const seteDigitos = c >= 100_000_000;
           if (m.longo !== seteDigitos) falhas.push(`${id}: classe .longo = ${m.longo}`);
-          const esperada = Math.min(40 * pct / 100, (seteDigitos ? 0.15 : 0.175) * m.larguraBloco);
-          if (Math.abs(m.fonte - esperada) > 0.2) falhas.push(`${id}: fonte ${m.fonte} px, esperado ${esperada.toFixed(2)}`);
-          // A 100% o número grande fica nos 40 px do design (--texto-2xl) até 6 dígitos. Com 7 dígitos, no Detalhe
-          // (bloco ao lado do monograma, 256 px), 15cqi = 38,4 px; a fórmula acima já confere esse caso.
-          if (pct === 100 && !seteDigitos && Math.abs(m.fonte - 40) > 0.2) falhas.push(`${id}: a 100% a fonte é ${m.fonte} px, não 40`);
+          // Teto do design (CSS, independe da fonte) e o ajuste ao espaço real abaixo dele.
+          const teto = Math.min(40 * pct / 100, (seteDigitos ? 0.15 : 0.175) * m.larguraBloco);
+          const a = await medirAjuste(page, t.testid, '.valor');
+          if (Math.abs(a.teto - teto) > 0.2) falhas.push(`${id}: teto do CSS ${a.teto} px, esperado ${teto.toFixed(2)}`);
+          falhas.push(...conferirAjuste(a, id));
+          // A 100% o número grande fica nos 40 px do design (--texto-2xl) até 6 dígitos sempre que couber (com Inter,
+          // sempre). Com 7 dígitos, no Detalhe (bloco ao lado do monograma, 256 px), o teto é 15cqi = 38,4 px.
+          if (pct === 100 && !seteDigitos && a.cabeNoTeto && Math.abs(m.fonte - 40) > 0.2) falhas.push(`${id}: a 100% a fonte é ${m.fonte} px, não 40`);
           // O "Por ano" dos Totais com 9 dígitos (R$ 9.999.999,99/mês = R$ 119.999.999,88/ano) é o BUG-11, com teste próprio.
           for (const f of await transbordos(page)) {
             if (c >= 833_333_334 && /total-anual/.test(f)) continue;
@@ -90,11 +96,10 @@ test.describe('Reteste 4 sprint 3 — BUG-10: número grande com 5, 6 e 7 dígit
   }
 });
 
-// BUG-11 (aberto no reteste 4; baixa): sem teto de valor no formulário, quantias irreais ainda saem da tela.
-// Marcado com test.fail(): passa enquanto o bug existir e fica vermelho quando for corrigido (aí, tirar o test.fail()).
+// BUG-11 (aberto no reteste 4; baixa): sem teto de valor no formulário, quantias irreais saíam da tela.
+// Reteste 5: corrigido pelo ajuste ao espaço real (dev-notes §14); o test.fail() saiu e o teste vale como regressão.
 test.describe('Reteste 4 sprint 3 — valores de 8 dígitos por mês e 9 dígitos por ano', () => {
   test('BUG-11 / US-22.CA4: a 150% e 200%, com R$ 8.333.333,34 e R$ 10.000.000,00 por mês, Início, Totais e Detalhe ficam dentro da tela', async ({ page }) => {
-    test.fail(true, 'BUG-11 aberto: "Por ano" de 9 dígitos e número grande de 8 dígitos passam da borda');
     const falhas: string[] = [];
     for (const c of [833_333_334, 1_000_000_000]) {
       for (const pct of [150, 200]) {

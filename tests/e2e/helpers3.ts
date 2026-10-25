@@ -102,3 +102,82 @@ export async function texto200(page: Page) {
 export async function semTransbordo(page: Page, contexto: string) {
   expect(await transbordos(page), contexto).toEqual([]);
 }
+
+/**
+ * US-22.CA4 com qualquer fonte do sistema (CI: DejaVu Sans; container: Inter). Mede um texto que não quebra e
+ * precisa caber no bloco (número grande, "Por ano"): o tamanho atual, o teto do CSS (o tamanho do design limitado
+ * por cqi, medido tirando por um instante o ajuste em linha) e se o texto cabe no teto e com 1 px a mais.
+ * Nada aqui depende das métricas de uma fonte: quem decide é o espaço medido na própria página.
+ * `testid` é o elemento ajustado; `alvo` (opcional) é o seletor do filho cuja largura conta (o `span.valor`).
+ */
+export async function medirAjuste(page: Page, testid: string, alvo?: string) {
+  return page.getByTestId(testid).evaluate((el, alvoSel) => {
+    const e = el as HTMLElement;
+    const a = (alvoSel ? e.querySelector<HTMLElement>(alvoSel) : null) ?? e;
+    let bloco: HTMLElement | null = e.parentElement;
+    while (bloco && !getComputedStyle(bloco).containerType.includes('inline-size')) bloco = bloco.parentElement;
+    const cs = getComputedStyle(bloco!);
+    const disponivel = bloco!.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const fonte = parseFloat(getComputedStyle(e).fontSize);
+    const largura = a.getBoundingClientRect().width;
+    const salvo = e.style.getPropertyValue('font-size');
+    e.style.removeProperty('font-size');
+    const teto = parseFloat(getComputedStyle(e).fontSize);
+    const larguraNoTeto = a.getBoundingClientRect().width;
+    e.style.setProperty('font-size', `${fonte + 1}px`);
+    const larguraMais1 = a.getBoundingClientRect().width;
+    if (salvo) e.style.setProperty('font-size', salvo); else e.style.removeProperty('font-size');
+    return {
+      fonte, teto, disponivel, largura,
+      cabeNoTeto: larguraNoTeto <= disponivel + 0.5,
+      cabeMais1: larguraMais1 <= disponivel + 0.5,
+    };
+  }, alvo);
+}
+
+/**
+ * Regras do ajuste ao espaço real, independentes da fonte: o texto cabe no bloco; nunca passa do teto do design;
+ * se cabe no teto, fica no teto (com Inter a 100% = tamanho do design); se não cabe, fica abaixo dele, em 16 px ou
+ * mais, e é o maior tamanho que cabe (com 1 px a mais já não caberia; tolerância dos passos de 0,5 px do ajuste).
+ */
+export function conferirAjuste(m: Awaited<ReturnType<typeof medirAjuste>>, id: string): string[] {
+  const f: string[] = [];
+  if (m.largura > m.disponivel + 0.5) f.push(`${id}: não cabe no bloco (${m.largura.toFixed(1)} > ${m.disponivel.toFixed(1)})`);
+  if (m.fonte > m.teto + 0.2) f.push(`${id}: fonte ${m.fonte} px acima do teto do design ${m.teto.toFixed(2)}`);
+  if (m.cabeNoTeto && Math.abs(m.fonte - m.teto) > 0.2) f.push(`${id}: cabe no teto ${m.teto.toFixed(2)} px, mas está em ${m.fonte}`);
+  if (!m.cabeNoTeto) {
+    if (m.fonte < 16 - 0.01) f.push(`${id}: fonte ${m.fonte} px abaixo do piso de 16 px`);
+    if (m.cabeMais1 && m.fonte + 1 <= m.teto) f.push(`${id}: encolheu demais (${m.fonte} px; com +1 px ainda caberia)`);
+  }
+  return f;
+}
+
+/** Retângulos de linha de um trecho de texto (Range); mais de um topo distinto = o trecho quebrou de linha. */
+export async function trechosPartidos(page: Page, seletor: string, padrao: string): Promise<string[]> {
+  return page.evaluate(({ seletor, padrao }) => {
+    const re = new RegExp(padrao, 'g');
+    const ruins: string[] = [];
+    for (const raiz of document.querySelectorAll(seletor)) {
+      if ((raiz as HTMLElement).closest('.sr-only, [hidden]')) continue;
+      const texto = raiz.textContent ?? '';
+      // Mapeia o texto concatenado para os nós de texto, para o trecho poder atravessar <span>.
+      const nos: { no: Text; ini: number }[] = [];
+      let pos = 0;
+      const w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode() as Text | null; n; n = w.nextNode() as Text | null) { nos.push({ no: n, ini: pos }); pos += n.data.length; }
+      const achar = (i: number) => { const x = [...nos].reverse().find((k) => k.ini <= i)!; return [x.no, i - x.ini] as const; };
+      for (const m of texto.matchAll(re)) {
+        const r = document.createRange();
+        const [a, ia] = achar(m.index!);
+        const [b, ib] = achar(m.index! + m[0].length - 1);
+        r.setStart(a, ia); r.setEnd(b, ib + 1);
+        // Linhas diferentes = dois retângulos sem sobreposição vertical (o "R$" menor e elevado fica na mesma linha).
+        const qs = [...r.getClientRects()].filter((q) => q.width > 0);
+        const partiu = qs.some((a) => qs.some((b) => b.top >= a.bottom - 1));
+        const onde = a.parentElement?.closest<HTMLElement>('[data-testid]')?.dataset.testid ?? (raiz as HTMLElement).dataset.testid ?? raiz.className;
+        if (partiu) ruins.push(`"${m[0]}" em ${onde}`);
+      }
+    }
+    return ruins;
+  }, { seletor, padrao });
+}

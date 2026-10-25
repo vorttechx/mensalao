@@ -2,7 +2,7 @@
 // us20-inicio.spec.ts e us22-telas.spec.ts. Janela 360×780, texto a 200% onde o bug é de texto grande.
 import { expect, test, type Page } from '@playwright/test';
 import { abrirS2, sub } from './helpers2';
-import { texto200 } from './helpers3';
+import { texto200, trechosPartidos } from './helpers3';
 
 const RELOGIO = '2026-10-18T12:00:00-03:00';
 const LONGO = 'Assinatura com um nome realmente muito longo para caber';
@@ -14,47 +14,25 @@ const dados = [
 ];
 const COPIAS = [{ id: 'c', criadaEm: '2026-09-20T08:00', quantidade: 2, conteudo: '{}' }];
 
-/** Retângulos de linha de um trecho de texto (Range); mais de um topo distinto = o trecho quebrou de linha. */
-async function trechosPartidos(page: Page, seletor: string, padrao: string): Promise<string[]> {
-  return page.evaluate(({ seletor, padrao }) => {
-    const re = new RegExp(padrao, 'g');
-    const ruins: string[] = [];
-    for (const raiz of document.querySelectorAll(seletor)) {
-      if ((raiz as HTMLElement).closest('.sr-only, [hidden]')) continue;
-      const texto = raiz.textContent ?? '';
-      // Mapeia o texto concatenado para os nós de texto, para o trecho poder atravessar <span>.
-      const nos: { no: Text; ini: number }[] = [];
-      let pos = 0;
-      const w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
-      for (let n = w.nextNode() as Text | null; n; n = w.nextNode() as Text | null) { nos.push({ no: n, ini: pos }); pos += n.data.length; }
-      const achar = (i: number) => { const x = [...nos].reverse().find((k) => k.ini <= i)!; return [x.no, i - x.ini] as const; };
-      for (const m of texto.matchAll(re)) {
-        const r = document.createRange();
-        const [a, ia] = achar(m.index!);
-        const [b, ib] = achar(m.index! + m[0].length - 1);
-        r.setStart(a, ia); r.setEnd(b, ib + 1);
-        // Linhas diferentes = dois retângulos sem sobreposição vertical (o "R$" menor e elevado fica na mesma linha).
-        const qs = [...r.getClientRects()].filter((q) => q.width > 0);
-        const partiu = qs.some((a) => qs.some((b) => b.top >= a.bottom - 1));
-        const onde = a.parentElement?.closest<HTMLElement>('[data-testid]')?.dataset.testid ?? (raiz as HTMLElement).dataset.testid ?? raiz.className;
-        if (partiu) ruins.push(`"${m[0]}" em ${onde}`);
-      }
-    }
-    return ruins;
-  }, { seletor, padrao });
-}
-
 test.describe('Reteste sprint 3 — BUG-01 a BUG-06', () => {
   test('BUG-01 / US-20.CA4 + design 3.11: com 3 ou mais lembretes o aviso mede no máximo 184 px e a nota não estoura', async ({ page }) => {
     const varios = [1, 2, 3, 4].map((i) => sub({ id: `l${i}`, nome: `Serviço ${i}`, proxima: `2026-10-${18 + (i % 2)}`, diaRef: 18 + (i % 2) }));
     await abrirS2(page, { relogio: RELOGIO, pro: true, prefs: { lembrete: { ativo: true, dias: 3 } }, assinaturas: varios });
     const caixa = (await page.getByTestId('lembrete-aviso').boundingBox())!;
     expect(caixa.height).toBeLessThanOrEqual(184.5);
-    // A nota cabe em até 2 linhas (era 3, 56,5 px).
+    // Reteste 5 (dev-notes §14): à vista, a nota cabe em até 2 linhas (era 3, 56,5 px). Com fonte larga (DejaVu no CI)
+    // ela tem 3 linhas e vai para dentro de "Mais N lembretes" (fechado); aí não conta a altura do aviso, mas tem de
+    // continuar lá, inteira, ao abrir.
     const nota = page.getByTestId('lembrete-limite-texto');
-    if (await nota.count()) {
+    expect(await nota.count()).toBe(1);
+    const escondida = await nota.evaluate((e) => !!e.closest('details:not([open])'));
+    if (!escondida) {
       const linhas = await nota.evaluate((e) => Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)));
       expect(linhas).toBeLessThanOrEqual(2);
+    } else {
+      await page.getByTestId('lembrete-aviso').locator('summary').click();
+      await expect(nota).toBeVisible();
+      await expect(nota).toHaveText('Com o app fechado, o aviso depende do seu aparelho e pode atrasar. Abra o app para ver tudo.');
     }
   });
 
