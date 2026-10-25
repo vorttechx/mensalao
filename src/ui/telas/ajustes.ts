@@ -15,6 +15,7 @@ import { seloPro } from '../componentes';
 import { secaoBackupAutomatico } from './copias';
 import { secaoLembretes } from './lembretes';
 import { secaoPlanilha } from './planilha';
+import { secaoAparencia } from './aparencia';
 import { secaoTemas } from './temas';
 import type { Tela } from '../tela';
 
@@ -123,6 +124,7 @@ export function telaAjustes(): Tela {
       secaoAvisos(),
       secaoLembretes(),
       secaoBackup(),
+      secaoAparencia(),
       secaoTemas(),
       h(
         'section',

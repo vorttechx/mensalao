@@ -1,5 +1,5 @@
 // US-17 / US-19.CA5 — Temas de cor (design 2.3). Aplicados por atributo data-tema no <html> (só variáveis CSS mudam).
-import { temaEfetivo, type IdTema } from '../domain/preferencias';
+import { aparenciaEfetiva, coresNavegador, temaEfetivo, type IdTema } from '../domain/preferencias';
 import { obterPrefs } from '../servicos/preferencias';
 import { ehPro } from '../servicos/pro';
 
@@ -29,16 +29,24 @@ export function nomeCurto(id: IdTema): string {
   return infoTema(id).nome.replace(' (padrão)', '');
 }
 
-/** Aplica o tema efetivo (o escolhido no Pro; o padrão no grátis, sem apagar a escolha). */
+/**
+ * Aplica o tema e a aparência efetivos (os escolhidos no Pro; o padrão e o automático no grátis, sem apagar
+ * as escolhas). data-aparencia só existe quando a aparência é forçada (design 2.3a, US-19.CA7 a CA10).
+ */
 export function aplicarTema(): void {
-  const id = temaEfetivo(obterPrefs(), ehPro());
+  const prefs = obterPrefs();
+  const pro = ehPro();
+  const id = temaEfetivo(prefs, pro);
+  const aparencia = aparenciaEfetiva(prefs, pro);
   const raiz = document.documentElement;
   if (id === 'verde-cedula') delete raiz.dataset.tema;
   else raiz.dataset.tema = id;
-  const info = infoTema(id);
+  if (aparencia === 'auto') delete raiz.dataset.aparencia;
+  else raiz.dataset.aparencia = aparencia;
+  const [corClara, corEscura] = coresNavegador(infoTema(id).corNavegador, aparencia);
   const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
   metas.forEach((m) => {
     const escuro = (m.getAttribute('media') ?? '').includes('dark');
-    m.content = escuro ? info.corNavegador[1] : info.corNavegador[0];
+    m.content = escuro ? corEscura : corClara;
   });
 }

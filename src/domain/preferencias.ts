@@ -1,4 +1,4 @@
-// Preferências do Pro (tema, lembrete e backup automático) em `mensalao:prefs:v1`, separadas do estado
+// Preferências do Pro (tema, aparência, lembrete e backup automático) em `mensalao:prefs:v1`, separadas do estado
 // das assinaturas e do estado Pro. Leitura tolerante: campo inválido volta ao padrão, sem travar (US-17.CA7).
 
 export const CHAVE_PREFS = 'mensalao:prefs:v1';
@@ -7,11 +7,18 @@ export type IdTema = 'verde-cedula' | 'azul-noite' | 'grafite' | 'ameixa';
 export const TEMAS: IdTema[] = ['verde-cedula', 'azul-noite', 'grafite', 'ameixa'];
 export const TEMA_PADRAO: IdTema = 'verde-cedula';
 
+/** Aparência (US-19.CA7): automático segue o celular; claro e escuro forçam o modo (só no Pro, D-07). */
+export type Aparencia = 'auto' | 'claro' | 'escuro';
+export const APARENCIAS: Aparencia[] = ['auto', 'claro', 'escuro'];
+export const APARENCIA_PADRAO: Aparencia = 'auto';
+
 export const LEMBRETE_DIAS_PADRAO = 1;
 export const LEMBRETE_DIAS_MAX = 7;
 
 export interface Preferencias {
   tema: IdTema;
+  /** Ausente ou inválido = 'auto' (US-19.CA7). */
+  aparencia: Aparencia;
   lembrete: { ativo: boolean; dias: number };
   /** Pares já avisados por notificação: "c|<id>|<data>" (cobrança) e "t|<id>|<data>" (fim do teste). */
   lembretesAvisados: string[];
@@ -30,6 +37,7 @@ export interface Preferencias {
 export function preferenciasPadrao(): Preferencias {
   return {
     tema: TEMA_PADRAO,
+    aparencia: APARENCIA_PADRAO,
     lembrete: { ativo: false, dias: LEMBRETE_DIAS_PADRAO },
     lembretesAvisados: [],
     backup: { ativo: true, ultimaExportacao: null, adiadoAte: null, inicioPro: null },
@@ -48,6 +56,10 @@ export function ehTema(v: unknown): v is IdTema {
   return typeof v === 'string' && (TEMAS as string[]).includes(v);
 }
 
+export function ehAparencia(v: unknown): v is Aparencia {
+  return typeof v === 'string' && (APARENCIAS as string[]).includes(v);
+}
+
 export function lerPreferencias(bruto: string | null): Preferencias {
   const p = preferenciasPadrao();
   if (bruto === null) return p;
@@ -59,6 +71,7 @@ export function lerPreferencias(bruto: string | null): Preferencias {
   }
   if (!ehObjeto(v)) return p;
   if (ehTema(v.tema)) p.tema = v.tema;
+  if (ehAparencia(v.aparencia)) p.aparencia = v.aparencia;
   if (ehObjeto(v.lembrete)) {
     if (typeof v.lembrete.ativo === 'boolean') p.lembrete.ativo = v.lembrete.ativo;
     const d = v.lembrete.dias;
@@ -77,4 +90,19 @@ export function lerPreferencias(bruto: string | null): Preferencias {
 /** Tema efetivo: o escolhido só vale no Pro; sem Pro, o padrão, sem apagar a escolha (US-12.CA13, US-17.CA6). */
 export function temaEfetivo(prefs: Preferencias, pro: boolean): IdTema {
   return pro ? prefs.tema : TEMA_PADRAO;
+}
+
+/** Aparência efetiva: a escolhida só vale no Pro; sem Pro, automático, sem apagar a escolha (US-19.CA8, CA9). */
+export function aparenciaEfetiva(prefs: Preferencias, pro: boolean): Aparencia {
+  return pro ? prefs.aparencia : APARENCIA_PADRAO;
+}
+
+/**
+ * Cores das duas metas theme-color [sem media, com media escuro] (design 2.3a, US-19.CA10):
+ * automático mantém o par claro/escuro do tema; claro ou escuro forçado põe a mesma cor nas duas.
+ */
+export function coresNavegador(par: [string, string], aparencia: Aparencia): [string, string] {
+  if (aparencia === 'claro') return [par[0], par[0]];
+  if (aparencia === 'escuro') return [par[1], par[1]];
+  return [par[0], par[1]];
 }

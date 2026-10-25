@@ -68,6 +68,6 @@ export function secaoTemas(): HTMLElement {
         );
       }),
     ),
-    h('p', { class: 'g-rodape' }, 'Os temas seguem o modo claro ou escuro do seu celular.'),
+    h('p', { class: 'g-rodape' }, 'Cada tema tem versão clara e escura, conforme a Aparência.'),
   );
 }

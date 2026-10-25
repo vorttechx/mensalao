@@ -64,9 +64,18 @@
 }
 @media (prefers-reduced-motion: reduce) { :root { --duracao-rapida: 0ms; --duracao-media: 0ms; } }
 
-/* Tema escuro (desenhado à parte) */
+/* Temas Pro (US-17 / US-19.CA5): mesmos ids da sprint 2, aplicados por data-tema no <html>.
+   Os blocos claros não ficam dentro de @media (prefers-color-scheme: light) (regra de especificidade). */
+[data-tema="azul-noite"] { --cor-fundo-agrupado: #F2F4F8; --cor-texto: #121A2B; --cor-texto-2: #556070; --cor-linha: #E1E6EE; --cor-borda: #7C8798; --cor-marca: #1F4E8C; --cor-marca-forte: #173D6E; }
+[data-tema="grafite"]    { --cor-fundo-agrupado: #F3F3F2; --cor-texto: #1B1C1E; --cor-texto-2: #5C5E62; --cor-linha: #E5E5E3; --cor-borda: #84868A; --cor-marca: #2F3B47; --cor-marca-forte: #222B34; }
+[data-tema="ameixa"]     { --cor-fundo-agrupado: #F7F3F5; --cor-texto: #22161E; --cor-texto-2: #66545F; --cor-linha: #EBE3E8; --cor-borda: #8C7A86; --cor-marca: #7A2E62; --cor-marca-forte: #5F2049; }
+
+/* Tema escuro (desenhado à parte) e escuros dos temas Pro, com a Aparência (design 2.3a, US-19.CA7 a CA10).
+   Sem data-aparencia = automático (segue o celular). Os mesmos blocos existem duas vezes: no media query,
+   exceto quando o Pro forçou o claro, e com data-aparencia="escuro", que vale com o celular em qualquer modo.
+   Os seletores escuros têm especificidade maior que os claros dos temas, então a ordem não importa. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-aparencia="claro"]) {
     --cor-fundo: #0F1512; --cor-fundo-agrupado: #0F1512; --cor-superficie: #18201B; --cor-superficie-2: #1F2923;
     --cor-texto: #E5ECE7; --cor-texto-2: #A0ADA6; --cor-linha: #27312B; --cor-borda: #6E7B74;
     --cor-marca: #7FCBA2; --cor-marca-forte: #9FDABA; --cor-sobre-marca: #0F1512;
@@ -76,18 +85,25 @@
     --cor-grafico-5: #A9C27A; --cor-grafico-6: #6CC7B4; --cor-grafico-7: #A0ADA6;
     color-scheme: dark;
   }
+  :root:not([data-aparencia="claro"])[data-tema="azul-noite"] { --cor-fundo: #0E1320; --cor-fundo-agrupado: #0E1320; --cor-superficie: #161D2D; --cor-superficie-2: #1D2638; --cor-texto: #E4EAF5; --cor-texto-2: #A3AEC2; --cor-linha: #263044; --cor-borda: #6C7890; --cor-marca: #8FB4F0; --cor-marca-forte: #B0CBF5; --cor-sobre-marca: #0E1320; }
+  :root:not([data-aparencia="claro"])[data-tema="grafite"] { --cor-fundo: #121212; --cor-fundo-agrupado: #121212; --cor-superficie: #1C1C1E; --cor-superficie-2: #252527; --cor-texto: #ECECEC; --cor-texto-2: #ABABB0; --cor-linha: #2E2E31; --cor-borda: #77777D; --cor-marca: #C5CFD9; --cor-marca-forte: #DDE4EA; --cor-sobre-marca: #121212; }
+  :root:not([data-aparencia="claro"])[data-tema="ameixa"] { --cor-fundo: #160F14; --cor-fundo-agrupado: #160F14; --cor-superficie: #20171E; --cor-superficie-2: #2A1F28; --cor-texto: #F2E9EF; --cor-texto-2: #BFAEBA; --cor-linha: #33262F; --cor-borda: #86737F; --cor-marca: #EBA6D4; --cor-marca-forte: #F3C4E3; --cor-sobre-marca: #160F14; }
 }
-
-/* Temas Pro (US-17 / US-19.CA5): mesmos ids da sprint 2, aplicados por data-tema no <html>.
-   Os blocos claros não ficam dentro de @media (prefers-color-scheme: light) (regra de especificidade). */
-[data-tema="azul-noite"] { --cor-fundo-agrupado: #F2F4F8; --cor-texto: #121A2B; --cor-texto-2: #556070; --cor-linha: #E1E6EE; --cor-borda: #7C8798; --cor-marca: #1F4E8C; --cor-marca-forte: #173D6E; }
-[data-tema="grafite"]    { --cor-fundo-agrupado: #F3F3F2; --cor-texto: #1B1C1E; --cor-texto-2: #5C5E62; --cor-linha: #E5E5E3; --cor-borda: #84868A; --cor-marca: #2F3B47; --cor-marca-forte: #222B34; }
-[data-tema="ameixa"]     { --cor-fundo-agrupado: #F7F3F5; --cor-texto: #22161E; --cor-texto-2: #66545F; --cor-linha: #EBE3E8; --cor-borda: #8C7A86; --cor-marca: #7A2E62; --cor-marca-forte: #5F2049; }
-@media (prefers-color-scheme: dark) {
-  [data-tema="azul-noite"] { --cor-fundo: #0E1320; --cor-fundo-agrupado: #0E1320; --cor-superficie: #161D2D; --cor-superficie-2: #1D2638; --cor-texto: #E4EAF5; --cor-texto-2: #A3AEC2; --cor-linha: #263044; --cor-borda: #6C7890; --cor-marca: #8FB4F0; --cor-marca-forte: #B0CBF5; --cor-sobre-marca: #0E1320; }
-  [data-tema="grafite"]    { --cor-fundo: #121212; --cor-fundo-agrupado: #121212; --cor-superficie: #1C1C1E; --cor-superficie-2: #252527; --cor-texto: #ECECEC; --cor-texto-2: #ABABB0; --cor-linha: #2E2E31; --cor-borda: #77777D; --cor-marca: #C5CFD9; --cor-marca-forte: #DDE4EA; --cor-sobre-marca: #121212; }
-  [data-tema="ameixa"]     { --cor-fundo: #160F14; --cor-fundo-agrupado: #160F14; --cor-superficie: #20171E; --cor-superficie-2: #2A1F28; --cor-texto: #F2E9EF; --cor-texto-2: #BFAEBA; --cor-linha: #33262F; --cor-borda: #86737F; --cor-marca: #EBA6D4; --cor-marca-forte: #F3C4E3; --cor-sobre-marca: #160F14; }
+:root[data-aparencia="escuro"] {
+  --cor-fundo: #0F1512; --cor-fundo-agrupado: #0F1512; --cor-superficie: #18201B; --cor-superficie-2: #1F2923;
+  --cor-texto: #E5ECE7; --cor-texto-2: #A0ADA6; --cor-linha: #27312B; --cor-borda: #6E7B74;
+  --cor-marca: #7FCBA2; --cor-marca-forte: #9FDABA; --cor-sobre-marca: #0F1512;
+  --cor-alerta: #EE9A72; --cor-sobre-alerta: #0F1512; --cor-teste: #93B4E8;
+  --cor-veu: rgba(0, 0, 0, 0.6);
+  --cor-grafico-1: #6FB8CB; --cor-grafico-2: #D9AE55; --cor-grafico-3: #D49BC8; --cor-grafico-4: #93AEEA;
+  --cor-grafico-5: #A9C27A; --cor-grafico-6: #6CC7B4; --cor-grafico-7: #A0ADA6;
+  color-scheme: dark;
 }
+:root[data-aparencia="escuro"][data-tema="azul-noite"] { --cor-fundo: #0E1320; --cor-fundo-agrupado: #0E1320; --cor-superficie: #161D2D; --cor-superficie-2: #1D2638; --cor-texto: #E4EAF5; --cor-texto-2: #A3AEC2; --cor-linha: #263044; --cor-borda: #6C7890; --cor-marca: #8FB4F0; --cor-marca-forte: #B0CBF5; --cor-sobre-marca: #0E1320; }
+:root[data-aparencia="escuro"][data-tema="grafite"] { --cor-fundo: #121212; --cor-fundo-agrupado: #121212; --cor-superficie: #1C1C1E; --cor-superficie-2: #252527; --cor-texto: #ECECEC; --cor-texto-2: #ABABB0; --cor-linha: #2E2E31; --cor-borda: #77777D; --cor-marca: #C5CFD9; --cor-marca-forte: #DDE4EA; --cor-sobre-marca: #121212; }
+:root[data-aparencia="escuro"][data-tema="ameixa"] { --cor-fundo: #160F14; --cor-fundo-agrupado: #160F14; --cor-superficie: #20171E; --cor-superficie-2: #2A1F28; --cor-texto: #F2E9EF; --cor-texto-2: #BFAEBA; --cor-linha: #33262F; --cor-borda: #86737F; --cor-marca: #EBA6D4; --cor-marca-forte: #F3C4E3; --cor-sobre-marca: #160F14; }
+/* Claro forçado: os blocos claros já valem; só anula o color-scheme. */
+:root[data-aparencia="claro"] { color-scheme: light; }
 
 /* =====================================================================
    Base
@@ -346,7 +362,8 @@ body.agrupado .banner { background: var(--cor-superficie); }
   display: grid; place-items: center; background: none; border: 0; cursor: pointer;
   color: var(--cor-texto-2); border-radius: var(--raio-campo);
 }
-@media (prefers-color-scheme: dark) { .banner { background: var(--cor-superficie); } }
+@media (prefers-color-scheme: dark) { :root:not([data-aparencia="claro"]) .banner { background: var(--cor-superficie); } }
+:root[data-aparencia="escuro"] .banner { background: var(--cor-superficie); }
 
 /* =====================================================================
    Estado vazio (3.13)
@@ -580,6 +597,10 @@ p.nota.bloco { padding-top: var(--espaco-3); }
 .copia { padding-top: var(--espaco-2); padding-bottom: var(--espaco-2); }
 .copias-vazia { color: var(--cor-texto-2); }
 fieldset.temas { border: 0; min-width: 0; }
+/* Aparência (3.10a): rádios em lista, sem amostras; a linha inteira é o label (min 48 px). */
+fieldset.aparencias { border: 0; min-width: 0; }
+.opcao-aparencia { min-height: 48px; gap: var(--espaco-3); cursor: pointer; }
+.opcao-aparencia .nome-aparencia { flex: 1; min-width: 0; }
 .opcao-tema { min-height: 56px; padding-top: var(--espaco-2); padding-bottom: var(--espaco-2); justify-content: flex-start; gap: var(--espaco-3); cursor: pointer; }
 .opcao-tema .nome-tema { flex: 1; min-width: 0; }
 .opcao-tema .em-uso { display: block; font-size: var(--texto-xs); color: var(--cor-texto-2); }
