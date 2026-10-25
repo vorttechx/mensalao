@@ -228,6 +228,10 @@ export function iniciarApp(el: HTMLElement): void {
     void processarLembretes();
     if (!telaComFormulario() && !document.querySelector('dialog[open]')) renderizar();
   });
+  // BUG-06: marca se o teclado está em uso, para o anel do título (foco por script) aparecer só nesse caso.
+  const raizDoc = document.documentElement;
+  document.addEventListener('keydown', (ev) => { if (!ev.altKey && !ev.ctrlKey && !ev.metaKey) raizDoc.classList.add('teclado'); }, true);
+  document.addEventListener('pointerdown', () => raizDoc.classList.remove('teclado'), true);
   aplicarTema();
   registrarTroca();
   renderizar();
