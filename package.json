@@ -9,7 +9,7 @@
     "build:teste": "tsc --noEmit -p tsconfig.json && vite build --mode teste",
     "preview": "vite preview --port 4173 --strictPort",
     "preview:teste": "vite preview --mode teste --port 4173 --strictPort",
-    "verificar:bundle": "npm run build && npm run build:teste && node scripts/verificar-provedor-falso.mjs",
+    "verificar:bundle": "npm run build && npm run build:teste && npx cap sync android && node scripts/verificar-provedor-falso.mjs && node scripts/verificar-anuncios.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "capturas": "node scripts/capturas.mjs",

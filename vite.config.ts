@@ -123,10 +123,29 @@ function csp(): Plugin {
 
 /** IDs de teste oficiais do Google (iguais a src/plataforma/ids-anuncios.ts). */
 const IDS_TESTE = { banner: 'ca-app-pub-3940256099942544/9214589741', premiado: 'ca-app-pub-3940256099942544/5224354917' };
+const EDITOR_TESTE = '3940256099942544';
+const FORMATO_BLOCO = /^ca-app-pub-\d{16}\/\d{10}$/;
 
-/** Configuração de anúncios injetada no bundle (__MENSALAO_ANUNCIOS__): IDs de teste em todo build. */
-function configAnuncios() {
-  return { ...IDS_TESTE, teste: true, umpDepuracao: process.env.MENSALAO_UMP_DEPURACAO?.trim() ?? '', aparelhosTeste: [] as string[] };
+/**
+ * Configuração de anúncios injetada no bundle (__MENSALAO_ANUNCIOS__), US-30.CA1/CA2:
+ * - todo build (desenvolvimento, teste, CI, APK de debug): só os IDs de TESTE do Google;
+ * - MENSALAO_ANUNCIOS=producao (scripts/android.mjs aab): os IDs REAIS vêm de MENSALAO_ADMOB_BANNER_ID e
+ *   MENSALAO_ADMOB_PREMIADO_ID; o build falha se faltarem, se o formato estiver errado ou se forem de teste.
+ *   Na produção não há região simulada do UMP nem aparelho de teste.
+ * Os IDs reais nunca são escritos em arquivo do repositório: só existem nas variáveis da máquina de quem gera o .aab.
+ */
+function configAnuncios(teste: boolean) {
+  if (process.env.MENSALAO_ANUNCIOS?.trim() !== 'producao') {
+    return { ...IDS_TESTE, teste: true, umpDepuracao: process.env.MENSALAO_UMP_DEPURACAO?.trim() ?? '', aparelhosTeste: [] as string[] };
+  }
+  if (teste) throw new Error('MENSALAO_ANUNCIOS=producao não vale para o build de teste (--mode teste).');
+  const banner = process.env.MENSALAO_ADMOB_BANNER_ID?.trim() ?? '';
+  const premiado = process.env.MENSALAO_ADMOB_PREMIADO_ID?.trim() ?? '';
+  for (const [nome, id] of [['MENSALAO_ADMOB_BANNER_ID', banner], ['MENSALAO_ADMOB_PREMIADO_ID', premiado]] as const) {
+    if (!FORMATO_BLOCO.test(id)) throw new Error(`${nome} ausente ou fora do formato ca-app-pub-<16 dígitos>/<10 dígitos>.`);
+    if (id.includes(EDITOR_TESTE)) throw new Error(`${nome} é um ID de teste do Google: o build de produção exige o ID real.`);
+  }
+  return { banner, premiado, teste: false, umpDepuracao: '', aparelhosTeste: [] as string[] };
 }
 
 // base relativa: o build funciona dentro do app (Capacitor serve dist/ a partir da raiz) e em qualquer subdiretório.
@@ -139,7 +158,7 @@ export default defineConfig(({ mode }) => {
   const teste = (process.env.VITE_MODO ?? env.VITE_MODO) === 'teste';
   return {
     base: './',
-    define: { __MENSALAO_ANUNCIOS__: JSON.stringify(configAnuncios()) },
+    define: { __MENSALAO_ANUNCIOS__: JSON.stringify(configAnuncios(teste)) },
     resolve: {
       alias: {
         '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'android'}.ts`),
