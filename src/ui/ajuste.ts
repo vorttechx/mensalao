@@ -1,13 +1,15 @@
 // US-22.CA4 — Texto grande ajustado ao espaço real, com qualquer fonte do sistema.
 // O CSS dá o ponto de partida (tamanho do design em rem, limitado por cqi); aqui se mede o que de fato coube
 // com a fonte que o aparelho usou (system-ui varia: Inter, Roboto, DejaVu Sans...) e se corrige:
-// - número grande e "Por ano": se "R$ n" não cabe na linha do bloco, a fonte diminui até caber (piso: 16 px);
+// - número grande, "Por ano", valor dos itens de lista e legenda do gráfico: se o texto sem quebra não cabe no
+//   bloco, a fonte diminui até caber (piso: 16 px);
 // - abas: 4 colunas, 2 ou 1, conforme os rótulos realmente caibam na largura de cada aba;
 // - aviso de lembretes: com 3 ou mais, se o trecho passar do limite do design, a nota vai para "Mais N lembretes".
 // Roda a cada montagem de tela e, via ResizeObserver, quando o bloco ou a escala do texto mudam.
 
-/** Elementos cujo texto não quebra e precisa caber na largura do bloco. */
-const SELETOR_AJUSTE = '.dinheiro-grande, .total-ano';
+/** Elementos cujo texto não quebra e precisa caber na largura do bloco: número grande, "Por ano", valor dos itens
+ *  de lista (Início e Assinaturas), valores dos grupos de Totais e a legenda-tabela do gráfico (valor e % sem quebra). */
+const SELETOR_AJUSTE = '.dinheiro-grande, .total-ano, .item .valor, .grupo-total .l b, table.legenda';
 
 /** Largura de conteúdo do bloco que limita o elemento (o contêiner de consulta mais próximo, ou o pai). */
 function larguraUtil(el: HTMLElement): number {
@@ -20,7 +22,8 @@ function larguraUtil(el: HTMLElement): number {
 }
 
 /**
- * Reduz o font-size de `el` até "R$ n" (`.valor`, ou o próprio elemento) caber na largura do bloco.
+ * Reduz o font-size de `el` até "R$ n" (`.valor` filho, ou o próprio elemento) caber na largura do bloco.
+ * Na legenda do gráfico, o elemento é a tabela inteira (cresce além de 100% quando valor e % não cabem).
  * Teto: o tamanho do CSS (design em rem, limitado por cqi). Piso: 16 px. "R$ n" nunca quebra (white-space: nowrap).
  */
 export function ajustarAoEspaco(el: HTMLElement): void {
