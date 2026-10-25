@@ -31,6 +31,31 @@ export const CATALOGO: ServicoCatalogo[] = [
   { id: 'chatgpt-plus', nome: 'ChatGPT Plus', categoria: 'Software / Produtividade', ciclo: 'mensal', valorCentavos: 11000, comoCancelar: 'No app ou site: Configurações > Conta/Assinatura > Gerenciar > Cancelar plano.' },
 ];
 
+/**
+ * Monogramas dos serviços do catálogo (sprint 3, design 3.5): iniciais e cor que lembra a do serviço,
+ * escurecida até passar 4,5:1 com o texto. Serviços genéricos usam tons da paleta neutra.
+ */
+export const MONOGRAMAS_CATALOGO: Record<string, { iniciais: string; fundo: string; texto: string }> = {
+  netflix: { iniciais: 'N', fundo: '#B1060F', texto: '#FFFFFF' },
+  spotify: { iniciais: 'Sp', fundo: '#147A3D', texto: '#FFFFFF' },
+  'amazon-prime': { iniciais: 'Pr', fundo: '#146EB4', texto: '#FFFFFF' },
+  'disney-plus': { iniciais: 'D+', fundo: '#113CCF', texto: '#FFFFFF' },
+  max: { iniciais: 'M', fundo: '#1A3BD6', texto: '#FFFFFF' },
+  globoplay: { iniciais: 'G', fundo: '#C8193C', texto: '#FFFFFF' },
+  'youtube-premium': { iniciais: 'YT', fundo: '#C4120C', texto: '#FFFFFF' },
+  apple: { iniciais: 'A', fundo: '#3A3A3C', texto: '#FFFFFF' },
+  'google-one': { iniciais: 'G1', fundo: '#1967D2', texto: '#FFFFFF' },
+  deezer: { iniciais: 'Dz', fundo: '#7B2CBF', texto: '#FFFFFF' },
+  'paramount-plus': { iniciais: 'P+', fundo: '#0057D9', texto: '#FFFFFF' },
+  'ifood-clube': { iniciais: 'iF', fundo: '#C8102E', texto: '#FFFFFF' },
+  'meli-plus': { iniciais: 'ML', fundo: '#FFE600', texto: '#2D3277' },
+  academia: { iniciais: 'Ac', fundo: '#5B6670', texto: '#FFFFFF' },
+  internet: { iniciais: 'In', fundo: '#4D6878', texto: '#FFFFFF' },
+  celular: { iniciais: 'Ce', fundo: '#5E5A7A', texto: '#FFFFFF' },
+  'microsoft-365': { iniciais: 'MS', fundo: '#C43E00', texto: '#FFFFFF' },
+  'chatgpt-plus': { iniciais: 'Ch', fundo: '#0B7A5E', texto: '#FFFFFF' },
+};
+
 /** Remove acentos e passa para minúsculas, para busca tolerante. */
 export function normalizarBusca(texto: string): string {
   return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();

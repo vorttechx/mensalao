@@ -1,10 +1,10 @@
-// US-05 — Assinaturas: lista geral com pausadas e seção recolhível de canceladas (design.md 4.5).
+// US-05 / US-21 — Assinaturas: lista geral com pausadas e seção recolhível de canceladas (design 4.2).
 import { formatarDataBR } from '../../domain/datas';
-import { formatarBRL } from '../../domain/dinheiro';
 import { rotuloPagamento, sufixoCiclo, type Assinatura } from '../../domain/tipos';
 import { obterEstado } from '../../loja';
 import { botao, estadoVazio, selo } from '../componentes';
 import { h } from '../dom';
+import { icone } from '../icones';
 import { adicionar, contadorLimite } from '../limite';
 import type { Tela } from '../tela';
 import { itemAssinatura, selosReajuste } from './comum';
@@ -24,7 +24,8 @@ function item(a: Assinatura): HTMLElement {
   selos.push(...selosReajuste(a));
   return itemAssinatura(a, {
     testid: 'sub-item',
-    valor: `${formatarBRL(a.valorCentavos)}${sufixoCiclo(a.ciclo)}`,
+    valorCentavos: a.valorCentavos,
+    sufixo: sufixoCiclo(a.ciclo),
     meta: `${a.categoria} · ${rotuloPagamento(a.pagamento)}`,
     selos,
     apagado: a.status !== 'ativa',
@@ -42,7 +43,7 @@ export function telaAssinaturas(): Tela {
         estadoVazio({
           testid: 'empty-state-assinaturas',
           textos: ['Você ainda não cadastrou assinaturas.'],
-          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio', icone: 'mais' }),
+          botao: botao('Adicionar assinatura', 'primario', adicionar, { testid: 'btn-adicionar-vazio' }),
         }),
       ],
     };
@@ -55,16 +56,16 @@ export function telaAssinaturas(): Tela {
   return {
     titulo: 'Assinaturas',
     aba: 'assinaturas',
-    fab: true,
+    adicionar: true,
     subtitulo: resumo || 'Nenhuma assinatura ativa',
     conteudo: [
+      principais.length ? h('ul', { class: 'lista lista-respiro', testid: 'sub-list', 'aria-label': 'Assinaturas ativas e pausadas' }, principais.map(item)) : null,
       contadorLimite(),
-      principais.length ? h('ul', { class: 'lista', testid: 'sub-list', 'aria-label': 'Assinaturas ativas e pausadas' }, principais.map(item)) : null,
       canceladas.length
         ? h(
             'details',
             { class: 'canceladas', testid: 'filtro-canceladas' },
-            h('summary', {}, `Canceladas (${canceladas.length})`),
+            h('summary', {}, h('span', {}, `Canceladas (${canceladas.length})`), icone('chevron-baixo', 'ic seta')),
             h('ul', { class: 'lista', testid: 'canceladas-list', 'aria-label': 'Canceladas' }, canceladas.map(item)),
           )
         : null,

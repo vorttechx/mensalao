@@ -27,4 +27,4 @@ O `.aab` vai para o Play Console (R-04). O produto in-app `mensalao_pro` (não c
 
 - `features.playBilling.enabled: true` liga a Digital Goods API dentro da TWA (sem isso o app mostra "compra indisponível").
 - `https://<domínio>/.well-known/assetlinks.json` tem de responder com o pacote e o fingerprint corretos, senão a TWA abre com barra de endereço e a cobrança não funciona.
-- Nome, cores e ícones batem com `public/manifest.webmanifest` (nome "Mensalão", tema #0B6B47, fundo #F5F8F6, ícone 512 px maskable).
+- Nome, cores e ícones batem com `public/manifest.webmanifest` (nome "Mensalão", tema #FFFFFF, fundo #FFFFFF, ícone 512 px maskable). Sprint 3: barra de status e de navegação na cor do papel (#FFFFFF no claro, #0F1512 no escuro), com ícones escuros no claro; tela de abertura = ícone 512 px centralizado sobre o branco.

@@ -1,21 +1,22 @@
-# Squad Mensalão
+# Mensalão
 
-Projeto do Claude Code com uma squad de quatro agentes (Produto, UX, Dev, QA) que constrói o Mensalão, um PWA de controle de assinaturas, com aprovação do Renato antes de cada etapa.
+PWA de controle de assinaturas, publicado em https://mensalao.app e empacotado como TWA para o Google Play.
+
+## Como rodar
+
+```
+npm ci
+npm run dev          # servidor de desenvolvimento
+npm run build        # build de produção em dist/
+npm test             # testes unitários (Vitest)
+npm run test:e2e     # testes de interface (Playwright)
+```
 
 ## Estrutura
 
-- `CLAUDE.md`: regras da squad, carregadas em toda sessão.
-- `.claude/agents/`: os quatro subagentes (`produto`, `ux`, `dev`, `qa`).
-- `.claude/skills/sprint/SKILL.md`: o comando `/sprint`, que executa uma etapa e para na aprovação.
-- `.claude/settings.json`: comandos pré-aprovados (npm, testes, git local) e bloqueios (`git push`).
-- `docs/`: backlog, direção e design (`design-direcao.md`, `design.md`, `design-preview.html`), bugs, status, notas do Dev, relatório do QA e painel.
-
-## Uso
-
-1. `/sprint status` mostra onde a squad parou.
-2. `/sprint` pede a sua decisão no portão atual e, se você aprovar, roda a próxima etapa.
-3. `/sprint ideia: <texto>` começa uma sprint nova.
-
-Fluxo: backlog (Produto) → G1 → design (UX) → GD → código (Dev) → G2 → testes (QA) → G3 → correções ou entrega.
-
-Estado atual: backlog pronto, aguardando a aprovação de G1 para o UX planejar o design.
+- `src/`: código do app (domínio em módulos puros, UI separada).
+- `public/`: manifest, ícones e `assetlinks.json` da TWA.
+- `tests/`: testes unitários (`tests/unit/`) e de interface (`tests/e2e/`).
+- `twa/`: configuração do empacotamento Android.
+- `docs/loja/`: ficha da Play, capturas, política de privacidade e guia de publicação.
+- `.github/workflows/`: CI em todo PR e publicação no GitHub Pages a cada push na `main`.

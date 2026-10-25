@@ -1,23 +1,23 @@
-// US-17 — Temas de cor (design 7.3). Aplicados por atributo data-tema no <html> (só variáveis CSS mudam).
-import { temaEfetivo, type IdTema } from '../domain/preferencias';
+// US-17 / US-19.CA5 — Temas de cor (design 2.3). Aplicados por atributo data-tema no <html> (só variáveis CSS mudam).
+import { aparenciaEfetiva, coresNavegador, temaEfetivo, type IdTema } from '../domain/preferencias';
 import { obterPrefs } from '../servicos/preferencias';
 import { ehPro } from '../servicos/pro';
 
 export interface InfoTema {
   id: IdTema;
   nome: string;
-  /** Prévia: fundo, primária e superfície no claro e no escuro. */
-  claro: [string, string, string];
-  escuro: [string, string, string];
-  /** Cor do navegador (meta theme-color) no claro e no escuro (US-17.CA8). */
+  /** Prévia (design 3.10): papel e marca no claro e no escuro. */
+  claro: [string, string];
+  escuro: [string, string];
+  /** Cor do navegador (meta theme-color) no claro e no escuro: o papel do tema (design 2.3, UX-S3-09). */
   corNavegador: [string, string];
 }
 
 export const TEMAS_INFO: InfoTema[] = [
-  { id: 'verde-cedula', nome: 'Verde-cédula (padrão)', claro: ['#F5F8F6', '#0B6B47', '#FFFFFF'], escuro: ['#0E1A15', '#5FD4A0', '#16261F'], corNavegador: ['#0B6B47', '#0E1A15'] },
-  { id: 'azul-noite', nome: 'Azul-noite', claro: ['#F4F6FA', '#1F4E8C', '#FFFFFF'], escuro: ['#0D1424', '#8DB8FF', '#152037'], corNavegador: ['#1F4E8C', '#0D1424'] },
-  { id: 'grafite', nome: 'Grafite', claro: ['#F5F5F4', '#34495E', '#FFFFFF'], escuro: ['#121212', '#C9D3DD', '#1C1C1E'], corNavegador: ['#34495E', '#121212'] },
-  { id: 'ameixa', nome: 'Ameixa', claro: ['#F8F5F7', '#7A2E62', '#FFFFFF'], escuro: ['#170F15', '#F0A8D8', '#221820'], corNavegador: ['#7A2E62', '#170F15'] },
+  { id: 'verde-cedula', nome: 'Verde-cédula (padrão)', claro: ['#FFFFFF', '#1D5C3F'], escuro: ['#0F1512', '#7FCBA2'], corNavegador: ['#FFFFFF', '#0F1512'] },
+  { id: 'azul-noite', nome: 'Azul-noite', claro: ['#FFFFFF', '#1F4E8C'], escuro: ['#0E1320', '#8FB4F0'], corNavegador: ['#FFFFFF', '#0E1320'] },
+  { id: 'grafite', nome: 'Grafite', claro: ['#FFFFFF', '#2F3B47'], escuro: ['#121212', '#C5CFD9'], corNavegador: ['#FFFFFF', '#121212'] },
+  { id: 'ameixa', nome: 'Ameixa', claro: ['#FFFFFF', '#7A2E62'], escuro: ['#160F14', '#EBA6D4'], corNavegador: ['#FFFFFF', '#160F14'] },
 ];
 
 export function infoTema(id: IdTema): InfoTema {
@@ -29,16 +29,24 @@ export function nomeCurto(id: IdTema): string {
   return infoTema(id).nome.replace(' (padrão)', '');
 }
 
-/** Aplica o tema efetivo (o escolhido no Pro; o padrão no grátis, sem apagar a escolha). */
+/**
+ * Aplica o tema e a aparência efetivos (os escolhidos no Pro; o padrão e o automático no grátis, sem apagar
+ * as escolhas). data-aparencia só existe quando a aparência é forçada (design 2.3a, US-19.CA7 a CA10).
+ */
 export function aplicarTema(): void {
-  const id = temaEfetivo(obterPrefs(), ehPro());
+  const prefs = obterPrefs();
+  const pro = ehPro();
+  const id = temaEfetivo(prefs, pro);
+  const aparencia = aparenciaEfetiva(prefs, pro);
   const raiz = document.documentElement;
   if (id === 'verde-cedula') delete raiz.dataset.tema;
   else raiz.dataset.tema = id;
-  const info = infoTema(id);
+  if (aparencia === 'auto') delete raiz.dataset.aparencia;
+  else raiz.dataset.aparencia = aparencia;
+  const [corClara, corEscura] = coresNavegador(infoTema(id).corNavegador, aparencia);
   const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
   metas.forEach((m) => {
     const escuro = (m.getAttribute('media') ?? '').includes('dark');
-    m.content = escuro ? info.corNavegador[1] : info.corNavegador[0];
+    m.content = escuro ? corEscura : corClara;
   });
 }

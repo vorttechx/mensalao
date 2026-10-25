@@ -47,6 +47,10 @@ test.describe('US-13 Lembrete antes da cobrança (Pro)', () => {
       ],
     });
     await expect(page.getByTestId('lembrete-item')).toHaveCount(3);
+    // Sprint 3 (UX-S3-08): do 3º em diante ficam no <details> "Mais N lembretes" (no DOM, mas recolhidos).
+    await expect(page.getByTestId('lembrete-item').nth(2)).toBeHidden();
+    await page.getByTestId('lembrete-aviso').locator('details > summary').click();
+    await expect(page.getByTestId('lembrete-item').nth(2)).toBeVisible();
     const textos = await page.getByTestId('lembrete-item').allInnerTexts();
     expect(textos.map((t) => t.split(':')[1].split('—')[0].trim())).toEqual(['Disney', 'Spotify', 'Alura']);
   });

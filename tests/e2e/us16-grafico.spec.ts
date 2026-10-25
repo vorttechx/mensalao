@@ -50,7 +50,11 @@ test.describe('US-16 Gráfico por categoria (Pro)', () => {
   test('US-16.CA5: uma categoria = 100,0% sem erro de desenho', async ({ page }) => {
     await abrirS2(page, { pro: true, hash: '#/totais', assinaturas: ativas(2) });
     await expect(page.getByTestId('grafico-pct')).toHaveText(['100,0%']);
-    await expect(page.locator('[data-testid="grafico-categorias"] svg circle')).toHaveCount(1);
+    // Sprint 3 (UX-S3-06): barra de composição em vez da rosca; uma categoria ocupa a barra inteira.
+    const svg = page.locator('[data-testid="grafico-categorias"] svg[role="img"]');
+    await expect(svg).toHaveCount(1);
+    await expect(svg.locator('rect')).toHaveCount(1);
+    expect(await page.getByTestId('grafico-categorias').innerHTML()).not.toMatch(/NaN|Infinity|undefined/);
   });
 
   test('US-16.CA6: lista vazia ou sem ativas mostra "Sem dados para o gráfico" sem NaN', async ({ page }) => {
