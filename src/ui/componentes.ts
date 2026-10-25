@@ -3,6 +3,7 @@ import { anexar, h, novoId, type Filho } from './dom';
 import { icone, type NomeIcone } from './icones';
 import { mascararDataBR, posicaoCursorMascara } from '../domain/datas';
 import { formatarBRL } from '../domain/dinheiro';
+import { monograma } from '../domain/monograma';
 
 /* ---------- Banner ---------- */
 
@@ -78,6 +79,14 @@ export function dinheiro(centavos: number, estilo: 'grande' | 'lista', extra: { 
   }
   if (extra.sufixo) el.append(h('span', { class: 'sufixo' }, extra.sufixo));
   return el;
+}
+
+/* ---------- Monograma (design 3.5) ---------- */
+
+/** Quadrado com as iniciais do serviço; decorativo (aria-hidden, US-21.CA4). */
+export function monogramaEl(nome: string, catalogoId?: string | null, grande = false): HTMLElement {
+  const m = monograma(nome, catalogoId);
+  return h('span', { class: `mono${grande ? ' mono-grande' : ''}`, 'aria-hidden': 'true', style: `--mono-fundo: ${m.fundo}; --mono-texto: ${m.texto}` }, m.iniciais);
 }
 
 /* ---------- Campos ---------- */

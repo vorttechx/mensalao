@@ -11,7 +11,7 @@ import type { Tela } from '../tela';
 import { lembreteExportar } from './copias';
 import { avisoLembretes } from './lembretes';
 import { reguaDoMes } from './regua';
-import { itemAssinatura, metaCobrancaCurta, selosReajuste, valorSimples } from './comum';
+import { itemAssinatura, metaCobrancaCurta, selosReajuste } from './comum';
 
 function itemProximo(i: ItemProximo, dia: string): HTMLElement {
   const a = i.assinatura;
@@ -20,9 +20,9 @@ function itemProximo(i: ItemProximo, dia: string): HTMLElement {
   if (i.seloVence) selos.push(selo('logo', textoVenceLogo(i.diasAteCobranca), 'badge-vence-logo'));
   selos.push(...selosReajuste(a));
   const aviso = i.testeTerminouEm
-    ? h('div', { class: 'nota-item', testid: 'aviso-teste-terminou' }, icone('info'), `Teste terminou em ${formatarDataBR(i.testeTerminouEm)} — agora é cobrança normal`)
+    ? h('span', { class: 'nota-item', testid: 'aviso-teste-terminou' }, icone('info'), `Teste terminou em ${formatarDataBR(i.testeTerminouEm)} — agora é cobrança normal`)
     : null;
-  return itemAssinatura(a, { testid: 'upcoming-item', valor: valorSimples(a), meta: metaCobrancaCurta(a, dia), selos, aviso });
+  return itemAssinatura(a, { testid: 'upcoming-item', valorCentavos: a.valorCentavos, meta: metaCobrancaCurta(a, dia), selos, aviso });
 }
 
 /** Total por mês como tipografia sobre o papel (mesmo cálculo de Totais, US-20.CA1). */

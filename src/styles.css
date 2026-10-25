@@ -449,3 +449,53 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 .medidor i { display: block; width: 14px; height: 4px; border-radius: 1px; background: var(--cor-linha); }
 .medidor i.cheio { background: var(--cor-texto-2); }
 .limite-apoio { font-size: var(--texto-xs); color: var(--cor-texto-2); }
+
+/* =====================================================================
+   US-21 — Listas com divisor fino e monograma de cada serviço (3.4, 3.5)
+   ===================================================================== */
+.lista { list-style: none; margin: 0; padding: 0; }
+.item {
+  display: flex; gap: var(--espaco-3); align-items: flex-start;
+  width: 100%; min-height: 60px; padding: 0 var(--margem-tela);
+  background: none; border: 0; text-align: left; text-decoration: none; color: var(--cor-texto); cursor: pointer;
+  transition: background-color var(--duracao-rapida) var(--curva);
+}
+.item:active { background: var(--cor-fundo-agrupado); }
+.item:focus-visible { outline-offset: -3px; }
+.item .corpo {
+  flex: 1; min-width: 0;
+  display: grid; grid-template-columns: 1fr auto; column-gap: var(--espaco-3); row-gap: 2px;
+  padding: var(--espaco-3) 0; border-bottom: 1px solid var(--cor-linha);
+}
+.item .nome {
+  font-weight: var(--peso-forte); line-height: 1.3; min-width: 0; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.item .valor { text-align: right; line-height: 1.3; }
+.item .meta { grid-column: 1 / -1; font-size: var(--texto-xs); color: var(--cor-texto-2); overflow-wrap: anywhere; }
+.item .marcas { grid-column: 1 / -1; margin-top: 2px; }
+.item .nota-item { grid-column: 1 / -1; display: flex; gap: 6px; align-items: flex-start; margin-top: 2px; font-size: var(--texto-xs); color: var(--cor-texto-2); }
+.item .nota-item svg { width: 14px; height: 14px; margin-top: 1px; }
+/* Pausada/cancelada na lista geral: tinta clara e monograma em cinza; a marca diz o motivo. */
+.item.apagado .nome, .item.apagado .valor { color: var(--cor-texto-2); font-weight: var(--peso-normal); }
+.item.apagado .mono { filter: grayscale(1); }
+
+/* Monograma: iniciais sobre a cor do serviço (decorativo). */
+.mono {
+  width: var(--monograma); height: var(--monograma); margin-top: var(--espaco-3); flex: none;
+  display: grid; place-items: center; border-radius: var(--raio-campo);
+  background: var(--mono-fundo); color: var(--mono-texto);
+  font-size: 0.875rem; font-weight: var(--peso-numero); letter-spacing: 0; line-height: 1; white-space: nowrap; overflow: hidden;
+}
+.mono.mono-grande { width: var(--monograma-grande); height: var(--monograma-grande); margin: 0; border-radius: var(--raio-grupo); font-size: 1.125rem; }
+
+/* Canceladas recolhidas no fim de Assinaturas */
+details.canceladas { margin-top: var(--espaco-2); }
+details.canceladas summary {
+  min-height: var(--toque-min); display: flex; align-items: center; gap: 6px; padding: 0 var(--margem-tela);
+  font-weight: var(--peso-forte); cursor: pointer; list-style: none;
+}
+details.canceladas summary::-webkit-details-marker { display: none; }
+details.canceladas summary .seta { color: var(--cor-texto-2); transition: transform var(--duracao-media) var(--curva); }
+details.canceladas[open] summary .seta { transform: rotate(180deg); }
+.lista-respiro { margin-top: var(--espaco-2); }

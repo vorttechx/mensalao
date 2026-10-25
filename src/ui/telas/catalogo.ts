@@ -2,7 +2,7 @@
 import { buscarCatalogo, type ServicoCatalogo } from '../../domain/catalogo';
 import { formatarBRL } from '../../domain/dinheiro';
 import { sufixoCiclo } from '../../domain/tipos';
-import { botao } from '../componentes';
+import { botao, monogramaEl } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
 import { avisarLimite, guardarTelaDeCadastro, podeAdicionar } from '../limite';
@@ -21,15 +21,20 @@ function itemCatalogo(s: ServicoCatalogo): HTMLElement {
     {},
     h(
       'button',
-      { type: 'button', class: 'cat', testid: 'catalog-item', 'data-catalogo-id': s.id, onclick: () => irPara(`#/nova/form/${encodeURIComponent(s.id)}`) },
-      h('b', {}, s.nome),
-      h('span', {}, `${formatarBRL(s.valorCentavos)}${sufixoCiclo(s.ciclo)} · ${s.categoria}`),
+      { type: 'button', class: 'item', testid: 'catalog-item', 'data-catalogo-id': s.id, onclick: () => irPara(`#/nova/form/${encodeURIComponent(s.id)}`) },
+      monogramaEl(s.nome, s.id),
+      h(
+        'span',
+        { class: 'corpo' },
+        h('span', { class: 'nome' }, s.nome),
+        h('span', { class: 'meta' }, `${formatarBRL(s.valorCentavos)}${sufixoCiclo(s.ciclo)} · ${s.categoria}`),
+      ),
     ),
   );
 }
 
 export function telaCatalogo(): Tela {
-  const lista = h('ul', { class: 'cartao-lista', testid: 'catalog-list', 'aria-labelledby': 'titulo-catalogo' });
+  const lista = h('ul', { class: 'lista', testid: 'catalog-list', 'aria-labelledby': 'titulo-catalogo' });
   const anuncio = h('p', { class: 'sr-only', 'aria-live': 'polite', testid: 'catalog-contagem' });
   const semResultado = h('p', { class: 'nota', testid: 'catalog-vazio', hidden: true });
 
