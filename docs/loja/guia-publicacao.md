@@ -2,7 +2,7 @@
 
 Ordem recomendada. Itens R-xx correspondem à seção 5.2 do backlog.
 
-1. **Confirmar o id de pacote** `br.com.mensalao.app` (R-10). Ele não muda depois.
+1. **Id de pacote** `br.com.mensalao.app` (confirmado pelo Renato em 25/10/2026, R-10). Ele não muda depois.
 2. **Registrar o domínio próprio** (R-02), ex.: `mensalao.com.br` no Registro.br, se disponível.
    - No DNS, aponte o domínio para o GitHub Pages (registros A/AAAA do Pages ou CNAME para `vorttechx.github.io`).
    - No repositório: Settings > Pages > Custom domain = o domínio; marque "Enforce HTTPS".

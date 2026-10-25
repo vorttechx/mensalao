@@ -59,6 +59,6 @@ Nenhum.
 Lista com caixas de marcar: https://claude.ai/artifact/KaS3458HW36sX2pHHvGkYm
 
 - Publicar o código da sprint 2 na main (PR) para atualizar o GitHub Pages.
-- Preço do Pro confirmado em R$ 19,99 (25/10/2026). Confirmar o id do pacote `br.com.mensalao.app`.
+- Preço do Pro confirmado em R$ 19,99 (25/10/2026). Id do pacote `br.com.mensalao.app` confirmado pelo Renato em 25/10/2026.
 - Registrar o domínio, apontar o DNS e definir `MENSALAO_DOMINIO`.
 - Conta na Play, chave de assinatura (fingerprint SHA-256), `.aab`, produto `mensalao_pro`, ficha, testadores de licença, teste de compra real, link da ficha (`URL_FICHA_PLAY`) e envio para revisão.
