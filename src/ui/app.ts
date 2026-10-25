@@ -6,6 +6,7 @@ import { aoMudarPlano, ehPro, fecharAvisoRevogacao, haAvisoRevogacao, verificarA
 import { criarBanner, fecharDialogosAbertos, seloPro } from './componentes';
 import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
+import { observarAjustes } from './ajuste';
 import { adicionar } from './limite';
 import { aplicarTema } from './temas';
 import { consumirBanner, fecharBanner, registrarTroca, rotaAtual } from './navegacao';
@@ -196,6 +197,8 @@ export function renderizar(): void {
   document.body.classList.toggle('agrupado', !!tela.agrupado);
 
   raiz.replaceChildren(app);
+  // US-22.CA4: número grande, "Por ano", abas e aviso de lembretes ajustados ao espaço real (qualquer fonte).
+  observarAjustes(raiz);
   document.title = tela.marca ? 'Mensalão' : `${tela.titulo} — Mensalão`;
 
   const focoTela = tela.aoMontar?.();

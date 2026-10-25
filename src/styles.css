@@ -189,24 +189,25 @@ html.teclado h1:focus-visible { outline: 3px solid var(--cor-foco); }
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
   background: var(--cor-fundo); border-top: 1px solid var(--cor-linha);
   padding-bottom: env(safe-area-inset-bottom);
-  container: nav / inline-size;
 }
 body.agrupado .nav { background: var(--cor-fundo-agrupado); }
 /* BUG-02 / BUG-08: as abas dividem a largura em colunas iguais (minmax(0, 1fr)) e o rótulo cresce com o texto do
-   sistema (rem, sem teto). Quando "Assinaturas" deixa de caber em 1/4 da barra, as abas se empilham em 2 colunas
-   (2 linhas) e, se ainda faltar espaço, em 1 coluna; a palavra só quebra em último caso (outra fonte). A consulta é
-   à largura da própria barra em rem, que acompanha o texto do sistema. */
+   sistema (rem, sem teto). US-22.CA4: o número de colunas vem da medida real (src/ui/ajuste.ts): 4 enquanto todos os
+   rótulos, em peso 600, cabem inteiros numa linha de 1/4 da barra; senão 2 colunas (2 linhas); senão 1. Sem limite
+   fixo em rem, que dependia da largura de uma fonte. A palavra só quebra em último caso (1 coluna). */
 .nav ul { list-style: none; margin: 0 auto; padding: 0; max-width: var(--largura-max); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .nav a {
-  min-height: var(--altura-nav); min-width: 0; padding: var(--espaco-1) 2px;
+  min-height: var(--altura-nav); min-width: 0; padding: var(--espaco-1) 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   text-decoration: none; color: var(--cor-texto-2); font-size: var(--texto-xs);
   line-height: var(--altura-linha-titulo); text-align: center; overflow-wrap: anywhere;
   transition: color var(--duracao-rapida) var(--curva);
 }
 .nav a[aria-current="page"] { color: var(--cor-marca); font-weight: var(--peso-forte); }
-@container nav (width < 20rem) { .nav ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@container nav (width < 10rem) { .nav ul { grid-template-columns: minmax(0, 1fr); } }
+.nav ul[data-colunas="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nav ul[data-colunas="1"] { grid-template-columns: minmax(0, 1fr); }
+/* Só durante a medida (síncrona, nunca pintada): rótulo numa linha, no peso da aba ativa. */
+.nav ul.medindo a { white-space: nowrap; overflow-wrap: normal; font-weight: var(--peso-forte); }
 
 /* =====================================================================
    Botões (3.1)
@@ -295,7 +296,9 @@ select.controle { appearance: none; -webkit-appearance: none; padding-right: 40p
    ("/mês", "/ano") desce para a linha de baixo quando não cabe. O único limite é a largura do próprio bloco: o
    valor pode ocupar a linha toda, mas não sai da tela nem cria rolagem horizontal.
    BUG-10: 17,5cqi é o tamanho em que "R$ 999.999,99" (≈ 5,64 em) cabe no bloco; com 7 dígitos ou mais
-   ("R$ 9.999.999,99" ≈ 6,5 em) a classe .longo baixa para 15cqi. A 100% continua nos 40 px (--texto-2xl). */
+   ("R$ 9.999.999,99" ≈ 6,5 em) a classe .longo baixa para 15cqi. A 100% continua nos 40 px (--texto-2xl).
+   US-22.CA4: esses limites são só o ponto de partida (medidos com Inter); se com a fonte do aparelho "R$ n" ainda
+   não couber, ajustarAoEspaco (src/ui/ajuste.ts) reduz a fonte até caber (piso de 16 px). */
 .dinheiro-grande {
   font-size: min(var(--texto-2xl), 17.5cqi); font-weight: var(--peso-numero); letter-spacing: var(--tracking-numero);
   line-height: var(--altura-linha-numero);
@@ -469,7 +472,8 @@ dialog.dialogo::backdrop { background: var(--cor-veu); }
 .avisos summary::-webkit-details-marker { display: none; }
 .avisos details[open] > summary .seta { transform: rotate(180deg); }
 .avisos summary .seta { transition: transform var(--duracao-media) var(--curva); }
-/* BUG-01: a nota usa a largura toda do trecho para caber em 2 linhas e manter o aviso ≤ 184 px (3.11). */
+/* BUG-01: a nota usa a largura toda do trecho para caber em 2 linhas e manter o aviso ≤ 184 px (3.11).
+   US-22.CA4: se com a fonte do aparelho ainda passar disso, a nota vai para dentro de "Mais N lembretes" (ajuste.ts). */
 .avisos .nota { padding-left: 0; }
 .aviso-backup { margin: var(--espaco-4) var(--margem-tela) 0; padding: 10px 0; border-top: 1px solid var(--cor-linha); border-bottom: 1px solid var(--cor-linha); display: grid; gap: 2px; }
 .avisos + .aviso-backup { margin-top: 0; border-top: 0; }
@@ -586,7 +590,8 @@ ol.historico .atual span:last-child { font-weight: var(--peso-forte); }
 .bloco-total .rotulo { font-size: var(--texto-xs); color: var(--cor-texto-2); }
 .bloco-total .dinheiro-grande { display: block; margin-top: 2px; }
 /* BUG-09: com texto grande, o "Por ano" desce para baixo do rótulo (à direita) em vez de sair da tela; "R$ n" nunca
-   quebra e o tamanho para em 12cqi do bloco (container), largura em que "R$ 9.999.999,99" ainda cabe numa linha. */
+   quebra e o tamanho para em 12cqi do bloco (container), largura em que "R$ 9.999.999,99" ainda cabe numa linha
+   (com Inter); com outra fonte, ajustarAoEspaco (src/ui/ajuste.ts) reduz até caber. */
 .par { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 var(--espaco-3); margin-top: var(--espaco-2); padding: 10px 0; border-top: 1px solid var(--cor-linha); }
 .par span:first-child { color: var(--cor-texto-2); }
 .par .total-ano { margin-left: auto; font-size: min(var(--texto-md), 12cqi); font-weight: var(--peso-forte); white-space: nowrap; }
