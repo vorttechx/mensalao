@@ -2,7 +2,7 @@
 import { buscarCatalogo, type ServicoCatalogo } from '../../domain/catalogo';
 import { formatarBRL } from '../../domain/dinheiro';
 import { sufixoCiclo } from '../../domain/tipos';
-import { botao } from '../componentes';
+import { botao, monogramaEl } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
 import { avisarLimite, guardarTelaDeCadastro, podeAdicionar } from '../limite';
@@ -21,17 +21,22 @@ function itemCatalogo(s: ServicoCatalogo): HTMLElement {
     {},
     h(
       'button',
-      { type: 'button', class: 'cat', testid: 'catalog-item', 'data-catalogo-id': s.id, onclick: () => irPara(`#/nova/form/${encodeURIComponent(s.id)}`) },
-      h('b', {}, s.nome),
-      h('span', {}, `${formatarBRL(s.valorCentavos)}${sufixoCiclo(s.ciclo)} · ${s.categoria}`),
+      { type: 'button', class: 'item', testid: 'catalog-item', 'data-catalogo-id': s.id, onclick: () => irPara(`#/nova/form/${encodeURIComponent(s.id)}`) },
+      monogramaEl(s.nome, s.id),
+      h(
+        'span',
+        { class: 'corpo' },
+        h('span', { class: 'nome' }, s.nome),
+        h('span', { class: 'meta' }, `${formatarBRL(s.valorCentavos)}${sufixoCiclo(s.ciclo)} · ${s.categoria}`),
+      ),
     ),
   );
 }
 
 export function telaCatalogo(): Tela {
-  const lista = h('ul', { class: 'cartao-lista', testid: 'catalog-list', 'aria-labelledby': 'titulo-catalogo' });
+  const lista = h('ul', { class: 'lista', testid: 'catalog-list', 'aria-labelledby': 'titulo-catalogo' });
   const anuncio = h('p', { class: 'sr-only', 'aria-live': 'polite', testid: 'catalog-contagem' });
-  const semResultado = h('p', { class: 'nota', testid: 'catalog-vazio', hidden: true });
+  const semResultado = h('p', { class: 'catalogo-vazio', testid: 'catalog-vazio', hidden: true });
 
   const busca = h('input', {
     id: 'busca-catalogo',
@@ -63,16 +68,20 @@ export function telaCatalogo(): Tela {
     conteudo: [
       h(
         'div',
-        { class: 'campo' },
-        h('label', { for: 'busca-catalogo' }, 'Buscar serviço'),
-        h('div', { class: 'prefixo busca' }, icone('busca'), busca),
+        { class: 'bloco pilha catalogo-busca' },
+        h(
+          'div',
+          { class: 'campo' },
+          h('label', { for: 'busca-catalogo' }, 'Buscar serviço'),
+          h('div', { class: 'prefixo busca' }, icone('busca'), busca),
+        ),
+        botao('Cadastrar livremente', 'secundario', () => irPara('#/nova/form'), { testid: 'btn-cadastrar-livre', larga: true }),
       ),
-      botao('Cadastrar livremente', 'secundario', () => irPara('#/nova/form'), { testid: 'btn-cadastrar-livre', larga: true }),
-      h('h2', { class: 'secao', id: 'titulo-catalogo' }, 'Serviços conhecidos'),
+      h('div', { class: 'secao-titulo' }, h('h2', { id: 'titulo-catalogo' }, 'Serviços conhecidos')),
       anuncio,
       lista,
       semResultado,
-      h('p', { class: 'nota' }, 'Valores sugeridos podem estar desatualizados. Você confere antes de salvar.'),
+      h('p', { class: 'nota bloco' }, 'Valores sugeridos podem estar desatualizados. Você confere antes de salvar.'),
     ],
   };
 }

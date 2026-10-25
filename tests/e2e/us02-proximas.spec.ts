@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { abrir, lerEstado, sub } from './helpers';
 
+// Sprint 3 (design 9.2): a meta do item no Início usa a data curta "Ter, 20 out" em vez de "20/10/2026".
 test.describe('US-02 Próximas cobranças', () => {
   test('US-02.CA1 / CA11: ordenação, e dados do item', async ({ page }) => {
     await abrir(page, [
@@ -11,7 +12,7 @@ test.describe('US-02 Próximas cobranças', () => {
     const itens = page.getByTestId('upcoming-item');
     await expect(itens.getByTestId('item-nome')).toHaveText(['Cedo', 'Alfa', 'Zeta']);
     await expect(itens.nth(2)).toContainText('R$ 44,90');
-    await expect(itens.nth(2)).toContainText('20/10/2026');
+    await expect(itens.nth(2)).toContainText('Ter, 20 out');
     await expect(itens.nth(2)).toContainText('Pix Automático');
   });
 
@@ -47,24 +48,24 @@ test.describe('US-02 Próximas cobranças', () => {
 
   test('US-02.CA4: data vencida é avançada e persistida ao abrir', async ({ page }) => {
     await abrir(page, [sub({ proxima: '2026-08-20', diaRef: 20 })]);
-    await expect(page.getByTestId('upcoming-item')).toContainText('20/10/2026');
+    await expect(page.getByTestId('upcoming-item')).toContainText('Ter, 20 out'); // design 9.2: data curta na meta
     expect((await lerEstado(page)).assinaturas[0].proxima).toBe('2026-10-20');
   });
 
   test('US-02.CA5: anual vence 10/03/2027', async ({ page }) => {
     await abrir(page, [sub({ ciclo: 'anual', proxima: '2026-03-10', diaRef: 10 })]);
-    await expect(page.getByTestId('upcoming-item')).toContainText('10/03/2027');
+    await expect(page.getByTestId('upcoming-item')).toContainText('Qua, 10 mar 2027') // design 9.2: ano só quando for outro ano;
   });
 
   test('US-02.CA6: mensal dia 31 mantém o 31 quando o mês permite', async ({ page }) => {
     await abrir(page, [sub({ proxima: '2026-08-31', diaRef: 31 })]);
-    await expect(page.getByTestId('upcoming-item')).toContainText('30/09/2026');
+    await expect(page.getByTestId('upcoming-item')).toContainText('Qua, 30 set');
     await page.clock.setFixedTime('2026-10-01T12:00:00-03:00');
     await page.reload();
-    await expect(page.getByTestId('upcoming-item')).toContainText('31/10/2026');
+    await expect(page.getByTestId('upcoming-item')).toContainText('Sáb, 31 out');
     await page.clock.setFixedTime('2026-11-01T12:00:00-03:00');
     await page.reload();
-    await expect(page.getByTestId('upcoming-item')).toContainText('30/11/2026');
+    await expect(page.getByTestId('upcoming-item')).toContainText('Seg, 30 nov');
   });
 
   test('US-02.CA7: selo de teste grátis perto do fim', async ({ page }) => {

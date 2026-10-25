@@ -1,6 +1,8 @@
-// Conformidade visual/acessibilidade da sprint 2 com docs/design.md (Parte 2), nos itens verificáveis por máquina.
+// Conformidade das telas da sprint 2 (Pro, Ajustes, Totais, diálogos) com o design.md da sprint 3 (seções 3.1, 3.14,
+// 3.16, 4.7 a 4.10 e 6), nos itens verificáveis por máquina. A verificação geral das telas está em us22-telas.spec.ts.
 import { expect, test } from '@playwright/test';
 import { abrirS2, ativas, semRolagemHorizontal, sub } from './helpers2';
+import { transbordos } from './helpers3';
 
 const dados = [
   ...ativas(3),
@@ -10,13 +12,14 @@ const dados = [
 const rotas = ['#/', '#/assinaturas', '#/totais', '#/ajustes', '#/pro'];
 
 for (const pro of [false, true]) {
-  test.describe(`Design Parte 2 (${pro ? 'Pro' : 'grátis'})`, () => {
+  test.describe(`Design sprint 3 nas telas da sprint 2 (${pro ? 'Pro' : 'grátis'})`, () => {
     test(`sem rolagem horizontal em 360 px em todas as telas (${pro ? 'Pro' : 'grátis'})`, async ({ page }) => {
       await abrirS2(page, { pro, assinaturas: dados, prefs: { lembrete: { ativo: true, dias: 3 }, backup: { ativo: true, inicioPro: '2026-08-01' } } });
       for (const r of rotas) {
         await page.goto('./' + r);
         await expect(page.getByTestId('titulo-tela')).toBeVisible();
         await semRolagemHorizontal(page);
+        expect(await transbordos(page), `rota ${r}`).toEqual([]);
       }
     });
 
@@ -63,7 +66,7 @@ for (const pro of [false, true]) {
   });
 }
 
-test.describe('Design Parte 2: diálogo de limite', () => {
+test.describe('Design 3.14 / 4.10: diálogo de limite', () => {
   test('foco vai para o diálogo, Esc fecha e devolve o foco, e o botão principal é o de "Conhecer o Pro"', async ({ page }) => {
     await abrirS2(page, { assinaturas: ativas(5) });
     await page.getByTestId('btn-adicionar').click();
@@ -79,5 +82,29 @@ test.describe('Design Parte 2: diálogo de limite', () => {
     await page.getByTestId('btn-adicionar').click();
     const t = (await page.getByTestId('limite-aviso').innerText()).toLowerCase();
     for (const p of ['bloquead', 'urgente', 'agora!', 'última chance', 'erro']) expect(t).not.toContain(p);
+  });
+  test('design 3.14: diálogo sem ícone, foco inicial em "Agora não" e "Conhecer o Pro" empilhado em cima em 360 px', async ({ page }) => {
+    await abrirS2(page, { assinaturas: ativas(5) });
+    await page.getByTestId('btn-adicionar').click();
+    await expect(page.getByTestId('limite-btn-agora-nao')).toBeFocused();
+    expect(await page.getByTestId('limite-aviso').locator('svg').count()).toBe(0);
+    const pro = (await page.getByTestId('limite-btn-pro').boundingBox())!;
+    const nao = (await page.getByTestId('limite-btn-agora-nao').boundingBox())!;
+    expect(pro.y).toBeLessThan(nao.y);
+  });
+});
+
+test.describe('Design 3.16: recurso Pro no grátis sem cadeado, tracejado nem cinza de desabilitado', () => {
+  test('cartões lock-* em Ajustes e Totais com carimbo Pro e botão de nome completo', async ({ page }) => {
+    await abrirS2(page, { assinaturas: ativas(2), hash: '#/ajustes' });
+    for (const id of ['lock-lembrete', 'lock-backup', 'lock-csv', 'lock-aparencia', 'lock-temas']) {
+      const c = page.getByTestId(id);
+      await expect(c, id).toBeVisible();
+      await expect(c.getByTestId('lock-btn-pro'), id).toHaveAccessibleName(/^Conhecer o Pro para /);
+      const borda = await c.evaluate((e) => [...e.querySelectorAll<HTMLElement>('*')].concat(e as HTMLElement).map((x) => getComputedStyle(x).borderStyle).filter((b) => b.includes('dashed')));
+      expect(borda, id).toEqual([]);
+    }
+    await page.goto('./#/totais');
+    await expect(page.getByTestId('lock-grafico').getByTestId('lock-btn-pro')).toBeVisible();
   });
 });

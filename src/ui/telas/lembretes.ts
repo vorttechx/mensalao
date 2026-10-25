@@ -4,37 +4,53 @@ import { notificador, lembretesAtuais, processarLembretes } from '../../servicos
 import { alterarPrefs, obterPrefs } from '../../servicos/preferencias';
 import { ehPro } from '../../servicos/pro';
 import { renderizar } from '../app';
-import { botao, cartaoRecursoPro, dialogoInfo, interruptor } from '../componentes';
+import { cartaoRecursoPro, dialogoInfo, interruptor, linhaAcao, textoSemQuebrarValores } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
 import { avisar, navegar } from '../navegacao';
 
 export const TEXTO_LIMITE_LEMBRETE = 'Com o app fechado, o aviso depende do seu aparelho e pode atrasar. Abra o app para ver tudo.';
 
-/** Aviso de lembretes no topo do Início; não existe sem lembrete na janela. */
+/** Linhas do aviso que ficam à vista; as demais vão para "Mais N lembretes" (design 3.11, US-20.CA4). */
+const LEMBRETES_VISIVEIS = 2;
+
+function linhaLembrete(i: ReturnType<typeof lembretesAtuais>[number]): HTMLElement {
+  const teste = i.tipo === 'fim-teste';
+  return h(
+    'li',
+    {},
+    h(
+      'a',
+      { href: `#/assinatura/${encodeURIComponent(i.assinaturaId)}`, testid: 'lembrete-item', class: teste ? 'fim-teste' : null },
+      icone(teste ? 'ampulheta' : 'sino'),
+      textoSemQuebrarValores(i.texto),
+      icone('seta', 'ic seta'),
+    ),
+  );
+}
+
+/**
+ * Aviso discreto de lembretes no Início (design 3.11): um trecho do extrato entre dois divisores,
+ * sem faixa colorida. Até 2 linhas à vista; o resto dentro de "Mais N lembretes". Não existe sem lembrete na janela.
+ */
 export function avisoLembretes(): HTMLElement | null {
   const itens = lembretesAtuais();
   if (itens.length === 0) return null;
+  const visiveis = itens.slice(0, LEMBRETES_VISIVEIS);
+  const resto = itens.slice(LEMBRETES_VISIVEIS);
   return h(
     'section',
-    { class: 'aviso-lembretes', role: 'status', testid: 'lembrete-aviso', 'aria-labelledby': 'titulo-lembretes' },
-    h('h2', { id: 'titulo-lembretes' }, icone('sino'), 'Lembretes'),
-    h(
-      'ul',
-      {},
-      itens.map((i) =>
-        h(
-          'li',
-          {},
-          h(
-            'a',
-            { href: `#/assinatura/${encodeURIComponent(i.assinaturaId)}`, testid: 'lembrete-item', class: i.tipo === 'fim-teste' ? 'fim-teste' : null },
-            i.tipo === 'fim-teste' ? icone('ampulheta') : null,
-            h('span', {}, i.texto),
-          ),
-        ),
-      ),
-    ),
+    { class: 'avisos', role: 'status', testid: 'lembrete-aviso', 'aria-labelledby': 'titulo-lembretes' },
+    h('h2', { id: 'titulo-lembretes', class: 'sr-only' }, 'Lembretes'),
+    h('ul', {}, visiveis.map(linhaLembrete)),
+    resto.length
+      ? h(
+          'details',
+          { class: 'mais-lembretes' },
+          h('summary', {}, `Mais ${resto.length} ${resto.length === 1 ? 'lembrete' : 'lembretes'}`, icone('chevron-baixo', 'ic seta')),
+          h('ul', {}, resto.map(linhaLembrete)),
+        )
+      : null,
     h('p', { class: 'nota', testid: 'lembrete-limite-texto' }, TEXTO_LIMITE_LEMBRETE),
   );
 }
@@ -53,7 +69,6 @@ async function ligarLembrete(): Promise<void> {
       testid: 'lembrete-dialogo',
       testidPrincipal: 'lembrete-btn-continuar',
       testidSaida: 'lembrete-btn-voltar',
-      icone: 'sino',
     });
     if (continuar === null) return; // fechado pela troca de rota: nada a fazer (BUG-01)
     if (!continuar) {
@@ -70,7 +85,8 @@ async function ligarLembrete(): Promise<void> {
   document.querySelector<HTMLElement>('[data-testid="lembrete-ativar"]')?.focus();
 }
 
-function formDias(): HTMLElement {
+/** Grupo do Pro: interruptor, dias de antecedência e "Salvar lembrete" como linha de ação (UX-S3-07). */
+function formLembrete(interruptorEl: HTMLElement): HTMLElement {
   const atual = obterPrefs().lembrete.dias;
   const campo = h('input', {
     id: 'lembrete-dias',
@@ -102,22 +118,21 @@ function formDias(): HTMLElement {
   }
   return h(
     'form',
-    { novalidate: true, onsubmit: salvar, testid: 'form-lembrete' },
+    { class: 'grupo', novalidate: true, onsubmit: salvar, testid: 'form-lembrete' },
+    interruptorEl,
     h(
       'div',
-      { class: 'campo' },
-      h('label', { for: 'lembrete-dias' }, 'Quantos dias antes?'),
-      h('span', { class: 'ajuda', id: 'ajuda-lembrete-dias' }, 'De 0 a 7. 0 = no dia da cobrança.'),
-      h('div', { class: 'campo-curto' }, campo, h('span', { 'aria-hidden': 'true' }, 'dias')),
+      { class: 'lin-bloco campo-grupo' },
+      h('div', { class: 'campo-linha' }, h('label', { for: 'lembrete-dias' }, 'Quantos dias antes?'), h('div', { class: 'campo-curto' }, campo, h('span', { 'aria-hidden': 'true' }, 'dias'))),
       erro,
     ),
-    botao('Salvar lembrete', 'secundario', () => undefined, { testid: 'lembrete-btn-salvar', tipo: 'submit' }),
+    linhaAcao('Salvar lembrete', () => undefined, { testid: 'lembrete-btn-salvar', tipo: 'submit' }),
   );
 }
 
 /** Seção "Lembretes antes da cobrança" dos Ajustes. */
 export function secaoLembretes(): HTMLElement {
-  const titulo = h('h2', { class: 'secao', id: 'titulo-lembretes-ajustes' }, 'Lembretes antes da cobrança');
+  const titulo = h('h2', { class: 'g-titulo', id: 'titulo-lembretes-ajustes' }, 'Lembretes antes da cobrança');
   if (!ehPro()) {
     return h(
       'section',
@@ -126,6 +141,7 @@ export function secaoLembretes(): HTMLElement {
       cartaoRecursoPro({
         testid: 'lock-lembrete',
         titulo: 'Lembretes antes da cobrança',
+        tituloOculto: true,
         descricao: ['Receba um aviso de 0 a 7 dias antes de cada cobrança, para cancelar a tempo.'],
         recurso: 'lembretes antes da cobrança',
         aoConhecer: () => navegar('#/pro'),
@@ -135,35 +151,32 @@ export function secaoLembretes(): HTMLElement {
   const p = obterPrefs();
   const situacao: HTMLElement[] = [];
   if (!notificador.suportado()) {
-    situacao.push(h('p', { class: 'nota com-icone', testid: 'lembrete-sem-suporte' }, icone('info'), h('span', {}, 'Seu aparelho não permite notificações; usaremos o aviso dentro do app')));
+    situacao.push(h('p', { class: 'g-rodape com-icone', testid: 'lembrete-sem-suporte' }, icone('info'), h('span', {}, 'Seu aparelho não permite notificações; usaremos o aviso dentro do app')));
   } else if (notificador.permissao() === 'denied') {
     situacao.push(
-      h('p', { class: 'nota com-icone', testid: 'lembrete-sem-permissao' }, icone('info'), h('span', {}, 'Notificações do sistema desativadas. Você verá os avisos ao abrir o app.')),
+      h('p', { class: 'g-rodape com-icone', testid: 'lembrete-sem-permissao' }, icone('info'), h('span', {}, 'Notificações do sistema desativadas. Você verá os avisos ao abrir o app.')),
     );
   }
+  const chave = interruptor({
+    rotulo: 'Lembrar antes da cobrança',
+    testid: 'lembrete-ativar',
+    marcado: p.lembrete.ativo,
+    aoMudar: (ligado) => {
+      if (ligado) void ligarLembrete();
+      else {
+        alterarPrefs((x) => ({ ...x, lembrete: { ...x.lembrete, ativo: false } }));
+        renderizar();
+        document.querySelector<HTMLElement>('[data-testid="lembrete-ativar"]')?.focus();
+      }
+    },
+  });
   return h(
     'section',
     { 'aria-labelledby': 'titulo-lembretes-ajustes' },
     titulo,
-    h(
-      'div',
-      { class: 'cartao cartao-switch' },
-      interruptor({
-        rotulo: 'Lembrar antes da cobrança',
-        testid: 'lembrete-ativar',
-        marcado: p.lembrete.ativo,
-        aoMudar: (ligado) => {
-          if (ligado) void ligarLembrete();
-          else {
-            alterarPrefs((x) => ({ ...x, lembrete: { ...x.lembrete, ativo: false } }));
-            renderizar();
-            document.querySelector<HTMLElement>('[data-testid="lembrete-ativar"]')?.focus();
-          }
-        },
-      }),
-    ),
-    formDias(),
-    h('p', { class: 'nota com-icone', testid: 'lembrete-limite-texto' }, icone('info'), h('span', {}, TEXTO_LIMITE_LEMBRETE)),
+    formLembrete(chave),
+    h('p', { class: 'g-rodape', id: 'ajuda-lembrete-dias' }, 'De 0 a 7. 0 = no dia da cobrança.'),
+    h('p', { class: 'g-rodape com-icone', testid: 'lembrete-limite-texto' }, icone('info'), h('span', {}, TEXTO_LIMITE_LEMBRETE)),
     ...situacao,
   );
 }

@@ -98,7 +98,9 @@ test.describe('US-17 Temas de cor (Pro)', () => {
     await escolher(page, 'ameixa');
     const ameixa = await cores();
     expect(ameixa).not.toEqual(padrao);
-    expect(ameixa).toContain('#7a2e62');
+    // Sprint 3 (UX-S3-09, design 2.3): theme-color é o papel do tema (claro #FFFFFF, escuro do tema).
+    expect(padrao).toEqual(['#ffffff', '#0f1512']);
+    expect(ameixa).toEqual(['#ffffff', '#160f14']);
   });
 
   test('US-17.CA9: trocar de tema não faz requisições de rede', async ({ page }) => {

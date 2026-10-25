@@ -8,9 +8,9 @@ import {
   restaurarCompra,
   type ResultadoRestaurar,
 } from '../../servicos/pro';
-import { botao } from '../componentes';
+import { botao, seloPro } from '../componentes';
 import { h, novoId } from '../dom';
-import { icone, moedaGrande } from '../icones';
+import { icone } from '../icones';
 import { voltar } from '../navegacao';
 import type { Tela } from '../tela';
 
@@ -54,10 +54,9 @@ function online(): boolean {
 function listaRecursos(): HTMLElement {
   return h(
     'ul',
-    { class: 'pro-recursos', testid: 'pro-recursos' },
-    RECURSOS.map((r) =>
-      h('li', {}, icone('check', 'ic24'), h('div', {}, h('b', {}, r.nome), h('span', {}, r.descricao))),
-    ),
+    { class: 'grupo pro-recursos', testid: 'pro-recursos' },
+    // Recursos como lista agrupada, sem ✓ verde (design 4.9).
+    RECURSOS.map((r) => h('li', { class: 'lin-bloco' }, h('span', { class: 't' }, r.nome), h('span', { class: 'd' }, r.descricao))),
   );
 }
 
@@ -69,7 +68,7 @@ function bannerArea(tipo: 'ok' | 'info' | 'erro', texto: string, testid: string)
   return h(
     'div',
     { class: `banner ${tipo === 'erro' ? 'banner-erro' : 'banner-ok'}`, role: tipo === 'erro' ? 'alert' : 'status', tabindex: '-1', testid },
-    icone(tipo === 'erro' ? 'alerta' : 'info', 'ic24'),
+    icone(tipo === 'erro' ? 'alerta' : tipo === 'ok' ? 'check' : 'info', 'ic24'),
     h('div', { class: 'texto' }, h('p', {}, texto)),
   );
 }
@@ -136,15 +135,14 @@ function conteudoCompra(): Node[] {
     return [
       h(
         'div',
-        { class: 'pro-indisponivel', testid: 'pro-indisponivel' },
-        icone('info', 'ic24'),
+        { class: 'grupo pro-indisponivel', testid: 'pro-indisponivel' },
         h(
           'div',
-          {},
-          h('p', { class: 'forte' }, 'A compra do Pro está disponível no app do Mensalão na Google Play'),
+          { class: 'lin-bloco' },
+          h('p', { class: 't' }, 'A compra do Pro está disponível no app do Mensalão na Google Play'),
           h('p', { class: 'nota' }, 'Seus dados continuam funcionando normalmente aqui.'),
           URL_FICHA_PLAY
-            ? h('a', { class: 'btn btn-primario', href: URL_FICHA_PLAY, rel: 'noopener', target: '_blank', testid: 'pro-btn-play' }, 'Abrir na Google Play')
+            ? h('a', { class: 'btn btn-primario btn-larga', href: URL_FICHA_PLAY, rel: 'noopener', target: '_blank', testid: 'pro-btn-play' }, 'Abrir na Google Play')
             : null,
         ),
       ),
@@ -182,7 +180,6 @@ function conteudoCompra(): Node[] {
     return filhos;
   }
   const b = botao(st.comprando ? 'Abrindo a Google Play…' : `Comprar Pro por ${st.preco.preco}`, 'primario', () => void comprar(), btnBase);
-  b.classList.add('btn-alta');
   if (st.comprando) {
     b.disabled = true;
     b.setAttribute('aria-busy', 'true');
@@ -237,14 +234,14 @@ function blocoPro(): HTMLElement[] {
     restaurou ? bannerArea('ok', 'Compra restaurada. Obrigado!', 'pro-restaurar-msg') : null,
     h(
       'div',
-      { class: 'pro-ativo', testid: 'pro-ativo' },
-      h('h2', { id: 'titulo-pro-ativo', tabindex: '-1' }, icone('check', 'ic24'), 'Você é Pro'),
+      { class: 'bloco pro-ativo', testid: 'pro-ativo' },
+      h('h2', { id: 'titulo-pro-ativo', tabindex: '-1' }, h('span', {}, 'Você é Pro'), seloPro({ 'aria-hidden': 'true' })),
       h('p', {}, 'Obrigado por apoiar o Mensalão. Todos os recursos estão liberados neste aparelho.'),
     ),
     h('p', { class: 'sr-only', 'aria-live': 'polite' }, st.virouPro ? 'Você é Pro' : ''),
-    h('h2', { class: 'secao' }, 'Incluído no seu Pro'),
+    h('h2', { class: 'g-titulo' }, 'Incluído no seu Pro'),
     listaRecursos(),
-    botao('Voltar ao Mensalão', 'primario', () => voltar('#/'), { testid: 'pro-btn-voltar-app', larga: true }),
+    h('div', { class: 'bloco' }, botao('Voltar ao Mensalão', 'primario', () => voltar('#/'), { testid: 'pro-btn-voltar-app', larga: true })),
   ].filter((x): x is HTMLElement => x !== null);
 }
 
@@ -256,23 +253,22 @@ export function telaPro(entrou: boolean): Tela {
   if (pro) {
     areaCompra = null;
     areaRestaurar = null;
-    conteudo = h('div', { class: 'pro-tela', testid: 'pro-tela' }, h('div', { class: 'pro-moeda' }, moedaGrande()), ...blocoPro());
+    conteudo = h('div', { class: 'pro-tela', testid: 'pro-tela' }, ...blocoPro());
   } else {
-    areaCompra = h('div', { class: 'pro-compra pilha' });
-    areaRestaurar = h('div', { class: 'pro-restaurar pilha' });
+    areaCompra = h('div', { class: 'bloco pro-compra pilha' });
+    areaRestaurar = h('div', { class: 'bloco pro-restaurar pilha' });
     conteudo = h(
       'div',
       { class: 'pro-tela', testid: 'pro-tela' },
-      h('div', { class: 'pro-moeda' }, moedaGrande()),
-      h('p', { class: 'pro-promessa' }, h('strong', {}, 'Pague uma vez, use para sempre.'), ' ', h('span', {}, 'Sem mensalidade e sem anúncios.')),
-      h('h2', { class: 'secao' }, 'O que vem no Pro'),
+      // A promessa é tipografia alinhada à esquerda, sem a moeda (design 4.9).
+      h('p', { class: 'bloco pro-promessa' }, h('strong', {}, 'Pague uma vez, use para sempre.'), ' ', h('span', {}, 'Sem mensalidade e sem anúncios.')),
+      h('h2', { class: 'g-titulo' }, 'O que vem no Pro'),
       listaRecursos(),
       areaCompra,
       areaRestaurar,
       h(
         'p',
-        { class: 'nota com-icone', testid: 'pro-nota-gratis' },
-        icone('info'),
+        { class: 'bloco nota', testid: 'pro-nota-gratis' },
         h('span', {}, 'O Mensalão grátis continua funcionando, sem prazo: até 5 assinaturas ativas, próximas cobranças, totais, guia de cancelamento e backup em arquivo.'),
       ),
     );
@@ -283,6 +279,7 @@ export function telaPro(entrou: boolean): Tela {
   return {
     titulo: 'Mensalão Pro',
     voltar: () => voltar('#/'),
+    agrupado: true,
     conteudo: [conteudo],
     aoMontar: virou ? () => conteudo.querySelector<HTMLElement>('#titulo-pro-ativo') : undefined,
   };
