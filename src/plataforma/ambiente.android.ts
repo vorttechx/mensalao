@@ -2,6 +2,9 @@
 // Não importa nada de teste. No app: Google Play Billing, notificações locais e arquivos nativos.
 // Fora do app (npm run dev no navegador), os plugins nativos não existem e tudo cai no "indisponível"
 // (US-24.CA9): compra indisponível e notificação do navegador, sem quebrar. Nenhum controle para ativar o Pro.
+import { AnunciosAdMob } from './anuncios-admob';
+import { AnunciosIndisponivel } from './anuncios-indisponivel';
+import type { ProvedorAnuncios } from './anuncios';
 import { SalvadorNavegador } from './arquivos';
 import { SalvadorNativo } from './arquivos-nativo';
 import { ProvedorPlayNativo } from './compra-play';
@@ -19,6 +22,11 @@ export function criarProvedor(): ProvedorCompra {
 
 export function criarNotificador(): Notificador {
   return ehNativo() ? new NotificadorLocal() : new NotificadorNavegador();
+}
+
+/** AdMob real só dentro do app; no navegador, sem anúncios (US-24.CA9). */
+export function criarProvedorAnuncios(): ProvedorAnuncios {
+  return ehNativo() ? new AnunciosAdMob() : new AnunciosIndisponivel();
 }
 
 export function criarSalvadorArquivos(): SalvadorArquivos {

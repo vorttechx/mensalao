@@ -91,6 +91,14 @@ function cname(): Plugin {
   };
 }
 
+/** IDs de teste oficiais do Google (iguais a src/plataforma/ids-anuncios.ts). */
+const IDS_TESTE = { banner: 'ca-app-pub-3940256099942544/9214589741', premiado: 'ca-app-pub-3940256099942544/5224354917' };
+
+/** Configuração de anúncios injetada no bundle (__MENSALAO_ANUNCIOS__): IDs de teste em todo build. */
+function configAnuncios() {
+  return { ...IDS_TESTE, teste: true, umpDepuracao: process.env.MENSALAO_UMP_DEPURACAO?.trim() ?? '', aparelhosTeste: [] as string[] };
+}
+
 // base relativa: o build funciona dentro do app (Capacitor serve dist/ a partir da raiz) e em qualquer subdiretório.
 // Build de teste (US-12.CA14 a CA16): `vite build --mode teste` (VITE_MODO=teste em .env.teste) troca o
 // alias "@ambiente" para o ambiente de teste, com o provedor falso, e grava em dist-teste/. O build de
@@ -101,6 +109,7 @@ export default defineConfig(({ mode }) => {
   const teste = (process.env.VITE_MODO ?? env.VITE_MODO) === 'teste';
   return {
     base: './',
+    define: { __MENSALAO_ANUNCIOS__: JSON.stringify(configAnuncios()) },
     resolve: {
       alias: {
         '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'android'}.ts`),

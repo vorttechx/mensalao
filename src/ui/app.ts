@@ -7,6 +7,8 @@ import { criarBanner, fecharDialogosAbertos, seloPro } from './componentes';
 import { h } from './dom';
 import { icone, type NomeIcone } from './icones';
 import { observarAjustes } from './ajuste';
+import { atualizarAnuncio, instalarAnuncios } from './anuncios';
+import type { TelaAnuncio } from '../domain/anuncios';
 import { adicionar } from './limite';
 import { aplicarTema } from './temas';
 import { consumirBanner, fecharBanner, registrarTroca, rotaAtual } from './navegacao';
@@ -84,6 +86,12 @@ function montarNav(ativa: Aba): HTMLElement {
       ),
     ),
   );
+}
+
+/** Telas com banner (D-06): só as abas Início, Assinaturas e Totais; a recuperação nunca. */
+function telaAnuncio(tela: Tela): TelaAnuncio {
+  if (emRecuperacao()) return 'outra';
+  return tela.aba === 'inicio' || tela.aba === 'assinaturas' || tela.aba === 'totais' ? tela.aba : 'outra';
 }
 
 /** Monta a tela atual. Chamado a cada troca de rota e após ações na mesma tela. */
@@ -199,6 +207,8 @@ export function renderizar(): void {
   raiz.replaceChildren(app);
   // US-22.CA4: número grande, "Por ano", abas e aviso de lembretes ajustados ao espaço real (qualquer fonte).
   observarAjustes(raiz);
+  // US-25: faixa do anúncio nas telas com banner (Início, Assinaturas, Totais), depois das abas medidas.
+  atualizarAnuncio(app, telaAnuncio(tela), trocou);
   document.title = tela.marca ? 'Mensalão' : `${tela.titulo} — Mensalão`;
 
   const focoTela = tela.aoMontar?.();
@@ -256,6 +266,7 @@ export function iniciarApp(el: HTMLElement): void {
   document.addEventListener('keydown', (ev) => { if (!ev.altKey && !ev.ctrlKey && !ev.metaKey) raizDoc.classList.add('teclado'); }, true);
   document.addEventListener('pointerdown', () => raizDoc.classList.remove('teclado'), true);
   aplicarTema();
+  instalarAnuncios();
   registrarTroca();
   renderizar();
   void verificarAoAbrir();

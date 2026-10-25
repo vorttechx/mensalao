@@ -60,6 +60,14 @@
 
   /* Movimento */
   --duracao-rapida: 120ms; --duracao-media: 180ms; --curva: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Anúncio (Parte 4, seção 13): altura do banner nativo até o SDK informar a real (o app grava a real
+     com style.setProperty), papel até as abas, cabeça da faixa e a faixa inteira (100 px com H = 56). */
+  --anuncio-altura: 56px;
+  --anuncio-respiro: 16px;
+  --anuncio-cabeca: 28px;
+  --anuncio-faixa: calc(var(--anuncio-cabeca) + var(--anuncio-altura) + var(--anuncio-respiro));
+  --cor-anuncio-reserva: var(--cor-fundo-agrupado);
   color-scheme: light;
 }
 @media (prefers-reduced-motion: reduce) { :root { --duracao-rapida: 0ms; --duracao-media: 0ms; } }
@@ -83,6 +91,7 @@
     --cor-veu: rgba(0, 0, 0, 0.6);
     --cor-grafico-1: #6FB8CB; --cor-grafico-2: #D9AE55; --cor-grafico-3: #D49BC8; --cor-grafico-4: #93AEEA;
     --cor-grafico-5: #A9C27A; --cor-grafico-6: #6CC7B4; --cor-grafico-7: #A0ADA6;
+    --cor-anuncio-reserva: var(--cor-superficie);
     color-scheme: dark;
   }
   :root:not([data-aparencia="claro"])[data-tema="azul-noite"] { --cor-fundo: #0E1320; --cor-fundo-agrupado: #0E1320; --cor-superficie: #161D2D; --cor-superficie-2: #1D2638; --cor-texto: #E4EAF5; --cor-texto-2: #A3AEC2; --cor-linha: #263044; --cor-borda: #6C7890; --cor-marca: #8FB4F0; --cor-marca-forte: #B0CBF5; --cor-sobre-marca: #0E1320; }
@@ -97,6 +106,7 @@
   --cor-veu: rgba(0, 0, 0, 0.6);
   --cor-grafico-1: #6FB8CB; --cor-grafico-2: #D9AE55; --cor-grafico-3: #D49BC8; --cor-grafico-4: #93AEEA;
   --cor-grafico-5: #A9C27A; --cor-grafico-6: #6CC7B4; --cor-grafico-7: #A0ADA6;
+  --cor-anuncio-reserva: var(--cor-superficie);
   color-scheme: dark;
 }
 :root[data-aparencia="escuro"][data-tema="azul-noite"] { --cor-fundo: #0E1320; --cor-fundo-agrupado: #0E1320; --cor-superficie: #161D2D; --cor-superficie-2: #1D2638; --cor-texto: #E4EAF5; --cor-texto-2: #A3AEC2; --cor-linha: #263044; --cor-borda: #6C7890; --cor-marca: #8FB4F0; --cor-marca-forte: #B0CBF5; --cor-sobre-marca: #0E1320; }
@@ -208,6 +218,34 @@ body.agrupado .nav { background: var(--cor-fundo-agrupado); }
 .nav ul[data-colunas="1"] { grid-template-columns: minmax(0, 1fr); }
 /* Só durante a medida (síncrona, nunca pintada): rótulo numa linha, no peso da aba ativa. */
 .nav ul.medindo a { white-space: nowrap; overflow-wrap: normal; font-weight: var(--peso-forte); }
+
+/* =====================================================================
+   Faixa do anúncio (Parte 4, 14.1): fixa acima das abas, por cima do fim do conteúdo
+   ===================================================================== */
+/* O banner nativo do Google é desenhado pelo SDK por cima da área reservada; o app só desenha a moldura.
+   Medidas em px (como o banner, que não escala com o texto): fio + 8 + rótulo 16 + 4, banner, 16 até as abas. */
+.faixa-anuncio {
+  position: fixed; left: 0; right: 0; z-index: 9;
+  bottom: calc(var(--altura-nav-atual, var(--altura-nav)) + env(safe-area-inset-bottom));
+  height: var(--anuncio-faixa); box-sizing: border-box;
+  padding-top: 8px;
+  background: var(--cor-fundo); border-top: 1px solid var(--cor-linha);
+  opacity: 1; transition: opacity 120ms linear;
+}
+.faixa-anuncio.entrando { opacity: 0; }
+.faixa-anuncio.liberando { opacity: 0; transition: opacity 160ms var(--curva); }
+.anuncio-rotulo {
+  margin: 0; padding: 0 var(--margem-tela) 4px; height: 20px; box-sizing: border-box;
+  font-size: 13px; line-height: 16px; font-weight: var(--peso-normal); color: var(--cor-texto-2);
+}
+.anuncio-reserva { height: var(--anuncio-altura); background: var(--cor-anuncio-reserva); }
+/* Com a faixa, o fim do conteúdo fica a 32 px do fio (60 px do banner, US-25.CA3/CA8). */
+.app.com-nav.com-anuncio .conteudo {
+  padding-bottom: calc(var(--altura-nav-atual, var(--altura-nav)) + env(safe-area-inset-bottom) + var(--anuncio-faixa) + var(--espaco-7));
+}
+@media (prefers-reduced-motion: reduce) {
+  .faixa-anuncio, .faixa-anuncio.liberando { transition: none; }
+}
 
 /* =====================================================================
    Botões (3.1)
