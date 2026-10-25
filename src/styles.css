@@ -582,9 +582,11 @@ ol.historico .atual span:last-child { font-weight: var(--peso-forte); }
 .bloco-total { padding-top: var(--espaco-1); }
 .bloco-total .rotulo { font-size: var(--texto-xs); color: var(--cor-texto-2); }
 .bloco-total .dinheiro-grande { display: block; margin-top: 2px; }
-.par { display: flex; justify-content: space-between; align-items: baseline; gap: var(--espaco-3); margin-top: var(--espaco-2); padding: 10px 0; border-top: 1px solid var(--cor-linha); }
+/* BUG-09: com texto grande, o "Por ano" desce para baixo do rótulo (à direita) em vez de sair da tela; "R$ n" nunca
+   quebra e o tamanho para em 12cqi do bloco (container), largura em que "R$ 9.999.999,99" ainda cabe numa linha. */
+.par { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 var(--espaco-3); margin-top: var(--espaco-2); padding: 10px 0; border-top: 1px solid var(--cor-linha); }
 .par span:first-child { color: var(--cor-texto-2); }
-.par .total-ano { font-size: var(--texto-md); font-weight: var(--peso-forte); white-space: nowrap; }
+.par .total-ano { margin-left: auto; font-size: min(var(--texto-md), 12cqi); font-weight: var(--peso-forte); white-space: nowrap; }
 .bloco-total .nota { padding-top: var(--espaco-1); }
 .linha-teste { display: flex; gap: var(--espaco-2); align-items: flex-start; margin-top: var(--espaco-3); font-size: var(--texto-xs); font-weight: var(--peso-forte); color: var(--cor-teste); }
 .linha-teste svg { margin-top: 1px; }
