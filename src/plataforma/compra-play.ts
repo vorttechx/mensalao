@@ -51,8 +51,13 @@ export class ProvedorPlayNativo implements ProvedorCompra {
     } catch (e) {
       const m = mensagem(e);
       if (/USER_CANCELED/i.test(m)) return 'cancelado'; // fechar a folha da Play não é erro (US-11.CA5)
-      if (/ITEM_ALREADY_OWNED/i.test(m)) return 'ok'; // já é dono: a lista de compras confirma
-      return 'erro';
+      if (!/ITEM_ALREADY_OWNED/i.test(m)) return 'erro';
+      // SEC-03: a Play também diz "já possui" com compra PENDENTE; só a lista (purchaseState "1") libera o Pro.
+      try {
+        return (await this.listarCompras()).includes(sku) ? 'ok' : 'erro';
+      } catch {
+        return 'erro';
+      }
     }
     if (t.purchaseState !== undefined && t.purchaseState !== COMPRADO) return 'erro'; // pendente: sem Pro ainda
     await this.confirmar(t);
