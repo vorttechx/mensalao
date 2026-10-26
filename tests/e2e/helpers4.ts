@@ -56,11 +56,13 @@ export async function abrirAnuncios(page: Page, o: OpcoesAnuncios = {}) {
   if (Object.keys(prov).length) entradas.push(['mensalao:teste:provedor', JSON.stringify(prov)]);
   if (s2.notificacao) entradas.push(['mensalao:teste:notificacao', JSON.stringify(s2.notificacao)]);
   if (s2.prefs) entradas.push(['mensalao:prefs:v1', JSON.stringify(s2.prefs)]);
+  // A rota vai primeiro, ainda com os controles padrão: a sessão vazia de antes da recarga não pode registrar
+  // chamadas do provedor falso na conta do teste.
+  if (s2.hash) await page.evaluate((h) => new Promise<void>((ok) => { location.hash = h; setTimeout(ok, 60); }), s2.hash);
   await page.evaluate((e) => {
     localStorage.removeItem('mensalao:teste:anuncios-chamadas');
     e.forEach(([k, v]) => localStorage.setItem(k, v));
   }, entradas);
-  if (s2.hash) await page.evaluate((h) => { location.hash = h; }, s2.hash);
   await page.reload();
 }
 
