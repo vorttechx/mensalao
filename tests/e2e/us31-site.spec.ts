@@ -292,8 +292,10 @@ test.describe('US-31.CA3 service worker de autodestruição', () => {
     });
     expect((await page.evaluate(() => caches.keys())).length).toBe(3);
     await page.evaluate(() => navigator.serviceWorker.register('/sw.js'));
-    await expect.poll(async () => page.evaluate(() => caches.keys()), { timeout: 20_000 }).toEqual([]);
-    await expect.poll(async () => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), { timeout: 20_000 }).toBe(0);
+    // A aba é recarregada pelo próprio SW no fim: um evaluate no meio da navegação falha e é tentado de novo.
+    const tolerante = async <T,>(f: () => Promise<T>, padrao: T): Promise<T> => f().catch(() => padrao);
+    await expect.poll(() => tolerante(() => page.evaluate(() => caches.keys()), ['navegando']), { timeout: 20_000 }).toEqual([]);
+    await expect.poll(() => tolerante(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), -1), { timeout: 20_000 }).toBe(0);
     await ctx.close();
   });
 });
