@@ -56,9 +56,9 @@ test.describe('US-12 Restaurar compra e estado Pro persistido', () => {
     await expect(page.getByTestId('pro-btn-restaurar')).toBeEnabled();
   });
 
-  test('US-12.CA6: reembolso (loja sem a compra) revoga o Pro, avisa uma vez e preserva os dados', async ({ page }) => {
+  test('US-12.CA6 (texto novo: US-26.CA4): reembolso (loja sem a compra) revoga o Pro, avisa uma vez e preserva os dados', async ({ page }) => {
     await abrirS2(page, { assinaturas: ativas(8), proBruto: PRO_JSON, provedor: { compras: [] } });
-    await expect(page.getByTestId('pro-revogado-aviso')).toContainText('Seu Mensalão Pro não foi encontrado na Google Play. Você voltou ao plano grátis; seus dados continuam todos aqui.');
+    await expect(page.getByTestId('pro-revogado-aviso')).toContainText('Seu Mensalão Pro não foi encontrado na Google Play. Você voltou ao plano grátis e os anúncios voltam. Seus dados continuam todos aqui.');
     await expect(page.getByTestId('selo-pro')).toHaveCount(0);
     await expect(page.getByTestId('limite-contador')).toContainText('8 de 5');
     expect(JSON.parse((await lerChave(page, 'mensalao:v1'))!).assinaturas).toHaveLength(8);

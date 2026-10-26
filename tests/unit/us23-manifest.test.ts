@@ -1,5 +1,5 @@
 // US-23 — Ícone, manifest e TWA (design 5.2): arquivos do repositório conferidos com o design aprovado.
-import { readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -38,10 +38,14 @@ describe('US-23 manifest, ícone e TWA', () => {
     expect(svg).toMatch(/#1D5C3F/i);
     expect(svg).toMatch(/#9FD8B8/i);
   });
-  it('US-23.CA3: TWA acompanha o manifest (status, navegação e abertura)', () => {
-    const t = json('twa/twa-manifest.json');
-    expect(t).toMatchObject({ themeColor: '#FFFFFF', navigationColor: '#FFFFFF', navigationColorDark: '#0F1512', backgroundColor: '#FFFFFF' });
-    expect(t.iconUrl).toMatch(/icon-512\.png$/);
+  it('US-23.CA3 (US-24.CA2): sem TWA, a cor de status/navegação vem do manifest e do Capacitor', () => {
+    expect(existsSync(resolve(raiz, 'twa'))).toBe(false);
+    const m = json('public/manifest.webmanifest');
+    expect(m.theme_color.toUpperCase()).toBe('#FFFFFF');
+    expect(m.background_color.toUpperCase()).toBe('#FFFFFF');
+    const cap = json('capacitor.config.json');
+    expect(JSON.stringify(cap)).toMatch(/SystemBars/);
+    expect(m.icons.some((i: { src: string }) => /icon-512\.png$/.test(i.src))).toBe(true);
   });
   it('US-23.CA2: as 6 capturas da loja existem', () => {
     for (const f of ['1-inicio', '2-totais', '3-assinaturas', '4-detalhe', '5-pro', '6-ajustes']) {
