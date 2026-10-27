@@ -197,9 +197,11 @@ html.teclado h1:focus-visible { outline: 3px solid var(--cor-foco); }
    ===================================================================== */
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  background: var(--cor-fundo); border-top: 1px solid var(--cor-linha);
+  background: var(--cor-fundo);
   padding-bottom: env(safe-area-inset-bottom);
 }
+/* BUG-01: o fio de 1 px fica fora da caixa da barra (56 px), para a margem do banner e a faixa não passarem por baixo dele */
+.nav::before { content: ""; position: absolute; top: -1px; left: 0; right: 0; height: 1px; background: var(--cor-linha); }
 body.agrupado .nav { background: var(--cor-fundo-agrupado); }
 /* BUG-02 / BUG-08: as abas dividem a largura em colunas iguais (minmax(0, 1fr)) e o rótulo cresce com o texto do
    sistema (rem, sem teto). US-22.CA4: o número de colunas vem da medida real (src/ui/ajuste.ts): 4 enquanto todos os
@@ -235,7 +237,7 @@ body.agrupado .nav { background: var(--cor-fundo-agrupado); }
 .faixa-anuncio.entrando { opacity: 0; }
 .faixa-anuncio.liberando { opacity: 0; transition: opacity 160ms var(--curva); }
 .anuncio-rotulo {
-  margin: 0; padding: 0 var(--margem-tela) 4px; height: 20px; box-sizing: border-box;
+  margin: 0; padding: 0 var(--margem-tela) 4px; height: 19px; /* BUG-01: fio 1 + 8 + 19 + 56 + 16 = 100 */ box-sizing: border-box;
   font-size: 13px; line-height: 16px; font-weight: var(--peso-normal); color: var(--cor-texto-2);
 }
 .anuncio-reserva { height: var(--anuncio-altura); background: var(--cor-anuncio-reserva); }
