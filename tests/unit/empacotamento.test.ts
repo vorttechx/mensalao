@@ -5,24 +5,22 @@ import { describe, expect, it } from 'vitest';
 const ler = (p: string) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
 describe('empacotamento (sprint 2, seção 5.1)', () => {
-  const twa = JSON.parse(ler('twa/twa-manifest.json'));
-  const links = JSON.parse(ler('public/.well-known/assetlinks.json'));
+  const cap = JSON.parse(ler('capacitor.config.json'));
   const manifest = JSON.parse(ler('public/manifest.webmanifest'));
 
-  it('E-01: projeto TWA coerente com o manifest do PWA e com Play Billing ativo', () => {
-    expect(twa.name).toBe(manifest.name);
-    expect(twa.display).toBe(manifest.display);
-    expect(twa.themeColor.toLowerCase()).toBe(manifest.theme_color.toLowerCase());
-    expect(twa.features.playBilling.enabled).toBe(true);
-    expect(twa.packageId).toBe('br.com.mensalao.app');
-    expect(twa.enableSiteSettingsShortcut).toBe(true);
+  it('E-01 (US-24.CA2): projeto Capacitor coerente com o manifest do PWA; TWA e assetlinks.json saíram', () => {
+    expect(cap.appName).toBe(manifest.name);
+    expect(cap.appId).toBe('br.com.mensalao.app');
+    expect(cap.webDir).toBe('dist');
+    expect(existsSync(new URL('../../twa', import.meta.url))).toBe(false);
+    expect(existsSync(new URL('../../public/.well-known/assetlinks.json', import.meta.url))).toBe(false);
+    expect(existsSync(new URL('../../android/app/src/main/AndroidManifest.xml', import.meta.url))).toBe(true);
   });
-  it('E-02: assetlinks.json válido, com o mesmo pacote da TWA e o SHA-256 ainda como marcador a preencher (pendência R-03)', () => {
-    expect(Array.isArray(links)).toBe(true);
-    expect(links[0].relation).toContain('delegate_permission/common.handle_all_urls');
-    expect(links[0].target.namespace).toBe('android_app');
-    expect(links[0].target.package_name).toBe(twa.packageId);
-    expect(links[0].target.sha256_cert_fingerprints).toHaveLength(1);
+  it('E-02 (US-24.CA2): o guia de publicação descreve o .aab (npm run android:aab) e não manda mais gerar assetlinks.json', () => {
+    const guia = ler('docs/loja/guia-publicacao.md');
+    expect(guia).toMatch(/android:aab/);
+    expect(guia).toMatch(/\.aab/);
+    expect(guia).not.toMatch(/bubblewrap/i);
   });
   it('E-03: manifest tem id, escopo, start_url e ícones any e maskable 192/512', () => {
     expect(manifest.id).toBeTruthy();
@@ -34,7 +32,7 @@ describe('empacotamento (sprint 2, seção 5.1)', () => {
   });
   it('E-05: política de privacidade em docs e página privacidade.html', () => {
     expect(existsSync(new URL('../../docs/loja/politica-de-privacidade.md', import.meta.url))).toBe(true);
-    expect(ler('privacidade.html')).toMatch(/privacidade/i);
+    expect(ler('public/privacidade.html')).toMatch(/privacidade/i);
   });
   it('E-06: ficha da loja com descrição curta de até 80 caracteres e o SKU do Pro', () => {
     const ficha = ler('docs/loja/ficha-play.md');

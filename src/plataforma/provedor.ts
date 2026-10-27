@@ -3,7 +3,7 @@
 export type ResultadoCompra = 'ok' | 'cancelado' | 'erro';
 
 export interface ProvedorCompra {
-  /** Qual implementação está em uso (Google Play, indisponível no navegador comum ou falsa de teste). */
+  /** Qual implementação está em uso (Google Play Billing nativo, indisponível fora do app Android ou falsa de teste). */
   readonly tipo: 'play' | 'indisponivel' | 'falso';
   disponivel(): Promise<boolean>;
   /** Preço já formatado pela loja na moeda do usuário; null se a loja não devolveu o produto. */
@@ -17,10 +17,23 @@ export interface ProvedorCompra {
 export type PermissaoNotificacao = 'default' | 'granted' | 'denied';
 
 export interface Notificador {
+  /** Lê o estado inicial (ex.: permissão do Android, que é assíncrona). Chamado uma vez ao abrir, antes da 1ª tela. */
+  preparar?(): Promise<void>;
   suportado(): boolean;
   permissao(): PermissaoNotificacao;
   pedirPermissao(): Promise<PermissaoNotificacao>;
   notificar(titulo: string, corpo: string): Promise<void>;
+}
+
+/** Resultado de entregar um arquivo gerado no aparelho (backup JSON ou planilha CSV, US-24.CA11). */
+export type ResultadoArquivo = 'ok' | 'cancelado' | 'erro';
+
+/**
+ * Entrega de arquivo: download do navegador (desenvolvimento e build de teste) ou gravação + folha de
+ * compartilhar do Android (a WebView do Capacitor não baixa arquivos por link).
+ */
+export interface SalvadorArquivos {
+  salvar(nome: string, conteudo: string, tipoMime: string): Promise<ResultadoArquivo>;
 }
 
 /** Rejeita se a promessa não responder no prazo (verificação sem travar o app). */

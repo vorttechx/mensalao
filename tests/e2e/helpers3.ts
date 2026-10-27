@@ -96,7 +96,8 @@ export async function transbordos(page: Page): Promise<string[]> {
 
 /** Aumenta o texto em 200% (os tamanhos do app são em rem). */
 export async function texto200(page: Page) {
-  await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+  // A CSP do app (US-29.CA8, style-src 'self') bloqueia <style> inline; o CSSOM é permitido.
+  await page.evaluate(() => document.documentElement.style.setProperty('font-size', '200%', 'important'));
 }
 
 export async function semTransbordo(page: Page, contexto: string) {

@@ -17,8 +17,10 @@ import type { Tela } from '../tela';
 /** Endereço da ficha na Google Play. Vazio enquanto o app não estiver publicado: o botão fica oculto (US-11.CA7). */
 export const URL_FICHA_PLAY = '';
 
-const RECURSOS: { nome: string; descricao: string }[] = [
+const RECURSOS: { nome: string; descricao: string; testid?: string }[] = [
   { nome: 'Assinaturas ilimitadas', descricao: 'O grátis vai até 5 ativas.' },
+  // US-26.CA1 / design 14.5: 2º benefício, no mesmo estilo dos outros (sem selo, ícone nem cor).
+  { nome: 'Sem anúncios', descricao: 'O plano grátis mostra anúncios; o Pro remove todos.', testid: 'pro-semanuncio' },
   { nome: 'Lembrete antes da cobrança', descricao: 'Aviso de 0 a 7 dias antes.' },
   { nome: 'Backup automático', descricao: 'Cópias no aparelho e lembrete para exportar um arquivo.' },
   { nome: 'Exportar planilha CSV', descricao: 'Para Excel ou Google Planilhas.' },
@@ -56,7 +58,7 @@ function listaRecursos(): HTMLElement {
     'ul',
     { class: 'grupo pro-recursos', testid: 'pro-recursos' },
     // Recursos como lista agrupada, sem ✓ verde (design 4.9).
-    RECURSOS.map((r) => h('li', { class: 'lin-bloco' }, h('span', { class: 't' }, r.nome), h('span', { class: 'd' }, r.descricao))),
+    RECURSOS.map((r) => h('li', { class: 'lin-bloco', testid: r.testid }, h('span', { class: 't' }, r.nome), h('span', { class: 'd' }, r.descricao))),
   );
 }
 

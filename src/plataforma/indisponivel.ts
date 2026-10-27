@@ -1,4 +1,4 @@
-// Provedor "Indisponível": navegador comum, fora da TWA da Google Play (D-02, US-11.CA7).
+// Provedor "Indisponível": fora do app Android (desenvolvimento no navegador) ou sem a Google Play (US-11.CA7, US-24.CA9).
 import type { ProvedorCompra, ResultadoCompra } from './provedor';
 
 export class ProvedorIndisponivel implements ProvedorCompra {

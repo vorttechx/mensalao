@@ -1,4 +1,5 @@
 // Fluxos de exportar/importar backup na interface (usados em Ajustes e na recuperação de dados).
+import { criarSalvadorArquivos } from '@ambiente';
 import { gerarBackup, lerBackup, mensagensErroBackup, nomeArquivoBackup } from '../domain/backup';
 import type { Estado } from '../domain/tipos';
 import { contarAtivas, LIMITE_GRATIS } from '../domain/plano';
@@ -9,18 +10,32 @@ import { confirmar } from './componentes';
 import { h } from './dom';
 import { avisar } from './navegacao';
 
-/** Baixa o arquivo JSON (blob local, sem rede) e devolve o nome usado. */
-export function exportarBackup(): string {
+import type { ResultadoArquivo } from '../plataforma/provedor';
+
+/** Download do navegador ou gravação + compartilhar do Android (US-24.CA11). Nada sai do aparelho sozinho. */
+export const salvadorArquivos = criarSalvadorArquivos();
+
+/**
+ * Gera o arquivo JSON e o entrega; devolve o nome usado e o resultado. A exportação só conta (lembrete
+ * de backup do Pro) quando o arquivo foi entregue.
+ */
+export async function exportarBackup(): Promise<{ nome: string; resultado: ResultadoArquivo }> {
   const nome = nomeArquivoBackup(hoje());
   const conteudo = JSON.stringify(gerarBackup(obterEstado(), new Date().toISOString()), null, 2);
-  const url = URL.createObjectURL(new Blob([conteudo], { type: 'application/json' }));
-  const a = h('a', { href: url, download: nome, hidden: true });
-  document.body.append(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  registrarExportacao();
-  return nome;
+  const resultado = await salvadorArquivos.salvar(nome, conteudo, 'application/json');
+  if (resultado === 'ok') registrarExportacao();
+  return { nome, resultado };
+}
+
+/** Aviso de erro comum aos arquivos (folha de compartilhar fechada não gera aviso, design 15.6). */
+export const LINHAS_ERRO_ARQUIVO = ['Não foi possível gerar o arquivo. Tente de novo.'];
+
+/** "Exportar backup" de Ajustes e do lembrete de backup: entrega o arquivo e agenda o aviso de sempre. */
+export async function exportarBackupComAviso(aoTerminar: () => void): Promise<void> {
+  const { nome, resultado } = await exportarBackup();
+  if (resultado === 'ok') avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
+  if (resultado === 'erro') avisar({ tipo: 'erro', linhas: LINHAS_ERRO_ARQUIVO, testid: 'export-erro' });
+  aoTerminar();
 }
 
 function plural(n: number): string {

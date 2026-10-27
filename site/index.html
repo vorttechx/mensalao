@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="theme-color" content="#0F1512" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="./icons/icone.svg" />
+    <link rel="stylesheet" href="./pagina.css" />
+    <meta name="description" content="Mensalão: controle suas assinaturas sem conectar ao banco. App para celular Android." />
+    <title>Mensalão: controle de assinaturas</title>
+    <script src="./site.js" defer></script>
+  </head>
+  <body>
+    <div class="pagina" data-testid="site-apresentacao">
+      <header class="site-topo"><svg viewBox="0 0 512 512" aria-hidden="true" focusable="false"><rect width="512" height="512" fill="#1D5C3F"/><rect x="112" y="356" width="288" height="12" rx="6" fill="#FFFFFF"/><rect x="136" y="236" width="36" height="120" rx="4" fill="#FFFFFF"/><rect x="200" y="176" width="36" height="180" rx="4" fill="#FFFFFF"/><rect x="264" y="276" width="36" height="80" rx="4" fill="#FFFFFF"/><rect x="336" y="144" width="12" height="248" rx="6" fill="#9FD8B8"/></svg><span>Mensalão</span></header>
+      <main>
+        <h1>Controle suas assinaturas sem conectar ao banco.</h1>
+        <p class="site-lead">Quanto sai por mês, em que dia e para quem. Suas assinaturas ficam só no seu celular.</p>
+        <div class="site-acao" id="site-acao">
+          <p class="nota" data-testid="site-so-celular">O Mensalão é um app para celular Android. Não há versão para navegador.</p>
+          <!--PLAY--><p class="site-embreve" data-testid="site-play-em-breve">Em breve na Google Play</p><!--/PLAY-->
+        </div>
+        <figure class="site-exemplo">
+          <div aria-hidden="true">
+            <p class="rotulo">Total por mês</p>
+            <p class="total"><span class="rs">R$</span>189<span class="ct">,59</span></p>
+            <div class="ex-regua"><b class="pago d5"></b><b class="d18"></b><b class="d19"></b><b class="d21"></b><b class="d25"></b><span class="hoje"></span></div>
+            <div class="ex-item"><span class="ex-mono sp">Sp</span><span class="ex-corpo"><span class="nome">Spotify</span><span class="valor">R$ 21,90</span><span class="meta">hoje · Pix Automático</span></span></div>
+            <div class="ex-item"><span class="ex-mono n">N</span><span class="ex-corpo"><span class="nome">Netflix</span><span class="valor">R$ 44,90</span><span class="meta">Seg, 19 out · Cartão</span></span></div>
+          </div>
+          <figcaption>Exemplo da tela inicial do app, com dados de exemplo.</figcaption>
+        </figure>
+        <dl class="site-fatos">
+          <div><dt>Sem senha de banco</dt><dd>Você cadastra cada assinatura; o app não se conecta a nenhum banco.</dd></div>
+          <div><dt>Avisa o que vence</dt><dd>As próximas cobranças, em ordem, com destaque para os próximos dias.</dd></div>
+          <div><dt>Grátis, com anúncios discretos</dt><dd>Até 5 assinaturas ativas. O Pro é compra única e tira os anúncios.</dd></div>
+        </dl>
+      </main>
+      <footer class="site-rodape">
+        <a href="./privacidade.html" data-testid="site-link-privacidade">Política de privacidade</a>
+        <a href="mailto:contato@mensalao.app" data-testid="site-contato">contato@mensalao.app</a>
+        <small>© 2026 Mensalão</small>
+      </footer>
+    </div>
+  </body>
+</html>

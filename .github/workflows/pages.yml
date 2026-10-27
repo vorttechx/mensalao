@@ -1,4 +1,6 @@
-# Publica o app no GitHub Pages a cada push na main (ou manualmente pela aba Actions).
+# Publica o SITE (mensalao.app: apresentação, política, app-ads.txt e sw.js de autodestruição) no GitHub
+# Pages a cada push na main (ou pela aba Actions). O app NÃO é publicado: ele só existe no pacote Android
+# (US-31.CA1/CA12). O build do app continua sendo gerado e verificado aqui, mas não sobe.
 name: Publicar no GitHub Pages
 
 on:
@@ -26,14 +28,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      # Gera os builds de produção e de teste e falha se o provedor falso estiver na produção (US-12.CA14).
+      # Builds do app (produção e teste), cap sync, site e todas as verificações (provedores falsos, IDs do
+      # AdMob, domínios de anúncio, URLs externas e a pasta do site sem o app web).
       - run: npm run verificar:bundle
         env:
-          # Domínio próprio (D-05): defina a variável MENSALAO_DOMINIO no repositório para gravar o CNAME.
+          # Domínio próprio: a variável MENSALAO_DOMINIO grava o CNAME na pasta do site.
           MENSALAO_DOMINIO: ${{ vars.MENSALAO_DOMINIO }}
+          # Ficha da Play (R-21): enquanto vazia, a página mostra "Em breve na Google Play".
+          MENSALAO_URL_PLAY: ${{ vars.MENSALAO_URL_PLAY }}
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: dist-site
 
   deploy:
     needs: build

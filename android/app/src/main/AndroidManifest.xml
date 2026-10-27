@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mensalão (US-24): app Capacitor. Permissões só as necessárias (revisão do Segurança, US-24.CA14). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      allowBackup=false e regras de extração vazias: as assinaturas (localStorage da WebView) não vão para o
+      backup do Google nem para a transferência entre aparelhos sem a pessoa saber. O backup é o arquivo JSON
+      que ela exporta (US-07). Decisão registrada em dev-notes.md (US-24.CA14).
+    -->
+    <application
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- Exportar backup/planilha: o arquivo fica no cache do app e é entregue à folha de compartilhar. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!--
+          ID do app no AdMob. Vem do build (app/build.gradle, manifestPlaceholders): debug usa o ID de TESTE do
+          Google; release exige MENSALAO_ADMOB_APP_ID real. Nunca fixo aqui (US-30.CA1).
+        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+        <!-- Só inicia o SDK de anúncios quando o app pede (depois do plano e do consentimento, US-25.CA15). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
+            android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
+            android:value="true" />
+        <!-- SEC-02: a medição do SDK só começa quando o app chama MobileAds.initialize (só no grátis, depois do consentimento). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
+            android:value="true" />
+    </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Identificador de publicidade (Android 13+), declarado também na Play (US-29.CA6). -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <!-- Lembretes do Pro: notificação local (Android 13+ pede ao ligar o lembrete, US-24.CA7). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!--
+      O plugin de notificações declara permissões para notificações AGENDADAS; o Mensalão só mostra
+      notificação na hora (ao abrir o app), então elas saem do manifesto final.
+    -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" tools:node="remove" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" tools:node="remove" />
+</manifest>

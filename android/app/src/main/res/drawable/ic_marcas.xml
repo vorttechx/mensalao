@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Marcas do ícone do Mensalão (public/icons/icone.svg, design 5.2), sem o fundo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp" android:height="96dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+    <path android:fillColor="#FFFFFF" android:pathData="M118,356h276a6,6 0,0 1,6 6a6,6 0,0 1,-6 6h-276a6,6 0,0 1,-6 -6a6,6 0,0 1,6 -6z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M140,236h28a4,4 0,0 1,4 4v116h-36v-116a4,4 0,0 1,4 -4z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M204,176h28a4,4 0,0 1,4 4v176h-36v-176a4,4 0,0 1,4 -4z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M268,276h28a4,4 0,0 1,4 4v76h-36v-76a4,4 0,0 1,4 -4z" />
+    <path android:fillColor="#9FD8B8" android:pathData="M342,144a6,6 0,0 1,6 6v236a6,6 0,0 1,-12 0v-236a6,6 0,0 1,6 -6z" />
+</vector>

@@ -1,0 +1,2 @@
+# app-ads.txt do Mensalão (US-29.CA7). O Renato troca o marcador pelo ID de editor do AdMob antes de publicar.
+google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

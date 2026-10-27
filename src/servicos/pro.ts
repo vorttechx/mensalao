@@ -13,6 +13,7 @@ import {
   type Disponibilidade,
   type EstadoPro,
 } from '../domain/pro';
+import { planoParaAnuncios, type PlanoAnuncios } from '../domain/anuncios';
 import { comPrazo, type ProvedorCompra, type ResultadoCompra } from '../plataforma/provedor';
 
 /** Prazo da loja na verificação ao abrir e na restauração (depois disso, "sem resposta"). */
@@ -51,6 +52,11 @@ function gravarCache(novo: EstadoPro): void {
 
 export function ehPro(): boolean {
   return proEfetivo({ disponibilidade, confirmacao, cache });
+}
+
+/** Plano visto pelos anúncios (regra conservadora D-08): grátis só depois de a loja responder sem a compra. */
+export function planoAnuncios(): PlanoAnuncios {
+  return planoParaAnuncios({ confirmacao, cache });
 }
 
 export function obterDisponibilidade(): Disponibilidade {

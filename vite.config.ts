@@ -12,8 +12,9 @@ function arquivosPublicos(dir: string, raiz = dir): string[] {
 }
 
 /**
- * Gera o service worker (sw.js) no build com a lista de todos os arquivos do app,
- * para funcionar offline após o primeiro acesso (US-08). Sem dependências externas.
+ * Gera o service worker (sw.js) no build com a lista de todos os arquivos do app, para o app aberto no
+ * navegador (build de teste e desenvolvimento) funcionar offline (US-08). No app Android ele não é registrado
+ * (main.ts): os arquivos já estão no pacote. O sw.js do site público é outro (site/sw.js, de autodestruição).
  */
 function serviceWorker(): Plugin {
   return {
@@ -21,9 +22,8 @@ function serviceWorker(): Plugin {
     apply: 'build',
     // writeBundle: o bundle já está completo (inclui as páginas HTML e sem os chunks vazios removidos pelo Vite).
     writeBundle(opcoes, bundle) {
-      // .well-known/assetlinks.json e CNAME são para a TWA e o Pages, não para o cache offline.
       const arquivos = ['./', 'index.html', ...Object.keys(bundle), ...arquivosPublicos('public')]
-        .filter((f) => f !== 'sw.js' && f !== 'CNAME' && !f.startsWith('.well-known/'))
+        .filter((f) => f !== 'sw.js')
         .filter((f, i, todos) => todos.indexOf(f) === i);
       const versao = createHash('sha256').update(arquivos.join('|')).digest('hex').slice(0, 12);
       const codigo = `// Gerado no build (vite.config.ts). Cache do app para uso offline.
@@ -77,40 +77,85 @@ self.addEventListener('notificationclick', (ev) => {
 }
 
 /**
- * Domínio próprio no GitHub Pages (D-05, E-02): com MENSALAO_DOMINIO definido (ex.: mensalao.com.br),
- * o build grava o arquivo CNAME. Sem a variável, nada muda (o Pages atual continua funcionando).
+ * US-29.CA8 / SUG-SEC-02: CSP por <meta> no index.html do app (WebView do Capacitor e build de teste), sem
+ * 'unsafe-inline' e sem nenhum domínio de anúncio: o SDK do AdMob roda na camada nativa, fora da página.
+ * Só no build (o servidor de desenvolvimento do Vite injeta script inline para o recarregamento).
  */
-function cname(): Plugin {
+export const CSP_APP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ');
+
+function csp(): Plugin {
   return {
-    name: 'mensalao-cname',
+    name: 'mensalao-csp',
     apply: 'build',
-    generateBundle() {
-      const dominio = process.env.MENSALAO_DOMINIO?.trim();
-      if (dominio) this.emitFile({ type: 'asset', fileName: 'CNAME', source: `${dominio}\n` });
+    transformIndexHtml: {
+      order: 'post',
+      handler(html) {
+        const metas = `<meta http-equiv="Content-Security-Policy" content="${CSP_APP}" />\n    <meta name="referrer" content="no-referrer" />\n    `;
+        return html.replace('<meta name="viewport"', `${metas}<meta name="viewport"`);
+      },
     },
   };
 }
 
-// base relativa: o build funciona em qualquer subdiretório (ex.: /apps/mensalao/).
+/** IDs de teste oficiais do Google (iguais a src/plataforma/ids-anuncios.ts). */
+const IDS_TESTE = { banner: 'ca-app-pub-3940256099942544/9214589741', premiado: 'ca-app-pub-3940256099942544/5224354917' };
+const EDITOR_TESTE = '3940256099942544';
+const FORMATO_BLOCO = /^ca-app-pub-\d{16}\/\d{10}$/;
+
+/**
+ * Configuração de anúncios injetada no bundle (__MENSALAO_ANUNCIOS__), US-30.CA1/CA2:
+ * - todo build (desenvolvimento, teste, CI, APK de debug): só os IDs de TESTE do Google;
+ * - MENSALAO_ANUNCIOS=producao (scripts/android.mjs aab): os IDs REAIS vêm de MENSALAO_ADMOB_BANNER_ID e
+ *   MENSALAO_ADMOB_PREMIADO_ID; o build falha se faltarem, se o formato estiver errado ou se forem de teste.
+ *   Na produção não há região simulada do UMP nem aparelho de teste.
+ * Os IDs reais nunca são escritos em arquivo do repositório: só existem nas variáveis da máquina de quem gera o .aab.
+ */
+function configAnuncios(teste: boolean) {
+  if (process.env.MENSALAO_ANUNCIOS?.trim() !== 'producao') {
+    return { ...IDS_TESTE, teste: true, umpDepuracao: process.env.MENSALAO_UMP_DEPURACAO?.trim() ?? '', aparelhosTeste: [] as string[] };
+  }
+  if (teste) throw new Error('MENSALAO_ANUNCIOS=producao não vale para o build de teste (--mode teste).');
+  const banner = process.env.MENSALAO_ADMOB_BANNER_ID?.trim() ?? '';
+  const premiado = process.env.MENSALAO_ADMOB_PREMIADO_ID?.trim() ?? '';
+  for (const [nome, id] of [['MENSALAO_ADMOB_BANNER_ID', banner], ['MENSALAO_ADMOB_PREMIADO_ID', premiado]] as const) {
+    if (!FORMATO_BLOCO.test(id)) throw new Error(`${nome} ausente ou fora do formato ca-app-pub-<16 dígitos>/<10 dígitos>.`);
+    if (id.includes(EDITOR_TESTE)) throw new Error(`${nome} é um ID de teste do Google: o build de produção exige o ID real.`);
+  }
+  return { banner, premiado, teste: false, umpDepuracao: '', aparelhosTeste: [] as string[] };
+}
+
+// base relativa: o build funciona dentro do app (Capacitor serve dist/ a partir da raiz) e em qualquer subdiretório.
 // Build de teste (US-12.CA14 a CA16): `vite build --mode teste` (VITE_MODO=teste em .env.teste) troca o
 // alias "@ambiente" para o ambiente de teste, com o provedor falso, e grava em dist-teste/. O build de
-// produção usa ambiente.producao.ts, que não importa o provedor falso: ele não chega ao bundle.
+// produção (dist/, que o Capacitor copia para o app Android) usa ambiente.android.ts, que não importa o
+// provedor falso: ele não chega ao bundle. O dist/ não é publicado na web (US-31).
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
   const teste = (process.env.VITE_MODO ?? env.VITE_MODO) === 'teste';
   return {
     base: './',
+    define: { __MENSALAO_ANUNCIOS__: JSON.stringify(configAnuncios(teste)) },
     resolve: {
       alias: {
-        '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'producao'}.ts`),
+        '@ambiente': resolve(__dirname, `src/plataforma/ambiente.${teste ? 'teste' : 'android'}.ts`),
       },
     },
     build: {
       target: 'es2022',
       outDir: teste ? 'dist-teste' : 'dist',
-      // Duas páginas: o app e a política de privacidade (E-05), ambas no cache offline.
-      rollupOptions: { input: { main: resolve(__dirname, 'index.html'), privacidade: resolve(__dirname, 'privacidade.html') } },
+      // A política (public/privacidade.html + public/pagina.css) é estática e vai como está: a mesma página
+      // no pacote do app (aberta sem rede) e no site público (US-29.CA3, US-31).
+      rollupOptions: { input: { main: resolve(__dirname, 'index.html') } },
     },
-    plugins: [serviceWorker(), cname()],
+    plugins: [csp(), serviceWorker()],
   };
 });

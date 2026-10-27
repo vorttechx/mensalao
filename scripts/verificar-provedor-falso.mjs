@@ -1,12 +1,14 @@
-// US-12.CA14 — Verifica que o provedor de compra FALSO e os controles de teste não estão no build de
-// produção (dist/) e que estão no build de teste (dist-teste/). Falha (código 1) se algo estiver errado.
-// Uso: npm run verificar:bundle (gera os dois builds e roda esta verificação)
+// US-12.CA14 / US-24.CA10 — Verifica que os provedores FALSOS e os controles de teste não estão no build de
+// produção (dist/, que só alimenta o app Android) nem no conteúdo web do pacote Android
+// (android/app/src/main/assets/public/, criado por `npx cap sync android`), e que estão no build de teste
+// (dist-teste/). Falha (código 1) se algo estiver errado.
+// Uso: npm run verificar:bundle (gera os builds e roda esta verificação)
 //      node scripts/verificar-provedor-falso.mjs [pasta-producao] [pasta-teste]
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-// Identificadores que só existem no código de teste (src/plataforma/falso.ts, notificador-falso.ts e ambiente.teste.ts).
-const MARCADORES = ['provedor-falso-mensalao', 'mensalao:teste:provedor', 'mensalao:teste:notificacao', '__mensalaoTeste'];
+// Identificadores que só existem no código de teste (src/plataforma/falso.ts, notificador-falso.ts, anuncios-falso.ts e ambiente.teste.ts).
+const MARCADORES = ['provedor-falso-mensalao', 'mensalao:teste:provedor', 'mensalao:teste:notificacao', '__mensalaoTeste', 'anuncios-falso-mensalao', 'mensalao:teste:anuncios'];
 const EXTENSOES = /\.(js|mjs|cjs|html|json|webmanifest|map|txt)$/;
 
 const [pastaProducao = 'dist', pastaTeste = 'dist-teste'] = process.argv.slice(2);
@@ -37,13 +39,20 @@ for (const [dir, nome] of [[pastaProducao, 'produção'], [pastaTeste, 'teste']]
 }
 if (falhou) process.exit(1);
 
-const prod = procurar(pastaProducao);
-if (Object.keys(prod).length > 0) {
-  falhou = true;
-  console.error(`ERRO: o build de produção (${pastaProducao}/) contém o provedor falso ou controles de teste:`);
-  for (const [m, arqs] of Object.entries(prod)) console.error(`  "${m}" em ${arqs.join(', ')}`);
-} else {
-  console.log(`OK: ${pastaProducao}/ (produção) não contém o provedor falso nem controles de teste.`);
+// Conteúdo web do app Android: só existe depois de `npx cap sync android` (a CI roda o sync antes).
+const PASTA_ANDROID = 'android/app/src/main/assets/public';
+const pastasProducao = [pastaProducao, ...(existsSync(PASTA_ANDROID) ? [PASTA_ANDROID] : [])];
+if (!existsSync(PASTA_ANDROID)) console.log(`AVISO: ${PASTA_ANDROID}/ não existe (rode "npx cap sync android" para conferir o pacote Android).`);
+
+for (const pasta of pastasProducao) {
+  const prod = procurar(pasta);
+  if (Object.keys(prod).length > 0) {
+    falhou = true;
+    console.error(`ERRO: o build de produção (${pasta}/) contém o provedor falso ou controles de teste:`);
+    for (const [m, arqs] of Object.entries(prod)) console.error(`  "${m}" em ${arqs.join(', ')}`);
+  } else {
+    console.log(`OK: ${pasta}/ (produção) não contém o provedor falso nem controles de teste.`);
+  }
 }
 
 const teste = procurar(pastaTeste);

@@ -4,7 +4,7 @@ import { alterarDiasAviso } from '../../domain/operacoes';
 import { lerDiasAviso } from '../../domain/validacao';
 import { definirEstado, obterEstado } from '../../loja';
 import { renderizar } from '../app';
-import { exportarBackup, importarArquivo, seletorDeArquivo } from '../backup';
+import { exportarBackupComAviso, importarArquivo, seletorDeArquivo } from '../backup';
 import { linhaAcao } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
@@ -17,6 +17,8 @@ import { secaoLembretes } from './lembretes';
 import { secaoPlanilha } from './planilha';
 import { secaoAparencia } from './aparencia';
 import { secaoTemas } from './temas';
+import { secaoAnunciosPrivacidade } from './anuncios-privacidade';
+import { linhaPolitica } from '../politica';
 import type { Tela } from '../tela';
 
 function secaoAvisos(): HTMLElement {
@@ -81,11 +83,7 @@ function secaoBackup(): HTMLElement {
     h(
       'div',
       { class: 'grupo' },
-      linhaAcao('Exportar backup', () => {
-        const nome = exportarBackup();
-        avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
-        renderizar();
-      }, { testid: 'btn-exportar' }),
+      linhaAcao('Exportar backup', () => void exportarBackupComAviso(renderizar), { testid: 'btn-exportar' }),
       linhaAcao('Importar backup', seletor.abrir, { testid: 'btn-importar' }),
     ),
     seletor.input,
@@ -126,6 +124,7 @@ export function telaAjustes(): Tela {
       secaoBackup(),
       secaoAparencia(),
       secaoTemas(),
+      secaoAnunciosPrivacidade(),
       h(
         'section',
         { 'aria-labelledby': 'titulo-sobre' },
@@ -133,9 +132,23 @@ export function telaAjustes(): Tela {
         h(
           'div',
           { class: 'grupo' },
-          h('a', { class: 'lin lin-acao', href: './privacidade.html', testid: 'link-privacidade' }, h('span', {}, 'Política de privacidade'), icone('seta', 'ic seta')),
+          // US-29.CA3 / design 14.6 e 17: URL pública (sem rede, a cópia do pacote) e o contato, os dois com "↗".
+          linhaPolitica('link-privacidade'),
+          h(
+            'a',
+            { class: 'lin lin-contato', href: 'mailto:contato@mensalao.app', testid: 'link-contato' },
+            h('span', {}, 'Contato'),
+            h('span', { class: 'dado-ext' }, 'contato@mensalao.app', icone('externo', 'ic ic-ext')),
+          ),
         ),
-        h('p', { class: 'g-rodape' }, 'Mensalão não se conecta a bancos e não envia seus dados para a internet.'),
+        // US-26.CA10 / design 17: a verdade nos dois planos.
+        h(
+          'p',
+          { class: 'g-rodape', testid: 'sobre-anuncios' },
+          ehPro()
+            ? 'Mensalão não se conecta a bancos e suas assinaturas nunca saem deste celular. Sem anúncios.'
+            : 'Mensalão não se conecta a bancos e suas assinaturas nunca saem deste celular. A versão grátis mostra anúncios do Google.',
+        ),
       ),
     ],
   };

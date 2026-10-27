@@ -4,7 +4,7 @@ import { alterarBackupAutomatico, conferirCopia, diasSemExportar, lembrarDepois,
 import { obterPrefs } from '../../servicos/preferencias';
 import { ehPro } from '../../servicos/pro';
 import { renderizar } from '../app';
-import { exportarBackup } from '../backup';
+import { exportarBackupComAviso } from '../backup';
 import { botao, cartaoRecursoPro, confirmar, interruptor, selo } from '../componentes';
 import { h } from '../dom';
 import { icone } from '../icones';
@@ -131,11 +131,7 @@ export function lembreteExportar(): HTMLElement | null {
     h(
       'div',
       { class: 'acoes' },
-      botao('Exportar agora', 'texto', () => {
-        const nome = exportarBackup();
-        avisar({ tipo: 'ok', linhas: [`Backup exportado: ${nome}`], testid: 'export-ok' });
-        renderizar();
-      }, { testid: 'backup-btn-exportar' }),
+      botao('Exportar agora', 'texto', () => void exportarBackupComAviso(renderizar), { testid: 'backup-btn-exportar' }),
       botao('Lembrar depois', 'texto', () => {
         lembrarDepois();
         renderizar();

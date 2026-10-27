@@ -9,7 +9,10 @@ import {
   notificacoesEnviadas,
   type ControleNotificacao,
 } from './notificador-falso';
-import type { Notificador, ProvedorCompra } from './provedor';
+import type { ProvedorAnuncios } from './anuncios';
+import { AnunciosFalso, CONTROLE_ANUNCIOS_PADRAO, ID_ANUNCIOS_FALSO, configurarAnuncios, lerChamadasAnuncios, lerControleAnuncios, type ControleAnunciosFalso } from './anuncios-falso';
+import { SalvadorNavegador } from './arquivos';
+import type { Notificador, ProvedorCompra, SalvadorArquivos } from './provedor';
 
 export const MODO_BUILD = 'teste' as const;
 
@@ -19,6 +22,29 @@ export function criarProvedor(): ProvedorCompra {
 
 export function criarNotificador(): Notificador {
   return new NotificadorFalso();
+}
+
+/** No build de teste os arquivos saem pelo download do navegador (o Playwright espera o evento de download). */
+/** O provedor de anúncios do build de teste é sempre o falso (US-30.CA3). */
+export function criarProvedorAnuncios(): ProvedorAnuncios {
+  return new AnunciosFalso();
+}
+
+export function criarSalvadorArquivos(): SalvadorArquivos {
+  return new SalvadorNavegador();
+}
+
+/** Sem integração nativa no navegador do teste. */
+export function instalarPlataforma(): void {
+  // vazio de propósito
+}
+
+export function aplicarBarrasSistema(_escuro: boolean | null): void {
+  // sem barras nativas no navegador
+}
+
+export function usarServiceWorker(): boolean {
+  return true;
 }
 
 /** Expõe os controles do provedor falso no console/Playwright (só existe no build de teste). */
@@ -36,6 +62,13 @@ export function instalarControlesTeste(): void {
       ler: lerControleNotificacao,
       configurar: (parcial: Partial<ControleNotificacao>) => configurarNotificacao(parcial),
       enviadas: notificacoesEnviadas,
+    },
+    anuncios: {
+      id: ID_ANUNCIOS_FALSO,
+      padrao: CONTROLE_ANUNCIOS_PADRAO,
+      ler: lerControleAnuncios,
+      configurar: (parcial: Partial<ControleAnunciosFalso>) => configurarAnuncios(parcial),
+      chamadas: lerChamadasAnuncios,
     },
   };
 }

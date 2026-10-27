@@ -2,14 +2,14 @@ import { expect, test } from '@playwright/test';
 import { abrirS2, ativas, configurarProvedor, lerChave, semRolagemHorizontal } from './helpers2';
 
 test.describe('US-11 Tela Mensalão Pro e compra única', () => {
-  test('US-11.CA1: tela Pro no grátis mostra título, promessa, 6 recursos e o botão de compra', async ({ page }) => {
+  test('US-11.CA1: tela Pro no grátis mostra título, promessa, 7 recursos (com "Sem anúncios", US-26.CA1) e o botão de compra', async ({ page }) => {
     await abrirS2(page, { hash: '#/pro' });
     await expect(page.getByTestId('pro-tela')).toBeVisible();
     await expect(page.getByTestId('titulo-tela')).toHaveText('Mensalão Pro');
     await expect(page.getByTestId('pro-tela')).toContainText('Pague uma vez, use para sempre');
     await expect(page.getByTestId('pro-tela')).toContainText('Sem mensalidade e sem anúncios');
-    await expect(page.getByTestId('pro-recursos').locator('li')).toHaveCount(6);
-    for (const r of ['Assinaturas ilimitadas', 'Lembrete antes da cobrança', 'Backup automático', 'Exportar planilha CSV', 'Gráficos por categoria', 'Temas']) {
+    await expect(page.getByTestId('pro-recursos').locator('li')).toHaveCount(7);
+    for (const r of ['Assinaturas ilimitadas', 'Lembrete antes da cobrança', 'Backup automático', 'Exportar planilha CSV', 'Gráficos por categoria', 'Temas', 'Sem anúncios']) {
       await expect(page.getByTestId('pro-recursos')).toContainText(r);
     }
     await expect(page.getByTestId('pro-btn-comprar')).toBeVisible();

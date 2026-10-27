@@ -25,7 +25,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      # Gera os builds de produção e de teste e falha se o provedor falso estiver na produção (US-12.CA14).
+      # Gera os builds de produção e de teste, roda `npx cap sync android` (sem Android SDK) e falha se o
+      # provedor falso estiver na produção (US-12.CA14), se houver ID real do AdMob fora da produção, domínio
+      # de anúncio na parte web ou URL externa fora da lista permitida (US-30.CA2, US-29.CA8, US-30.CA11).
+      # Não precisa de conta AdMob, de aparelho nem de rede de anúncio (US-30.CA7).
       - run: npm run verificar:bundle
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

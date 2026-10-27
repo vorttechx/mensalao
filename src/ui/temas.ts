@@ -1,4 +1,5 @@
 // US-17 / US-19.CA5 — Temas de cor (design 2.3). Aplicados por atributo data-tema no <html> (só variáveis CSS mudam).
+import { aplicarBarrasSistema } from '@ambiente';
 import { aparenciaEfetiva, coresNavegador, temaEfetivo, type IdTema } from '../domain/preferencias';
 import { obterPrefs } from '../servicos/preferencias';
 import { ehPro } from '../servicos/pro';
@@ -43,6 +44,7 @@ export function aplicarTema(): void {
   else raiz.dataset.tema = id;
   if (aparencia === 'auto') delete raiz.dataset.aparencia;
   else raiz.dataset.aparencia = aparencia;
+  aplicarBarrasSistema(aparencia === 'auto' ? null : aparencia === 'escuro');
   const [corClara, corEscura] = coresNavegador(infoTema(id).corNavegador, aparencia);
   const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
   metas.forEach((m) => {
