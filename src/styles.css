@@ -5,6 +5,9 @@
    Tokens — tema claro (Verde-cédula)
    ===================================================================== */
 :root {
+  /* BUG-02 (sprint 4): área da barra de status no Android (edge-to-edge). O Capacitor injeta
+     --safe-area-inset-top (valor 0 quando a própria WebView já recua o conteúdo); env() cobre os demais. */
+  --area-segura-topo: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
   /* Cor */
   --cor-fundo: #FFFFFF;            /* papel: Início, Assinaturas, Totais, catálogo, formulário */
   --cor-fundo-agrupado: #F3F5F2;   /* papel agrupado: Detalhe, Ajustes, Pro */
@@ -151,7 +154,7 @@ svg.ic24 { width: 24px; height: 24px; flex: none; }
 /* =====================================================================
    Estrutura: topo, títulos e conteúdo
    ===================================================================== */
-.app { max-width: var(--largura-max); margin: 0 auto; min-height: 100vh; }
+.app { max-width: var(--largura-max); margin: 0 auto; min-height: 100vh; padding-top: var(--area-segura-topo); }
 .conteudo { padding: 0 0 var(--espaco-7); }
 .app.com-nav .conteudo { padding-bottom: calc(var(--altura-nav-atual, var(--altura-nav)) + env(safe-area-inset-bottom) + var(--espaco-7)); }
 h1:focus { outline: none; }
