@@ -8,14 +8,15 @@ test.describe('BUG-02 (sprint 4): área da barra de status', () => {
     test(`${rota}: o topo começa abaixo da barra de status informada pelo Capacitor`, async ({ page }) => {
       await abrirS2(page);
       await page.goto('./' + rota);
-      const topo = page.locator('.app > :first-child');
-      await expect(topo).toBeVisible();
-      const antes = (await topo.boundingBox())!.y;
+      await expect(page.locator('.app > :first-child')).toBeVisible();
+      // Mede sempre o elemento atual: a tela pode ser remontada (ex.: o Pro ao receber o preço).
+      const y = () => page.evaluate(() => document.querySelector('.app > :first-child')?.getBoundingClientRect().y ?? -1);
+      const antes = await y();
       await page.evaluate(() => document.documentElement.style.setProperty('--safe-area-inset-top', '32px'));
-      await expect.poll(async () => (await topo.boundingBox())!.y).toBeGreaterThanOrEqual(antes + 32 - 0.5);
+      await expect.poll(y).toBeGreaterThanOrEqual(antes + 32 - 0.5);
       // Sem o valor do Capacitor (navegador ou WebView que já recua o conteúdo), nada muda.
       await page.evaluate(() => document.documentElement.style.setProperty('--safe-area-inset-top', '0px'));
-      await expect.poll(async () => (await topo.boundingBox())!.y).toBeLessThanOrEqual(antes + 0.5);
+      await expect.poll(y).toBeLessThanOrEqual(antes + 0.5);
     });
   }
 });
