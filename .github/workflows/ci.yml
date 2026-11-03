@@ -32,7 +32,10 @@ jobs:
       - run: npm run verificar:bundle
       - run: npx playwright install --with-deps chromium
       # Diagnóstico: as fontes do runner mudam o layout dos testes com texto grande.
-      - run: fc-match sans-serif; fc-match system-ui; fc-list : family | sort -u | head -40
+      - run: |
+          fc-match sans-serif
+          fc-match system-ui
+          fc-list : family | sort -u | head -40
       - run: npm run test:e2e
       - if: failure()
         uses: actions/upload-artifact@v4
