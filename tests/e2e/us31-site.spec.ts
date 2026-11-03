@@ -313,12 +313,14 @@ test.describe('US-31.CA6 / US-29.CA7 política e app-ads.txt públicos', () => {
     expect(medidas.sw).toBeLessThanOrEqual(medidas.cw);
   });
 
-  test('app-ads.txt responde como texto simples com a linha do AdMob (marcador a preencher) e nenhum ID de teste', async ({ request }) => {
+  test('app-ads.txt responde como texto simples com a linha do AdMob (ID de editor real ou marcador) e nenhum ID de teste', async ({ request }) => {
     const r = await request.get(u('/app-ads.txt'));
     expect(r.status()).toBe(200);
     expect(r.headers()['content-type']).toMatch(/^text\/plain/);
     const linhas = (await r.text()).split('\n').filter((l) => l.trim() && !l.startsWith('#'));
-    expect(linhas).toEqual(['google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0']);
+    expect(linhas).toHaveLength(1);
+    expect(linhas[0]).toMatch(/^google\.com, pub-(XXXXXXXXXXXXXXXX|\d{16}), DIRECT, f08c47fec0942fa0$/);
+    expect(linhas[0]).not.toContain('3940256099942544');
   });
 });
 

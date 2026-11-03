@@ -62,6 +62,8 @@ describe('US-30.CA1 / CA2 / CA9 nenhum ID real de anúncio no repositório', () 
     for (const f of arquivosVersionados().filter((a) => EXT_TEXTO.test(a) && !a.endsWith('package-lock.json'))) {
       const t = readFileSync(resolve(raiz, f), 'utf8');
       for (const m of t.matchAll(/ca-app-pub-(\d{16})/g)) if (m[1] !== EDITOR_TESTE) achados.push(`${f}: ${m[0]}`);
+      // O app-ads.txt é público por definição e precisa do ID de editor real (guia, passo 8); só ele pode ter.
+      if (f === 'site/app-ads.txt') continue;
       for (const m of t.matchAll(/\bpub-(\d{16})\b/g)) if (m[1] !== EDITOR_TESTE) achados.push(`${f}: ${m[0]} (ID de editor)`);
     }
     expect(achados).toEqual([]);
