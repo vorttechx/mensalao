@@ -29,8 +29,10 @@ Ordem recomendada. Itens R-xx correspondem à seção 5.2 do backlog. Tudo o que
 ## 4. Gerar o app Android
 
 10. **Máquina**: Node 22, JDK 21 e Android Studio (ou as command-line tools com `platforms;android-36` e `build-tools;36.0.0`), com `ANDROID_HOME` definido.
+   - **Ordem dos comandos** (na pasta do repositório, atualizada com `git pull`): `npm ci` e depois `npm run android:apk`. O script faz o build web (cria `dist/`), o `npx cap sync android` e o Gradle, nessa ordem. Não rode `npx cap sync android` sozinho num clone novo: sem `dist/` ele falha com "Could not find the web assets directory". Para só sincronizar, use `npm run android:sync` (ou `npm run build` antes do `cap sync`).
    - **Teste**: `npm run android:apk` gera `android/app/build/outputs/apk/debug/app-debug.apk` com os **IDs de teste do Google** (o `.apk` de debug nunca usa IDs reais). Instale com `adb install -r app-debug.apk`.
-   - Formulário do Google simulado como EEE no aparelho: `MENSALAO_UMP_DEPURACAO=EEA npm run android:apk` (só no build de teste).
+   - Formulário do Google simulado como EEE no aparelho (só no build de teste): `MENSALAO_UMP_DEPURACAO=EEA npm run android:apk` no macOS/Linux; no Windows, `$env:MENSALAO_UMP_DEPURACAO="EEA"; npm run android:apk` (PowerShell) ou `set MENSALAO_UMP_DEPURACAO=EEA&& npm run android:apk` (cmd). As variáveis de produção abaixo seguem a mesma regra.
+   - **Windows**: evite clonar dentro de pasta sincronizada (OneDrive, Dropbox), que trava arquivos durante o build do Gradle; prefira algo como `C:\dev\mensalao`.
    - **Produção**: defina as variáveis e rode `npm run android:aab`:
 
      | Variável | O que é |
